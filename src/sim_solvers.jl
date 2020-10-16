@@ -1,6 +1,13 @@
 export solve!
 
 function solve!(sim::Simulation)
+    """
+        solve!(sim::Simulation)
+
+        Solves the `Simulation` object `sim` using the techniques its attributes specify.
+
+        See also: [`init_sim`](@ref), [`Simulation`](@ref)
+    """
     println("==========================================")
     println("Solving cubic NLSE with the following options:")
     # Copy in x = 0 array
@@ -50,6 +57,16 @@ function solve!(sim::Simulation)
 end #solve
 
 function T2(ψ, ω, dx, F)
+    """
+        T2(ψ, ω, dx, F)
+
+        Compute `ψ'`, i.e. `ψ` advanced a step `dx` forward using a symplectic second order
+        integrator. `ψ'` is defined on an FFT grid with frequencies `ω` using an FFT plan
+        `F`. Uses second order integrator. Private function that should not be called
+        explicitly. Please use `solve`.
+
+        See also: [`solve`](@ref)
+    """
     # Nonlinear
     V = -1*abs.(ψ).^2                      
     ψ .*= exp.(-im * dx/2 * (-1*abs.(ψ).^2)) 
@@ -66,6 +83,16 @@ function T2(ψ, ω, dx, F)
 end #T2
 
 function T4S(ψ, ω, dx, F)
+    """
+        T4S(ψ, ω, dx, F)
+
+        Compute `ψ'`, i.e. `ψ` advanced a step `dx` forward using a symplectic fourth order
+        integrator. `ψ'` is defined on an FFT grid with frequencies `ω` using an FFT plan
+        `F`. Uses second order integrator. Private function that should not be called
+        explicitly. Please use `solve`.
+
+        See also: [`solve`](@ref), [`T2`](@ref)
+    """
     s = 2^(1 / 3)
     os = 1 / (2 - s)
 
@@ -80,6 +107,17 @@ function T4S(ψ, ω, dx, F)
 end # T4S
 
 function T6S(ψ, ω, dx, F)
+    """
+        T6S(ψ, ω, dx, F)
+
+        Compute `ψ'`, i.e. `ψ` advanced a step `dx` forward using a symplectic sixth order
+        integrator. `ψ'` is defined on an FFT grid with frequencies `ω` using an FFT plan
+        `F`. Uses second order integrator. Private function that should not be called
+        explicitly. Please use `solve`.
+
+        See also: [`solve`](@ref), [`T4S`](@ref)
+    """
+
     s = 2^(1 / 5)
     os = 1 / (2 - s)
 
@@ -94,6 +132,17 @@ function T6S(ψ, ω, dx, F)
 end #T6S
 
 function T8S(ψ, ω, dx, F)
+    """
+        T8S(ψ, ω, dx, F)
+
+        Compute `ψ'`, i.e. `ψ` advanced a step `dx` forward using a symplectic eighth order
+        integrator. `ψ'` is defined on an FFT grid with frequencies `ω` using an FFT plan
+        `F`. Uses second order integrator. Private function that should not be called
+        explicitly. Please use `solve`.
+
+        See also: [`solve`](@ref), [`T6S`](@ref)
+    """
+
     s = 2^(1 / 7)
     os = 1 / (2 - s)
 

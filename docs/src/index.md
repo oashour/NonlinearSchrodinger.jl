@@ -12,3 +12,7 @@ The Nonlinear Schrodinger suite is a set of tools for studying the nonlinear Sch
 ```@autodocs
 Modules = [NLSS]
 ```
+
+```@docs
+solve!(sim::Simulation)
+```
