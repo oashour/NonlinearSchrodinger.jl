@@ -1,4 +1,6 @@
-# Cubic NLS
+# Theory
+
+## Cubic NLS
 
 The cubic nonlinear Schrodinger equation is given by:
 
