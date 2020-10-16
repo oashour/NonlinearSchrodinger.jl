@@ -34,6 +34,8 @@ mutable struct Simulation
     PE::Array{Float64, 1}
     KE::Array{Float64, 1}
     dE::Array{Float64, 1}
+    N::Array{Float64, 1}
+    P::Array{Float64, 1}
 end # Simulation
 
 function init_sim_params(; kwargs...)
@@ -103,6 +105,8 @@ function init_sim(box::SimulationBox, params::SimulationParameters, ψ₀::Array
     PE = similar(E)    
     KE = similar(E)
     dE = similar(E)
+    N = similar(E)
+    P = similar(E)
     if αₚ < 0 
         throw(ArgumentError("αₚ < 0. Set αₚ = 0 to disable pruning or αₚ = Inf for fixed pruning. See documentation)"))
     end
@@ -110,6 +114,6 @@ function init_sim(box::SimulationBox, params::SimulationParameters, ψ₀::Array
         throw(ArgumentError("Pruning is only applicable when n_periods > 1."))
     end
     #set_num_threads(1)
-    sim = Simulation(box, params, ψ₀, algorithm, αₚ, false, ψ, false, ψ̃, false, E, PE, KE, dE)
+    sim = Simulation(box, params, ψ₀, algorithm, αₚ, false, ψ, false, ψ̃, false, E, PE, KE, dE, N, P)
    return sim
 end #init_sim

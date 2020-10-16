@@ -1,7 +1,7 @@
 export print, ψ₀_periodic, compute_energy!, compute_spectrum!
 
 function print(sim::Simulation)
-    println("Box Properties:u")
+    println("Box Properties:")
     println("------------------------------------------")
     println("dx = $(sim.box.dx) (Nₓ = $(sim.box.Nₓ))")
     println("Nₜ = $(sim.box.dx) (dt = $(sim.box.dt))")
@@ -40,17 +40,21 @@ function compute_spectrum!(sim::Simulation)
     println("==========================================")
 end
 
-function compute_energy!(sim::Simulation)
+function compute_CoM!(sim::Simulation)
     if ~sim.spectrum_computed
-        println("Energy calculation requested without a spectrum calculation.")
+        println("CoM calculation requested without a spectrum calculation.")
         compute_spectrum!(sim)
     end
     println("==========================================")
-    println("Computing energy")
-    norm = sum(abs.(sim.ψ).^2, dims=2)[:] # ≈ Nₜ
-    norm_ω = sum(abs.(sim.ψ̃).^2, dims=2)[:] # ≈ ??
-    sim.PE = -0.5*sum(abs.(sim.ψ).^4,dims=2)[:]./norm
-    sim.KE = 0.5*sum((sim.box.ω'.^2) .* (abs.(sim.ψ̃).^2),dims=2)[:]./norm_ω
+    println("Computing constants of motions")
+    # Compute the energies
+    # Do I need to find a better way of doing these integrals?
+    # We should have 
+    # sim.norm = sum(abs.(sim.ψ).^2, dims=2)[:]*sim.box.dt/sim.box.T but dt/T = 1/Nt, thus
+    sim.N = sum(abs2.(sim.ψ), dims=2)[:]/sim.box.Nₜ
+    sim.PE = -0.5*sum(abs2.(sim.ψ).^2,dims=2)[:]./(sim.N*sim.box.Nₜ)
+    sim.KE = 0.5*sum((sim.box.ω'.^2) .* (abs2.(sim.ψ̃)),dims=2)[:]./sim.N
+    sim.P = -imag.(sum(im * (sim.box.ω') .* (abs2.(sim.ψ̃)),dims=2)[:]./sim.N)
     sim.E = sim.KE + sim.PE
     sim.dE = sim.E .- sim.E[1]
     println("Energy computed.")
@@ -71,7 +75,7 @@ function ψ₀_periodic(coeff, box::SimulationBox, params::SimulationParameters;
     println("Computing A₀ to preserve normalization.")
     A0 = sqrt(1 - 2 * sum([abs(An) .^ 2 for An in coeff]))
     println("Computed A₀ = $A0")
-    #coeff.insert(0, A0)
+    #A0 = 1
     if phase != 0
         str = "ψ₀ = exp(i $phase t) ($A0 + "
     else
