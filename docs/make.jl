@@ -8,7 +8,7 @@ makedocs(;
     sitename="NLSS.jl",
     format=Documenter.HTML(;
         prettyurls=get(ENV, "CI", "false") == "true",
-        canonical="https://oashour.github.io/NLSS.jl",
+        canonical="http://omarashour.com/NLSS.jl",
         assets=String[],
     ),
     pages=[
