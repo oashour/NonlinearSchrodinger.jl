@@ -8,7 +8,7 @@ makedocs(;
     sitename="NLSS.jl",
     format=Documenter.HTML(;
         prettyurls=get(ENV, "CI", "false") == "true",
-        canonical="https://oashour.github.io/NLSS.jl",
+        canonical="http://omarashour.com/NLSS.jl",
         assets=String[],
     ),
     pages=[
@@ -18,4 +18,8 @@ makedocs(;
 
 deploydocs(;
     repo="github.com/oashour/NLSS.jl",
+    branch = "gh-pages",
+    devbranch = "master",
+    devurl = "dev"
+    #versions = ["stable" => "v^", "v#.#", devurl => devurl],
 )
