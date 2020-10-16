@@ -18,4 +18,8 @@ makedocs(;
 
 deploydocs(;
     repo="github.com/oashour/NLSS.jl",
+    branch = "gh-pages",
+    devbranch = "master",
+    devurl = "dev"
+    #versions = ["stable" => "v^", "v#.#", devurl => devurl],
 )
