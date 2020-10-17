@@ -1,4 +1,11 @@
-function plot_CoM(sim::Simulation, x_res::Int64 = 500)
+module Plotter
+using ..Simulation
+using Plots; gr()
+Plots.GRBackend()
+using LaTeXStrings
+using FFTW
+
+function plot_CoM(sim::Sim, x_res::Int64 = 500)
     println("Plotting energy with a resolution of $x_res")
     xₛ = Int(ceil(sim.box.Nₜ/x_res))
     p1 = plot(sim.box.x[1:xₛ:end], [sim.E[1:xₛ:end], sim.KE[1:xₛ:end], sim.PE[1:xₛ:end]], label = [L"E" L"T" L"V"])
@@ -24,7 +31,7 @@ function plot_CoM(sim::Simulation, x_res::Int64 = 500)
 
     return nothing
 end
-function plot_ψ(sim::Simulation; mode = "density", power=1, x_res=500, t_res=512)
+function plot_ψ(sim::Sim; mode = "density", power=1, x_res=500, t_res=512)
     if ~sim.solved
         throw(ArgumentError("The simulation has not been solved, unable to plot."))
     end
@@ -65,7 +72,7 @@ function plot_ψ(sim::Simulation; mode = "density", power=1, x_res=500, t_res=51
     return nothing
 end #plot_ψ
 
-function plot_ψ̃(sim::Simulation; mode = "density", x_res=500, ω_res=512, skip = 1, n_lines = 10)
+function plot_ψ̃(sim::Sim; mode = "density", x_res=500, ω_res=512, skip = 1, n_lines = 10)
     if ~sim.solved
         throw(ArgumentError("The simulation has not been solved, unable to plot."))
     end
@@ -107,3 +114,4 @@ function plot_ψ̃(sim::Simulation; mode = "density", x_res=500, ω_res=512, ski
 
     return nothing
 end #plot_ψ̃
+end

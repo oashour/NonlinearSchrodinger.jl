@@ -1,5 +1,4 @@
 export solve!
-
 """
     solve!(sim::Simulation)
 
@@ -7,7 +6,7 @@ Solves the `Simulation` object `sim` using the techniques its attributes specify
 
 See also: [`init_sim`](@ref), [`Simulation`](@ref)
 """
-function solve!(sim::Simulation)
+function solve!(sim::Sim)
     println("==========================================")
     println("Solving cubic NLSE with the following options:")
     # Copy in x = 0 array
@@ -43,7 +42,7 @@ function solve!(sim::Simulation)
         if sim.αₚ > 0 
             ψ = sim.ψ[i+1, :]
             F*ψ
-            @views ψ[ind_p] .*= exp.(-sim.αₚ*abs.(ψ[i+1, ind_p]))
+            @views ψ[ind_p] .*= exp.(-sim.αₚ*abs.(ψ[ind_p]))
             inv(F)*ψ
             sim.ψ[i+1, :] = ψ
         end

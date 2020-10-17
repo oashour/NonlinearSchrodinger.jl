@@ -1,7 +1,8 @@
 #export SimulationParameters, SimulationBox, Simulation 
 export init_sim_box, init_sim_params, init_sim
+export Sim, SimBox, SimParameters
 
-struct SimulationBox
+struct SimBox
     t::Array{Float64, 1}
     ω::Array{Float64, 1}
     x::Array{Float64, 1}
@@ -12,16 +13,16 @@ struct SimulationBox
     n_periods::Int
 end #SimulationBox
 
-struct SimulationParameters
+struct SimParameters
     λ::Complex{Float64}
     Ω::Float64
     a::Float64
     T::Float64
-end #SimulationParameters
+end #SimParameters
 
-mutable struct Simulation
-    box::SimulationBox
-    params::SimulationParameters
+mutable struct Sim
+    box::SimBox
+    params::SimParameters
     ψ₀::Array{Complex{Float64}, 1}
     algorithm::String
     αₚ::Float64
@@ -70,7 +71,7 @@ function init_sim_params(; kwargs...)
         a = (1 - (Ω / 2)^2) / 2
         λ = im * sqrt(2 * a)
     end
-    params = SimulationParameters(λ, Ω, a, T)
+    params = SimParameters(λ, Ω, a, T)
 
     println("Calculated Result: a = $a, λ = $λ, Ω = $Ω, T =$T")
     println("==========================================")
@@ -78,7 +79,7 @@ function init_sim_params(; kwargs...)
     return params
 end #init_sim_params
 
-function init_sim_box(xᵣ::Pair, params::SimulationParameters; dx = 1e-3, Nₜ = 256, n_periods::Int = 1)
+function init_sim_box(xᵣ::Pair, params::SimParameters; dx = 1e-3, Nₜ = 256, n_periods::Int = 1)
     println("==========================================")
     println("Initializing simulation box with $n_periods period(s) and dx = $dx, Nₜ = $Nₜ.")
     println("Box range is [xᵣ.first, xᵣ.second]")
@@ -90,7 +91,7 @@ function init_sim_box(xᵣ::Pair, params::SimulationParameters; dx = 1e-3, Nₜ 
     Nₓ = length(x)
     ω = 2 * π / T * (-Nₜ/2:Nₜ/2-1)
 
-    box = SimulationBox(t, ω, x, Nₜ, Nₓ, dt, dx, n_periods)
+    box = SimBox(t, ω, x, Nₜ, Nₓ, dt, dx, n_periods)
 
     println("Done computing t, x, ω")
     println("==========================================")
@@ -98,7 +99,7 @@ function init_sim_box(xᵣ::Pair, params::SimulationParameters; dx = 1e-3, Nₜ 
     return box
 end
 
-function init_sim(box::SimulationBox, params::SimulationParameters, ψ₀::Array; algorithm = "2S", αₚ = 0)
+function init_sim(box::SimBox, params::SimParameters, ψ₀::Array; algorithm = "2S", αₚ = 0)
     ψ = Array{Complex{Float64}}(undef, box.Nₓ, box.Nₜ)
     ψ̃ = similar(ψ)
     E = zeros(box.Nₓ)
@@ -114,6 +115,6 @@ function init_sim(box::SimulationBox, params::SimulationParameters, ψ₀::Array
         throw(ArgumentError("Pruning is only applicable when n_periods > 1."))
     end
     #set_num_threads(1)
-    sim = Simulation(box, params, ψ₀, algorithm, αₚ, false, ψ, false, ψ̃, false, E, PE, KE, dE, N, P)
+    sim = Sim(box, params, ψ₀, algorithm, αₚ, false, ψ, false, ψ̃, false, E, PE, KE, dE, N, P)
    return sim
 end #init_sim

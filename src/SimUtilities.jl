@@ -1,6 +1,6 @@
 export print, ψ₀_periodic, compute_energy!, compute_spectrum!
 
-function print(sim::Simulation)
+function print(sim::Sim)
     println("Box Properties:")
     println("------------------------------------------")
     println("dx = $(sim.box.dx) (Nₓ = $(sim.box.Nₓ))")
@@ -27,7 +27,7 @@ function print(sim::Simulation)
     println("------------------------------------------")
 end
 
-function compute_spectrum!(sim::Simulation)
+function compute_spectrum!(sim::Sim)
     println("==========================================")
     println("Computing spectrum")
     if sim.solved
@@ -40,7 +40,7 @@ function compute_spectrum!(sim::Simulation)
     println("==========================================")
 end
 
-function compute_CoM!(sim::Simulation)
+function compute_CoM!(sim::Sim)
     if ~sim.spectrum_computed
         println("CoM calculation requested without a spectrum calculation.")
         compute_spectrum!(sim)
@@ -61,7 +61,7 @@ function compute_CoM!(sim::Simulation)
     println("==========================================")
 end
 
-function ψ₀_periodic(coeff, box::SimulationBox, params::SimulationParameters; phase=0)
+function ψ₀_periodic(coeff, box::SimBox, params::SimParameters; phase=0)
     println("==========================================")
     println("Initializing periodic ψ₀")
     for (n, An) in enumerate(coeff)
