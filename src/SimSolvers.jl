@@ -4,7 +4,7 @@ export solve!
 
 Solves the `Simulation` object `sim` using the techniques its attributes specify.
 
-See also: [`init_sim`](@ref), [`Simulation`](@ref)
+See also: [`init_sim`](@ref), [`NLSS.Plotter.plot_ψ`](@ref)
 """
 function solve!(sim::Sim)
     println("==========================================")
@@ -60,7 +60,7 @@ end #solve
 
 Compute `ψ'`, i.e. `ψ` advanced a step `dx` forward using a symplectic second order
 integrator. `ψ'` is defined on an FFT grid with frequencies `ω` using an FFT plan
-`F`. Do not call this explicitly and use `solve` instead.
+`F`. Do not call this explicitly and use `solve!` instead.
 
 See also: [`solve!`](@ref)
 """
@@ -85,7 +85,7 @@ end #T2
 
 Compute `ψ'`, i.e. `ψ` advanced a step `dx` forward using a symplectic fourth order
 integrator. `ψ'` is defined on an FFT grid with frequencies `ω` using an FFT plan
-`F`. Do not call this explicitly and use `solve` instead.
+`F`. Do not call this explicitly and use `solve!` instead.
 
 See also: [`solve!`](@ref), [`T2`](@ref)
 """
@@ -108,7 +108,7 @@ end # T4S
 
 Compute `ψ'`, i.e. `ψ` advanced a step `dx` forward using a symplectic sixth order
 integrator. `ψ'` is defined on an FFT grid with frequencies `ω` using an FFT plan
-`F`. Do not call this explicitly and use `solve` instead.
+`F`. Do not call this explicitly and use `solve!` instead.
 
 See also: [`solve!`](@ref), [`T4S`](@ref)
 """
@@ -132,7 +132,7 @@ end #T6S
 
 Compute `ψ'`, i.e. `ψ` advanced a step `dx` forward using a symplectic eighth order
 integrator. `ψ'` is defined on an FFT grid with frequencies `ω` using an FFT plan
-`F`. Do not call this explicitly and use `solve` instead.
+`F`. Do not call this explicitly and use `solve!` instead.
 
 See also: [`solve!`](@ref), [`T6S`](@ref)
 """
