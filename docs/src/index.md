@@ -31,11 +31,11 @@ Depth = 1
 ## Library Outline
 
 ```@contents
-Pages = ["lib/public.md", "lib/private.md"]
+Pages = ["library.md"]
 ```
 
 ### [Index](@id main-index)
 
 ```@index
-Pages = ["lib/public.md"]
+Pages = ["library.md"]
 ```

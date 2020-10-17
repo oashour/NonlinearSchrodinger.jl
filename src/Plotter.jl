@@ -5,7 +5,18 @@ Plots.GRBackend()
 using LaTeXStrings
 using FFTW
 
-function plot_CoM(sim::Sim, x_res::Int64 = 500)
+export plot_ψ, plot_ψ̃, plot_CoM
+
+"""
+    function plot_CoM(sim::Sim, x_res::Int64 = 500)
+
+Plots the integrals of motion for a `Sim` object `sim` with a resolution `x_res` points in
+the x-direction. Produces plots of the energy, kinetic energy, potential energy, energy
+error, particle number and momentum
+
+See also: [`Simulation.compute_CoM!`](@ref)
+"""
+function plot_CoM(sim::Sim, x_res = 500)
     println("Plotting energy with a resolution of $x_res")
     xₛ = Int(ceil(sim.box.Nₜ/x_res))
     p1 = plot(sim.box.x[1:xₛ:end], [sim.E[1:xₛ:end], sim.KE[1:xₛ:end], sim.PE[1:xₛ:end]], label = [L"E" L"T" L"V"])
@@ -31,6 +42,18 @@ function plot_CoM(sim::Sim, x_res::Int64 = 500)
 
     return nothing
 end
+
+"""
+    plot_ψ(sim::Sim; mode = "density", power=1, x_res=500, t_res=512)
+
+Plot `sim.abs.(ψ).^power` on a grid of size approximately `t_res`x`x_res`
+The function can plot either a heatmap (`mode = "density"`) or a 3D surface
+(`mode = "surface"`)
+
+**TODO:** Insert pictures here
+
+See also: [`Simulation.solve!`](@ref)
+"""
 function plot_ψ(sim::Sim; mode = "density", power=1, x_res=500, t_res=512)
     if ~sim.solved
         throw(ArgumentError("The simulation has not been solved, unable to plot."))
@@ -72,6 +95,17 @@ function plot_ψ(sim::Sim; mode = "density", power=1, x_res=500, t_res=512)
     return nothing
 end #plot_ψ
 
+"""
+    plot_ψ̃(sim::Sim; mode = "density", power=1, x_res=500, t_res=512)
+
+Plot `log(sim.abs.(ψ))` on a grid of size approximately `ω_res`x`x_res`
+if `mode = density`, or with `n_lines` total, skipping `skip` between each 
+line if `mode = lines`. The latter uses `x_res` points as well.
+
+**TODO:** Insert pictures here
+
+See also: [`Simulation.compute_spectrum!`](@ref)
+"""
 function plot_ψ̃(sim::Sim; mode = "density", x_res=500, ω_res=512, skip = 1, n_lines = 10)
     if ~sim.solved
         throw(ArgumentError("The simulation has not been solved, unable to plot."))

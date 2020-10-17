@@ -1,5 +1,10 @@
 export print, ψ₀_periodic, compute_energy!, compute_spectrum!
 
+"""
+    function print(sim::Sim)
+
+Prints information about the `Sim` instance `sim`
+"""
 function print(sim::Sim)
     println("Box Properties:")
     println("------------------------------------------")
@@ -27,6 +32,14 @@ function print(sim::Sim)
     println("------------------------------------------")
 end
 
+"""
+    function compute_spectrum!(sim::Sim)
+
+Computes the normalized spectrum of `sim.ψ` with the center frequency shifted to the center
+and saves it in `sim.ψ̃`
+
+See also: [`NLSS.Plotter.plot_ψ̃`](@ref)
+"""
 function compute_spectrum!(sim::Sim)
     println("==========================================")
     println("Computing spectrum")
@@ -40,6 +53,13 @@ function compute_spectrum!(sim::Sim)
     println("==========================================")
 end
 
+"""
+    function compute_CoM!(sim::Sim)
+
+Computes the integrals of motion of `sim.ψ` and saves them in respective fields of `sim`.
+
+See also: [`NLSS.Plotter.plot_CoM`](@ref)
+"""
 function compute_CoM!(sim::Sim)
     if ~sim.spectrum_computed
         println("CoM calculation requested without a spectrum calculation.")
@@ -61,6 +81,16 @@ function compute_CoM!(sim::Sim)
     println("==========================================")
 end
 
+"""
+    function ψ₀_periodic(coeff, box::SimBox, params::SimParamseters; phase=0)
+
+Computes an initial wavefunction for the `SimBox` `box`, with fundamental frequency `sim.Ω`
+and coefficients ``A_1...n`` = `coeff` and an overall phase `exp(i phase t)`, i.e. of the form:
+
+**TODO**: insert latex form here
+
+See also: [`init_sim`](@ref)
+"""
 function ψ₀_periodic(coeff, box::SimBox, params::SimParameters; phase=0)
     println("==========================================")
     println("Initializing periodic ψ₀")
