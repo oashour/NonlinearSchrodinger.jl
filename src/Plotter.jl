@@ -1,7 +1,6 @@
 module Plotter
 using ..Simulation
-using Plots; gr()
-Plots.GRBackend()
+using Plots; gr() 
 using LaTeXStrings
 using FFTW
 
@@ -81,7 +80,7 @@ function plot_ψ(sim::Sim; mode = "density", power=1, x_res=500, t_res=512)
     # Adjust Attributes
     xlabel!(L"x")
     ylabel!(L"t")
-    xlims!((-sim.params.T/2*sim.box.n_periods, sim.params.T/2*sim.box.n_periods))
+    xlims!((-sim.T/2*sim.box.n_periods, sim.T/2*sim.box.n_periods))
     ylims!((minimum(sim.box.x), maximum(sim.box.x)))
 
     println("Plotting done!")
@@ -125,7 +124,7 @@ function plot_ψ̃(sim::Sim; mode = "density", x_res=500, ω_res=512, skip = 1, 
         p = heatmap(ω, x, log.(abs.(ψ̃)), tick_direction=:out, colorbar_title=L"\log|\tilde{\psi}|")
         xlabel!(L"\omega")
         ylabel!(L"x")
-        xlims!((-sim.box.Nₜ/2*sim.params.Ω/sim.box.n_periods, sim.box.Nₜ/2*sim.params.Ω/sim.box.n_periods))
+        xlims!((-sim.box.Nₜ/2*sim.Ω/sim.box.n_periods, sim.box.Nₜ/2*sim.Ω/sim.box.n_periods))
         ylims!((minimum(sim.box.x), maximum(sim.box.x)))
     elseif mode == "lines"
         ψ̃ = ifftshift(sim.ψ̃, 2)[1:xₛ:end, 1:skip:skip*n_lines]
