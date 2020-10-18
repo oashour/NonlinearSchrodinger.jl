@@ -35,12 +35,8 @@ function plot_CoM(sim::Sim, x_res = 500)
     xlabel!(L"x")
     ylabel!(L"N")
     xlims!((minimum(sim.box.x), maximum(sim.box.x)))
-    display(p1)
-    display(p2)
-    display(p3)
-    display(p4)
 
-    return nothing
+    return p1, p2, p3, p4
 end
 
 """
@@ -87,12 +83,11 @@ function plot_ψ(sim::Sim; mode = "density", power=1, x_res=500, t_res=512)
     ylabel!(L"t")
     xlims!((-sim.params.T/2*sim.box.n_periods, sim.params.T/2*sim.box.n_periods))
     ylims!((minimum(sim.box.x), maximum(sim.box.x)))
-    display(p)
 
     println("Plotting done!")
     println("==========================================")
 
-    return nothing
+    return p
 end #plot_ψ
 
 """
@@ -140,12 +135,10 @@ function plot_ψ̃(sim::Sim; mode = "density", x_res=500, ω_res=512, skip = 1, 
         xlabel!(L"x")
         ylabel!(L"\log|\tilde{\psi}|")
     end
-    # Adjust Attributes
-    display(p)
 
     println("Plotting done!")
     println("==========================================")
 
-    return nothing
+    return p
 end #plot_ψ̃
 end
