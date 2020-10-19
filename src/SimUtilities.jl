@@ -12,10 +12,9 @@ function print(sim::Sim)
     println("Nₜ = $(sim.box.dx) (dt = $(sim.box.dt))")
     println("Parameters:")
     println("------------------------------------------")
-    println("a = $(sim.params.a)")
-    println("λ = $(sim.params.λ)")
-    println("Ω = $(sim.params.Ω)")
-    println("T = $(sim.params.T)")
+    println("λ = $(sim.λ)")
+    println("Ω = $(sim.Ω)")
+    println("T = $(sim.T)")
     println("------------------------------------------")
     # Should add information about ψ₀
     if sim.algorithm == "2S"
@@ -91,7 +90,7 @@ and coefficients ``A_1...n`` = `coeff` and an overall phase `exp(i phase t)`, i.
 
 See also: [`init_sim`](@ref)
 """
-function ψ₀_periodic(coeff, box::SimBox, params::SimParameters; phase=0)
+function ψ₀_periodic(coeff, box::Box, Ω; phase=0)
     println("==========================================")
     println("Initializing periodic ψ₀")
     for (n, An) in enumerate(coeff)
@@ -114,8 +113,8 @@ function ψ₀_periodic(coeff, box::SimBox, params::SimParameters; phase=0)
 
     ψ₀ = A0 * ones(box.Nₜ)
     for (n, An) in enumerate(coeff)
-        ψ₀ += 2 * An * cos.(n * params.Ω * box.t)
-        str = string(str, "2 × $An × cos($n × $(params.Ω) t)")
+        ψ₀ += 2 * An * cos.(n * Ω * box.t)
+        str = string(str, "2 × $An × cos($n × $(Ω) t)")
     end #for
     # Multiply by the overall phase
     ψ₀ = exp.(im * phase * box.t) .* ψ₀
