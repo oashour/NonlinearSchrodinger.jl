@@ -30,3 +30,9 @@ Order   = [:type, :function]
 Modules = [NLSS.Plotter]
 Order   = [:function, :type]
 ```
+
+## Utilities
+```@autodocs
+Modules = [NLSS.Utilities]
+Order   = [:type, :function]
+```
