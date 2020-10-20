@@ -15,25 +15,25 @@ error, particle number and momentum
 
 See also: [`Simulation.compute_CoM!`](@ref)
 """
-function plot_CoM(sim::Sim, x_res = 500)
+function plot_CoM(obj, x_res = 500)
     println("Plotting energy with a resolution of $x_res")
-    xₛ = Int(ceil(sim.box.Nₜ/x_res))
-    p1 = plot(sim.box.x[1:xₛ:end], [sim.E[1:xₛ:end], sim.KE[1:xₛ:end], sim.PE[1:xₛ:end]], label = [L"E" L"T" L"V"])
+    xₛ = Int(ceil(obj.box.Nₜ/x_res))
+    p1 = plot(obj.box.x[1:xₛ:end], [obj.E[1:xₛ:end], obj.KE[1:xₛ:end], obj.PE[1:xₛ:end]], label = [L"E" L"T" L"V"])
     xlabel!(L"x")
     ylabel!(L"E")
-    xlims!((minimum(sim.box.x), maximum(sim.box.x)))
-    p2 = plot(sim.box.x[1:xₛ:end], sim.dE[1:xₛ:end], label = "")
+    xlims!((minimum(obj.box.x), maximum(obj.box.x)))
+    p2 = plot(obj.box.x[1:xₛ:end], obj.dE[1:xₛ:end], label = "")
     xlabel!(L"x")
     ylabel!(L"\delta E")
-    xlims!((minimum(sim.box.x), maximum(sim.box.x)))
-    p3 = plot(sim.box.x[1:xₛ:end], [sim.P[1:xₛ:end]], label = "")
+    xlims!((minimum(obj.box.x), maximum(obj.box.x)))
+    p3 = plot(obj.box.x[1:xₛ:end], [obj.P[1:xₛ:end]], label = "")
     xlabel!(L"x")
     ylabel!(L"P")
-    xlims!((minimum(sim.box.x), maximum(sim.box.x)))
-    p4 = plot(sim.box.x[1:xₛ:end], [sim.N[1:xₛ:end]], label = "")
+    xlims!((minimum(obj.box.x), maximum(obj.box.x)))
+    p4 = plot(obj.box.x[1:xₛ:end], [obj.N[1:xₛ:end]], label = "")
     xlabel!(L"x")
     ylabel!(L"N")
-    xlims!((minimum(sim.box.x), maximum(sim.box.x)))
+    xlims!((minimum(obj.box.x), maximum(obj.box.x)))
 
     return p1, p2, p3, p4
 end
@@ -49,7 +49,7 @@ The function can plot either a heatmap (`mode = "density"`) or a 3D surface
 
 See also: [`Simulation.solve!`](@ref)
 """
-function plot_ψ(sim::Sim; mode = "density", power=1, x_res=500, t_res=512)
+function plot_ψ(sim; mode = "density", power=1, x_res=500, t_res=512)
     if ~sim.solved
         throw(ArgumentError("The simulation has not been solved, unable to plot."))
     end
@@ -100,7 +100,7 @@ line if `mode = lines`. The latter uses `x_res` points as well.
 
 See also: [`Simulation.compute_spectrum!`](@ref)
 """
-function plot_ψ̃(sim::Sim; mode = "density", x_res=500, ω_res=512, skip = 1, n_lines = 10)
+function plot_ψ̃(sim; mode = "density", x_res=500, ω_res=512, skip = 1, n_lines = 10)
     if ~sim.solved
         throw(ArgumentError("The simulation has not been solved, unable to plot."))
     end

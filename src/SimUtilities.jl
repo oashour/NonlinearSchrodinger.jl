@@ -30,21 +30,20 @@ function print(sim::Sim)
     end
     println("------------------------------------------")
 end
-
 """
-    function compute_spectrum!(sim::Sim)
+    function compute_spectrum!(obj)
 
-Computes the normalized spectrum of `sim.ψ` with the center frequency shifted to the center
-and saves it in `sim.ψ̃`
+Computes the normalized spectrum of `obj.ψ` with the center frequency shifted to the center
+and saves it in `obj.ψ̃`. `obj` can be a `Sim` or `Calc` object
 
 See also: [`NLSS.Plotter.plot_ψ̃`](@ref)
 """
-function compute_spectrum!(sim::Sim)
+function compute_spectrum!(obj)
     println("==========================================")
     println("Computing spectrum")
-    if sim.solved
-        sim.ψ̃ = fftshift(fft(sim.ψ, 2), 2)/sim.box.Nₜ
-        sim.spectrum_computed = true
+    if obj.solved
+        obj.ψ̃ = fftshift(fft(obj.ψ, 2), 2)/obj.box.Nₜ
+        obj.spectrum_computed = true
     else
         throw(ArgumentError("Trying to compute spectrum of an unsolved simulation. Please solve the model first."))
     end
@@ -53,16 +52,18 @@ function compute_spectrum!(sim::Sim)
 end
 
 """
-    function compute_CoM!(sim::Sim)
+    function compute_CoM!(obj)
 
-Computes the integrals of motion of `sim.ψ` and saves them in respective fields of `sim`.
+Computes the integrals of motion of `obj.ψ` and saves them in respective fields of `obj`.
+`obj` can be a `Sim` or `Calc` object
 
 See also: [`NLSS.Plotter.plot_CoM`](@ref)
 """
-function compute_CoM!(sim::Sim)
-    if ~sim.spectrum_computed
+function compute_CoM!(obj)
+    bj
+    if ~obj.spectrum_computed
         println("CoM calculation requested without a spectrum calculation.")
-        compute_spectrum!(sim)
+        compute_spectrum!(obj)
     end
     println("==========================================")
     println("Computing constants of motions")
@@ -70,12 +71,12 @@ function compute_CoM!(sim::Sim)
     # Do I need to find a better way of doing these integrals?
     # We should have 
     # sim.norm = sum(abs.(sim.ψ).^2, dims=2)[:]*sim.box.dt/sim.box.T but dt/T = 1/Nt, thus
-    sim.N = sum(abs2.(sim.ψ), dims=2)[:]/sim.box.Nₜ
-    sim.PE = -0.5*sum(abs2.(sim.ψ).^2,dims=2)[:]./(sim.N*sim.box.Nₜ)
-    sim.KE = 0.5*sum((sim.box.ω'.^2) .* (abs2.(sim.ψ̃)),dims=2)[:]./sim.N
-    sim.P = -imag.(sum(im * (sim.box.ω') .* (abs2.(sim.ψ̃)),dims=2)[:]./sim.N)
-    sim.E = sim.KE + sim.PE
-    sim.dE = sim.E .- sim.E[1]
+    obj.N = sum(abs2.(obj.ψ), dims=2)[:]/obj.box.Nₜ
+    obj.PE = -0.5*sum(abs2.(obj.ψ).^2,dims=2)[:]./(obj.N*obj.box.Nₜ)
+    obj.KE = 0.5*sum((obj.box.ω'.^2) .* (abs2.(obj.ψ̃)),dims=2)[:]./obj.N
+    obj.P = -imag.(sum(im * (obj.box.ω') .* (abs2.(obj.ψ̃)),dims=2)[:]./obj.N)
+    obj.E = obj.KE + obj.PE
+    obj.dE = obj.E .- obj.E[1]jjkkk
     println("Energy computed.")
     println("==========================================")
 end
