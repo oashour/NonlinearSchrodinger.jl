@@ -1,6 +1,5 @@
 #export SimulationParameters, SimulationBox, Simulation 
-export init_box, init_sim, compute_parameters
-export Sim, SimBox, SimParameters
+export compute_parameters, Sim, Box
 
 struct Box{TT<:Real}
     t::Array{TT, 1}
@@ -64,7 +63,7 @@ function compute_parameters(; kwargs...)
     return λ, T, Ω
 end #compute_parameters
 
-function init_box(xᵣ::Pair, T; dx = 1e-3, Nₜ = 256, n_periods = 1)
+function Box(xᵣ::Pair, T; dx = 1e-3, Nₜ = 256, n_periods = 1)
     println("==========================================")
     println("Initializing simulation box with $n_periods period(s) and dx = $dx, Nₜ = $Nₜ.")
     T = n_periods * T
@@ -84,7 +83,7 @@ function init_box(xᵣ::Pair, T; dx = 1e-3, Nₜ = 256, n_periods = 1)
     return box
 end
 
-function init_sim(λ, box::Box, ψ₀::Array{Complex{TT}, 1}; algorithm = "2S", αₚ = 0.0) where TT <: Real
+function Sim(λ, box::Box, ψ₀::Array{Complex{TT}, 1}; algorithm = "2S", αₚ = 0.0) where TT <: Real
     ψ = Array{Complex{TT}}(undef, box.Nₓ, box.Nₜ)
     ψ̃ = similar(ψ)
     E = zeros(box.Nₓ)
