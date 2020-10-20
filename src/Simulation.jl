@@ -2,9 +2,9 @@ module Simulation
 
 using ProgressMeter
 using FFTW
+export solve!
 
-include("SimTypes.jl")
-include("SimUtilities.jl")
+include("SimExtras.jl")
 include("SimSolvers.jl")
 
 end #module
