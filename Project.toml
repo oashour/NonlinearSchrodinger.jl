@@ -12,6 +12,7 @@ ProgressMeter = "92933f4c-e287-5a05-a399-4b506db050ca"
 
 [compat]
 FFTW = "1.2"
+LaTeXStrings = "1.2"
 julia = "1.5"
 
 [extras]
