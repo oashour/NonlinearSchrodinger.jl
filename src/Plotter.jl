@@ -7,7 +7,7 @@ using FFTW
 export plot_ψ, plot_ψ̃, plot_CoM
 
 """
-    function plot_CoM(sim::Sim, x_res::Int64 = 500)
+    function plot_IoM(sim::Sim, x_res::Int64 = 500)
 
 Plots the integrals of motion for a `Sim` object `sim` with a resolution `x_res` points in
 the x-direction. Produces plots of the energy, kinetic energy, potential energy, energy
@@ -15,7 +15,7 @@ error, particle number and momentum
 
 See also: [`Simulation.compute_CoM!`](@ref)
 """
-function plot_CoM(obj, x_res = 500)
+function plot_IoM(obj, x_res = 500)
     println("Plotting energy with a resolution of $x_res")
     xₛ = Int(ceil(obj.box.Nₜ/x_res))
     p1 = plot(obj.box.x[1:xₛ:end], [obj.E[1:xₛ:end], obj.KE[1:xₛ:end], obj.PE[1:xₛ:end]], label = [L"E" L"T" L"V"])

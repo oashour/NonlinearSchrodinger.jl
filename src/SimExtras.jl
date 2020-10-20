@@ -1,6 +1,10 @@
-#export SimulationParameters, SimulationBox, Simulation 
-export compute_parameters, Sim, Box
+export Sim, Box
+export params, print
+export ψ₀_periodic
 
+###########################################################################
+# Types
+###########################################################################
 struct Box{TT<:Real}
     t::Array{TT, 1}
     ω::Array{TT, 1}
@@ -75,6 +79,9 @@ function Sim(λ, box::Box, ψ₀::Array{Complex{TT}, 1}; algorithm = "2S", αₚ
    return sim
 end #init_sim
 
+###########################################################################
+# Utility
+###########################################################################
 function params(; kwargs...)
     if length(kwargs) != 1
         throw(ArgumentError("You have either specified too few or too many parameters. You must specify one and only one of the following options: λ, Ω, T, a."))
@@ -104,3 +111,86 @@ function params(; kwargs...)
 
     return λ, T, Ω
 end #compute_parameters
+
+"""
+    function print(sim::Sim)
+
+Prints information about the `Sim` instance `sim`
+"""
+function print(sim::Sim)
+    println("Box Properties:")
+    println("------------------------------------------")
+    println("dx = $(sim.box.dx) (Nₓ = $(sim.box.Nₓ))")
+    println("Nₜ = $(sim.box.dx) (dt = $(sim.box.dt))")
+    println("Parameters:")
+    println("------------------------------------------")
+    println("λ = $(sim.λ)")
+    println("Ω = $(sim.Ω)")
+    println("T = $(sim.T)")
+    println("------------------------------------------")
+    # Should add information about ψ₀
+    if sim.algorithm == "2S"
+        println("Algorithm: second order symplectic")
+    elseif sim.algorithm == "4S"
+        println("Algorithm: fourth order symplectic")
+    elseif sim.algorithm == "6S"
+        println("Algorithm: sixth order symplectic")
+    elseif sim.algorithm == "8S"
+        println("Algorithm: eighth order symplectic")
+    else
+        throw(ArgumentError("Algorithm type unknown, please check the documentation"))
+    end
+    println("------------------------------------------")
+end
+
+###########################################################################
+# ψ₀
+###########################################################################
+"""
+    function ψ₀_periodic(coeff, box::SimBox, params::SimParamseters; phase=0)
+
+Computes an initial wavefunction for the `SimBox` `box`, with fundamental frequency `sim.Ω`
+and coefficients ``A_1...n`` = `coeff` and an overall phase `exp(i phase t)`, i.e. of the form:
+
+**TODO**: insert latex form here
+
+See also: [`init_sim`](@ref)
+"""
+function ψ₀_periodic(coeff::Array, box::Box, Ω; phase=0)
+    println("==========================================")
+    println("Initializing periodic ψ₀")
+    for (n, An) in enumerate(coeff)
+        if abs(An) >= 1
+            println("The absolute value of the coefficient A($(n+1)) = $(An) is greater than 1. psi_0 needs to be normalizable.")
+        else
+            println("A($(n)) = $(An)")
+        end #if
+    end #for
+
+    println("Computing A₀ to preserve normalization.")
+    A0 = sqrt(1 - 2 * sum([abs(An) .^ 2 for An in coeff]))
+    println("Computed A₀ = $A0")
+    #A0 = 1
+    if phase != 0
+        str = "ψ₀ = exp(i $phase t) ($A0 + "
+    else
+        str = "ψ₀ = $A0 + "
+    end
+
+    ψ₀ = A0 * ones(box.Nₜ)
+    for (n, An) in enumerate(coeff)
+        ψ₀ += 2 * An * cos.(n * Ω * box.t)
+        str = string(str, "2 × $An × cos($n × $(Ω) t)")
+    end #for
+    # Multiply by the overall phase
+    ψ₀ = exp.(im * phase * box.t) .* ψ₀
+
+    if phase != 0
+        str = string(str, ")")
+    end
+
+    println(str)
+    println("==========================================")
+
+    return ψ₀
+end #psi0_periodic
