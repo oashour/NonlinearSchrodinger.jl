@@ -90,7 +90,7 @@ and coefficients ``A_1...n`` = `coeff` and an overall phase `exp(i phase t)`, i.
 
 See also: [`init_sim`](@ref)
 """
-function ψ₀_periodic(coeff, box::Box, Ω; phase=0)
+function ψ₀_periodic(coeff::Array, box::Box, Ω; phase=0)
     println("==========================================")
     println("Initializing periodic ψ₀")
     for (n, An) in enumerate(coeff)

@@ -2,36 +2,36 @@
 export init_box, init_sim, compute_parameters
 export Sim, SimBox, SimParameters
 
-struct Box
-    t::Array{Float64, 1}
-    ω::Array{Float64, 1}
-    x::Array{Float64, 1}
+struct Box{TT<:Real}
+    t::Array{TT, 1}
+    ω::Array{TT, 1}
+    x::Array{TT, 1}
     Nₜ::Int64
     Nₓ::Int64
-    dt::Float64
-    dx::Float64
-    n_periods::Int
+    dt::TT
+    dx::TT
+    n_periods::Int64
 end #SimulationBox
 
-mutable struct Sim
-    λ::Complex{Float64}
-    T::Float64
-    Ω::Float64
-    box::Box
-    ψ₀::Array{Complex{Float64}, 1}
+mutable struct Sim{TT<:Real}
+    λ::Complex{TT}
+    T::TT
+    Ω::TT
+    box::Box{TT}
+    ψ₀::Array{Complex{TT}, 1}
     algorithm::String
-    αₚ::Float64
+    αₚ::TT
     solved::Bool
-    ψ::Array{Complex{Float64}, 2}
+    ψ::Array{Complex{TT}, 2}
     spectrum_computed::Bool
-    ψ̃::Array{Complex{Float64}, 2}
+    ψ̃::Array{Complex{TT}, 2}
     energy_computed::Bool
-    E::Array{Float64, 1}
-    PE::Array{Float64, 1}
-    KE::Array{Float64, 1}
-    dE::Array{Float64, 1}
-    N::Array{Float64, 1}
-    P::Array{Float64, 1}
+    E::Array{TT, 1}
+    PE::Array{TT, 1}
+    KE::Array{TT, 1}
+    dE::Array{TT, 1}
+    N::Array{TT, 1}
+    P::Array{TT, 1}
 end # Simulation
 
 function compute_parameters(; kwargs...)
@@ -64,17 +64,17 @@ function compute_parameters(; kwargs...)
     return λ, T, Ω
 end #compute_parameters
 
-function init_box(xᵣ::Pair, T::Float64; dx = 1e-3, Nₜ = 256, n_periods = 1)
+function init_box(xᵣ::Pair, T; dx = 1e-3, Nₜ = 256, n_periods = 1)
     println("==========================================")
     println("Initializing simulation box with $n_periods period(s) and dx = $dx, Nₜ = $Nₜ.")
     T = n_periods * T
     println("Longitudinal range is [$(xᵣ.first), $(xᵣ.second)], transverse range is [$(-T/2), $(T/2))")
     dt = T / Nₜ
-    t = dt * (-Nₜ/2:Nₜ/2-1)
+    t = dt * collect((-Nₜ/2:Nₜ/2-1))
 
-    x = xᵣ.first:dx:xᵣ.second
+    x = collect(xᵣ.first:dx:xᵣ.second)
     Nₓ = length(x)
-    ω = 2π/T * (-Nₜ/2:Nₜ/2-1)
+    ω = 2π/T * collect((-Nₜ/2:Nₜ/2-1))
 
     box = Box(t, ω, x, Nₜ, Nₓ, dt, dx, n_periods)
 
@@ -84,8 +84,8 @@ function init_box(xᵣ::Pair, T::Float64; dx = 1e-3, Nₜ = 256, n_periods = 1)
     return box
 end
 
-function init_sim(λ, box::Box, ψ₀::Array; algorithm = "2S", αₚ = 0)
-    ψ = Array{Complex{Float64}}(undef, box.Nₓ, box.Nₜ)
+function init_sim(λ, box::Box, ψ₀::Array{Complex{TT}, 1}; algorithm = "2S", αₚ = 0.0) where TT <: Real
+    ψ = Array{Complex{TT}}(undef, box.Nₓ, box.Nₜ)
     ψ̃ = similar(ψ)
     E = zeros(box.Nₓ)
     PE = similar(E)    
@@ -93,10 +93,10 @@ function init_sim(λ, box::Box, ψ₀::Array; algorithm = "2S", αₚ = 0)
     dE = similar(E)
     N = similar(E)
     P = similar(E)
-    if αₚ < 0 
+    if αₚ < 0.0 
         throw(ArgumentError("αₚ < 0. Set αₚ = 0 to disable pruning or αₚ = Inf for fixed pruning. See documentation)"))
     end
-    if αₚ > 0 && box.n_periods == 1 
+    if αₚ > 0.0 && box.n_periods == 1 
         throw(ArgumentError("Pruning is only applicable when n_periods > 1."))
     end
     # Compute some parameters
