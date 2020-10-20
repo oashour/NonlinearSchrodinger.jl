@@ -33,7 +33,7 @@ mutable struct Sim{TT<:Real}
     P::Array{TT, 1}
 end # Simulation
 
-function compute_parameters(; kwargs...)
+function params(; kwargs...)
     if length(kwargs) != 1
         throw(ArgumentError("You have either specified too few or too many parameters. You must specify one and only one of the following options: λ, Ω, T, a."))
     end
