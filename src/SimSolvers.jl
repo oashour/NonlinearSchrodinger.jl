@@ -69,8 +69,7 @@ See also: [`solve!`](@ref)
 """
 function T2(ψ, ω, dx, F)
     # Nonlinear
-    V = -1*abs.(ψ).^2                      
-    ψ .*= exp.(-im * dx/2 * (-1*abs.(ψ).^2)) 
+    ψ .*= exp.(-im * dx/2 * (-1*abs2.(ψ))) 
 
     # Kinetic
     F*ψ
@@ -78,7 +77,7 @@ function T2(ψ, ω, dx, F)
     inv(F)*ψ
 
     # Nonlinear
-    ψ .*= exp.(-im * dx/2 * (-1*abs.(ψ).^2)) 
+    ψ .*= exp.(-im * dx/2 * (-1*abs2.(ψ))) 
 
     return ψ
 end #T2
