@@ -23,6 +23,7 @@ function solve!(sim::Sim)
     #println("Generating FFT Plan")
     F = plan_fft!(sim.ψ[1, :]) # Plan
     F̃ = plan_ifft!(sim.ψ[1, :]) # Plan
+    W = ifftshift(cis.(sim.box.dx * sim.box.ω .^ 2 / 2))
 
     # Print info about simulation
     #print(sim)
@@ -31,7 +32,7 @@ function solve!(sim::Sim)
     #@showprogress 1 "Computing..." for i = 1:sim.box.Nₓ-1
     for i = 1:sim.box.Nₓ-1
         if sim.algorithm === A2  
-            sim.ψ[i+1, :] = T2(sim.ψ[i,:], sim.box.ω, sim.box.dx, F, F̃)
+            sim.ψ[i+1, :] = T2(sim.ψ[i,:], W, sim.box.dx, F, F̃)
         elseif sim.algorithm === A4S
             sim.ψ[i+1, :] = T4S(sim.ψ[i, :], sim.box.ω, sim.box.dx, F̃)
         elseif sim.algorithm == A6S
@@ -71,19 +72,21 @@ integrator. `ψ'` is defined on an FFT grid with frequencies `ω` using an FFT p
 
 See also: [`solve!`](@ref)
 """
-function T2(ψ, ω, dx, F, F̃)
+function T2(ψ, W, dx, F, F̃)
     # Nonlinear
     for i in 1:length(ψ)
-        ψ[i] *= exp(-im * dx/2 * (-1*abs2(ψ[i]))) 
+        ψ[i] *= cis(dx/2 * (-1*abs2(ψ[i]))) 
     end
     # Kinetic
     F*ψ
-    ψ .*= ifftshift(exp.(-im * dx * ω .^ 2 / 2)) 
+    for i in 1:length(W)
+        ψ[i] *= W[i]
+    end
     F̃*ψ
 
     # Nonlinear
     for i in 1:length(ψ)
-        ψ[i] *= exp(-im * dx/2 * (-1*abs2(ψ[i]))) 
+        ψ[i] *= cis(dx/2 * (-1*abs2(ψ[i]))) 
     end
 
     return ψ
