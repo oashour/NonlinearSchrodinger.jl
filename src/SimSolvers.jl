@@ -1,3 +1,6 @@
+export Algorithm
+
+@enum Algorithm A2 A4S A6S A8S
 
 """
     solve!(sim::Simulation)
@@ -7,8 +10,8 @@ Solves the `Simulation` object `sim` using the techniques its attributes specify
 See also: [`init_sim`](@ref), [`NLSS.Plotter.plot_ψ`](@ref)
 """
 function solve!(sim::Sim)
-    println("==========================================")
-    println("Solving cubic NLSE with the following options:")
+    #println("==========================================")
+    #println("Solving cubic NLSE with the following options:")
     # Copy in x = 0 array
     sim.ψ[1, :] = sim.ψ₀
     # Check for pruning and calculate indices
@@ -17,25 +20,26 @@ function solve!(sim::Sim)
         ind_p = sort([ind_p; sim.box.Nₜ.-ind_p.+2])
     end
     # Generate FFT Plans to optimize performance
-    println("Generating FFT Plan")
+    #println("Generating FFT Plan")
     F = plan_fft!(sim.ψ[1, :]) # Plan
-    F̃ = inv(F) # Inverse plan, now cached
+    F̃ = plan_ifft!(sim.ψ[1, :]) # Plan
 
     # Print info about simulation
-    print(sim)
+    #print(sim)
 
     # Start loop and pick algorithm
-    @showprogress 1 "Computing..." for i = 1:sim.box.Nₓ-1
-        if sim.algorithm == "2S"
-            sim.ψ[i+1, :] = T2(sim.ψ[i, :], sim.box.ω, sim.box.dx, F)
-        elseif sim.algorithm == "4S"
-            sim.ψ[i+1, :] = T4S(sim.ψ[i, :], sim.box.ω, sim.box.dx, F)
-        elseif sim.algorithm == "6S"
+    #@showprogress 1 "Computing..." for i = 1:sim.box.Nₓ-1
+    for i = 1:sim.box.Nₓ-1
+        if sim.algorithm === A2  
+            sim.ψ[i+1, :] = T2(sim.ψ[i,:], sim.box.ω, sim.box.dx, F, F̃)
+        elseif sim.algorithm === A4S
+            sim.ψ[i+1, :] = T4S(sim.ψ[i, :], sim.box.ω, sim.box.dx, F̃)
+        elseif sim.algorithm == A6S
             sim.ψ[i+1, :] = T6S(sim.ψ[i, :], sim.box.ω, sim.box.dx, F)
-        elseif sim.algorithm == "8S"
+        elseif sim.algorithm == A8S
             sim.ψ[i+1, :] = T8S(sim.ψ[i, :], sim.box.ω, sim.box.dx, F)
-        else
-            throw(ArgumentError("Algorithm type unknown, please check the documentation"))
+        #else # not needed with enums
+        #    throw(ArgumentError("Algorithm type unknown, please check the documentation"))
         end
         # Pruning
         # TODO: get rid of this extra ψ and rewrite more elegantly
@@ -49,8 +53,8 @@ function solve!(sim::Sim)
     end #for
     sim.solved = true
 
-    println("Computation Done!")
-    println("==========================================")
+    #println("Computation Done!")
+    #println("==========================================")
 
     return nothing
 end #solve
@@ -67,17 +71,20 @@ integrator. `ψ'` is defined on an FFT grid with frequencies `ω` using an FFT p
 
 See also: [`solve!`](@ref)
 """
-function T2(ψ, ω, dx, F)
+function T2(ψ, ω, dx, F, F̃)
     # Nonlinear
-    ψ .*= exp.(-im * dx/2 * (-1*abs2.(ψ))) 
-
+    for i in 1:length(ψ)
+        ψ[i] *= exp(-im * dx/2 * (-1*abs2(ψ[i]))) 
+    end
     # Kinetic
     F*ψ
     ψ .*= ifftshift(exp.(-im * dx * ω .^ 2 / 2)) 
-    inv(F)*ψ
+    F̃*ψ
 
     # Nonlinear
-    ψ .*= exp.(-im * dx/2 * (-1*abs2.(ψ))) 
+    for i in 1:length(ψ)
+        ψ[i] *= exp(-im * dx/2 * (-1*abs2(ψ[i]))) 
+    end
 
     return ψ
 end #T2

@@ -33,7 +33,7 @@ See also: [`NLSS.Plotter.plot_CoM`](@ref)
 """
 function compute_IoM!(obj)
     if ~obj.spectrum_computed
-        println("CoM calculation requested without a spectrum calculation.")
+        println("IoM calculation requested without a spectrum calculation.")
         compute_spectrum!(obj)
     end
     println("==========================================")

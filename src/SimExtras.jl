@@ -42,7 +42,7 @@ mutable struct Sim{TT<:Real}
     Ω::TT
     box::Box{TT}
     ψ₀::Array{Complex{TT}, 1}
-    algorithm::String
+    algorithm::Enum
     αₚ::TT
     solved::Bool
     ψ::Array{Complex{TT}, 2}
@@ -57,7 +57,7 @@ mutable struct Sim{TT<:Real}
     P::Array{TT, 1}
 end # Simulation
 
-function Sim(λ, box::Box, ψ₀::Array{Complex{TT}, 1}; algorithm = "2S", αₚ = 0.0) where TT <: Real
+function Sim(λ, box::Box, ψ₀::Array{Complex{TT}, 1}; algorithm = A2, αₚ = 0.0) where TT <: Real
     ψ = Array{Complex{TT}}(undef, box.Nₓ, box.Nₜ)
     ψ̃ = similar(ψ)
     E = zeros(box.Nₓ)
