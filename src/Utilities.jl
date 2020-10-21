@@ -47,7 +47,7 @@ function compute_IoM!(obj)
     obj.KE = 0.5*sum((obj.box.ω'.^2) .* (abs2.(obj.ψ̃)),dims=2)[:]./obj.N
     obj.P = -imag.(sum(im * (obj.box.ω') .* (abs2.(obj.ψ̃)),dims=2)[:]./obj.N)
     obj.E = obj.KE + obj.PE
-    obj.dE = obj.E .- obj.E[1]jjkkk
+    obj.dE = obj.E .- obj.E[1]
     println("Integrals of motion computed.")
     println("==========================================")
 end
