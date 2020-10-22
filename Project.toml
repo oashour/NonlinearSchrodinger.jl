@@ -13,6 +13,7 @@ ProgressMeter = "92933f4c-e287-5a05-a399-4b506db050ca"
 
 [compat]
 FFTW = "1.2"
+JLD = "0.10"
 LaTeXStrings = "1.2"
 PlotlyJS = "0.14"
 Plots = "1.6"
