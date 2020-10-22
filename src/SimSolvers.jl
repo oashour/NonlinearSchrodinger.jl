@@ -74,18 +74,18 @@ See also: [`solve!`](@ref)
 """
 function T2(ψ, W, dx, F, F̃)
     # Nonlinear
-    for i in 1:length(ψ)
+    @inbounds for i in 1:length(ψ)
         ψ[i] *= cis(dx/2 * (-1*abs2(ψ[i]))) 
     end
     # Kinetic
     F*ψ
-    for i in 1:length(W)
+    @inbounds for i in 1:length(W)
         ψ[i] *= W[i]
     end
     F̃*ψ
 
     # Nonlinear
-    for i in 1:length(ψ)
+    @inbounds for i in 1:length(ψ)
         ψ[i] *= cis(dx/2 * (-1*abs2(ψ[i]))) 
     end
 
