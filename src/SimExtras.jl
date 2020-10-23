@@ -58,7 +58,7 @@ mutable struct Sim{TT<:Real}
 end # Simulation
 
 function Sim(λ, box::Box, ψ₀::Array{Complex{TT}, 1}; step = T2, αₚ = 0.0) where TT <: Real
-    ψ = Array{Complex{TT}}(undef, box.Nₓ, box.Nₜ)
+    ψ = Array{Complex{TT}}(undef, box.Nₜ, box.Nₓ)
     ψ̃ = similar(ψ)
     E = zeros(box.Nₓ)
     PE = similar(E)    

@@ -11,7 +11,7 @@ function solve!(sim::Sim)
     #println("==========================================")
     #println("Solving cubic NLSE with the following options:")
     # Copy in x = 0 array
-    sim.ψ[1, :] = sim.ψ₀
+    sim.ψ[:, 1] = sim.ψ₀
     # Check for pruning and calculate indices
     if sim.αₚ > 0 
         ind_p = [i for i in 2:(sim.box.Nₜ÷2+1) if (i-1)%sim.box.n_periods != 0]
@@ -19,8 +19,8 @@ function solve!(sim::Sim)
     end
     # Generate FFT Plans to optimize performance
     #println("Generating FFT Plan")
-    F = plan_fft!(sim.ψ[1, :]) # Plan
-    F̃ = plan_ifft!(sim.ψ[1, :]) # Plan
+    F = plan_fft!(sim.ψ[:, 1]) # Plan
+    F̃ = plan_ifft!(sim.ψ[:, 1]) # Plan
 
     # Print info about simulation
     #print(sim)
@@ -30,14 +30,14 @@ function solve!(sim::Sim)
     # Step through time
     #@showprogress 1 "Computing..." for i = 1:sim.box.Nₓ-1
     for i = 1:sim.box.Nₓ-1
-        sim.ψ[i+1, :] = sim.step(sim.ψ[i,:], W, sim.box.dx, F, F̃)
+        sim.ψ[:, i+1] .= sim.step(sim.ψ[:, i], W, sim.box.dx, F, F̃)
         # Pruning TODO: rewrite
         if sim.αₚ > 0 
-            ψ = sim.ψ[i+1, :]
+            ψ = sim.ψ[:, i+1]
             F*ψ
             @views ψ[ind_p] .*= exp.(-sim.αₚ*abs.(ψ[ind_p]))
             inv(F)*ψ
-            sim.ψ[i+1, :] = ψ
+            sim.ψ[:, i+1] = ψ
         end
     end #for
     sim.solved = true
