@@ -1,7 +1,5 @@
 export Algorithm
 
-@enum Algorithm A2 A4S A6S A8S
-
 """
     solve!(sim::Simulation)
 
@@ -23,27 +21,17 @@ function solve!(sim::Sim)
     #println("Generating FFT Plan")
     F = plan_fft!(sim.ψ[1, :]) # Plan
     F̃ = plan_ifft!(sim.ψ[1, :]) # Plan
-    W = ifftshift(cis.(sim.box.dx * sim.box.ω .^ 2 / 2))
 
     # Print info about simulation
     #print(sim)
 
-    # Start loop and pick algorithm
+    # Cache the kinetic factor
+    W = ifftshift(cis.(sim.box.dx * sim.box.ω .^ 2 / 2))
+    # Step through time
     #@showprogress 1 "Computing..." for i = 1:sim.box.Nₓ-1
     for i = 1:sim.box.Nₓ-1
-        if sim.algorithm === A2  
-            sim.ψ[i+1, :] = T2(sim.ψ[i,:], W, sim.box.dx, F, F̃)
-        elseif sim.algorithm === A4S
-            sim.ψ[i+1, :] = T4S(sim.ψ[i, :], sim.box.ω, sim.box.dx, F̃)
-        elseif sim.algorithm == A6S
-            sim.ψ[i+1, :] = T6S(sim.ψ[i, :], sim.box.ω, sim.box.dx, F)
-        elseif sim.algorithm == A8S
-            sim.ψ[i+1, :] = T8S(sim.ψ[i, :], sim.box.ω, sim.box.dx, F)
-        #else # not needed with enums
-        #    throw(ArgumentError("Algorithm type unknown, please check the documentation"))
-        end
-        # Pruning
-        # TODO: get rid of this extra ψ and rewrite more elegantly
+        sim.ψ[i+1, :] = sim.step(sim.ψ[i,:], W, sim.box.dx, F, F̃)
+        # Pruning TODO: rewrite
         if sim.αₚ > 0 
             ψ = sim.ψ[i+1, :]
             F*ψ
@@ -101,16 +89,16 @@ integrator. `ψ'` is defined on an FFT grid with frequencies `ω` using an FFT p
 
 See also: [`solve!`](@ref), [`T2`](@ref)
 """
-function T4S(ψ, ω, dx, F)
+function T4S(ψ, W, dx, F, F̃)
     s = 2^(1 / 3)
     os = 1 / (2 - s)
 
     ft = os
     bt = -s * os
 
-    ψ = T2(ψ, ω, ft * dx, F)
-    ψ = T2(ψ, ω, bt * dx, F)
-    ψ = T2(ψ, ω, ft * dx, F)
+    ψ = T2(ψ, W, ft * dx, F, F̃)
+    ψ = T2(ψ, W, bt * dx, F, F̃)
+    ψ = T2(ψ, W, ft * dx, F, F̃)
 
     return ψ
 end # T4S
@@ -124,7 +112,7 @@ integrator. `ψ'` is defined on an FFT grid with frequencies `ω` using an FFT p
 
 See also: [`solve!`](@ref), [`T4S`](@ref)
 """
-function T6S(ψ, ω, dx, F)
+function T6S(ψ, W, dx, F, F̃)
 
     s = 2^(1 / 5)
     os = 1 / (2 - s)
@@ -132,9 +120,9 @@ function T6S(ψ, ω, dx, F)
     ft = os
     bt = -s * os
 
-    ψ = T4S(ψ, ω, ft * dx, F)
-    ψ = T4S(ψ, ω, bt * dx, F)
-    ψ = T4S(ψ, ω, ft * dx, F)
+    ψ = T4S(ψ, W, ft * dx, F, F̃)
+    ψ = T4S(ψ, W, bt * dx, F, F̃)
+    ψ = T4S(ψ, W, ft * dx, F, F̃)
 
     return ψ
 end #T6S
@@ -148,7 +136,7 @@ integrator. `ψ'` is defined on an FFT grid with frequencies `ω` using an FFT p
 
 See also: [`solve!`](@ref), [`T6S`](@ref)
 """
-function T8S(ψ, ω, dx, F)
+function T8S(ψ, W, dx, F, F̃)
 
     s = 2^(1 / 7)
     os = 1 / (2 - s)
@@ -156,9 +144,9 @@ function T8S(ψ, ω, dx, F)
     ft = os
     bt = -s * os
 
-    ψ = T6S(ψ, ω, ft * dx, F)
-    ψ = T6S(ψ, ω, bt * dx, F)
-    ψ = T6S(ψ, ω, ft * dx, F)
+    ψ = T6S(ψ, W, ft * dx, F, F̃)
+    ψ = T6S(ψ, W, bt * dx, F, F̃)
+    ψ = T6S(ψ, W, ft * dx, F, F̃)
 
     return ψ
 end #T8S
