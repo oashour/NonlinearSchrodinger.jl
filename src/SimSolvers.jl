@@ -19,8 +19,8 @@ function solve!(sim::Sim)
     end
     # Generate FFT Plans to optimize performance
     #println("Generating FFT Plan")
-    F = plan_fft!(sim.ψ[:, 1]) # Plan
-    F̃ = plan_ifft!(sim.ψ[:, 1]) # Plan
+    F = plan_fft!(@view sim.ψ[:, 1]) # Plan
+    F̃ = plan_ifft!(@view sim.ψ[:, 1]) # Plan
 
     # Print info about simulation
     #print(sim)
@@ -29,7 +29,7 @@ function solve!(sim::Sim)
     W = ifftshift(cis.(sim.box.dx * sim.box.ω .^ 2 / 2))
     # Step through time
     #@showprogress 1 "Computing..." for i = 1:sim.box.Nₓ-1
-    for i = 1:sim.box.Nₓ-1
+    @views for i = 1:sim.box.Nₓ-1
         sim.ψ[:, i+1] .= sim.step(sim.ψ[:, i], W, sim.box.dx, F, F̃)
         # Pruning TODO: rewrite
         if sim.αₚ > 0 
