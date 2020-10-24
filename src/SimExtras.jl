@@ -129,13 +129,13 @@ function print(sim::Sim)
     println("T = $(sim.T)")
     println("------------------------------------------")
     # Should add information about ψ₀
-    if sim.algorithm == "2S"
+    if sim.step === T₂ˢ
         println("Algorithm: second order symplectic")
-    elseif sim.algorithm == "4S"
+    elseif sim.step === T₄ˢ
         println("Algorithm: fourth order symplectic")
-    elseif sim.algorithm == "6S"
+    elseif sim.step === T₆ˢ
         println("Algorithm: sixth order symplectic")
-    elseif sim.algorithm == "8S"
+    elseif sim.step === T₈ˢ
         println("Algorithm: eighth order symplectic")
     else
         throw(ArgumentError("Algorithm type unknown, please check the documentation"))
