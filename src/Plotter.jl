@@ -62,7 +62,7 @@ function plot_ψ(sim; mode = "density", power=1, x_res=500, t_res=512)
     # Downsample
     t = sim.box.t[1:tₛ:end]
     x = sim.box.x[1:xₛ:end]
-    ψ = sim.ψ[1:xₛ:end, 1:tₛ:end]
+    ψ = sim.ψ[1:tₛ:end, 1:xₛ:end]
 
     # Figure out labels
     if power == 1
@@ -73,9 +73,9 @@ function plot_ψ(sim; mode = "density", power=1, x_res=500, t_res=512)
 
     # Plot
     if mode == "density"
-        p = heatmap(t, x, abs.(ψ).^power, tick_direction=:out, colorbar_title=clabel)
+        p = heatmap(t, x, abs.(ψ').^power, tick_direction=:out, colorbar_title=clabel)
     elseif mode == "surface"
-        p = surface(t, x, abs.(ψ).^power, zlabel=clabel, camera=(35, 68))
+        p = surface(t, x, abs.(ψ').^power, zlabel=clabel, camera=(35, 68))
     end
     # Adjust Attributes
     xlabel!(L"x")
@@ -119,18 +119,18 @@ function plot_ψ̃(sim; mode = "density", x_res=500, ω_res=512, skip = 1, n_lin
         # Downsample
         ω = sim.box.ω[1:ωₛ:end]
         x = sim.box.x[1:xₛ:end]
-        ψ̃ = sim.ψ̃[1:xₛ:end, 1:ωₛ:end]
+        ψ̃ = sim.ψ̃[1:ωₛ:end, 1:xₛ:end]
 
-        p = heatmap(ω, x, log.(abs.(ψ̃)), tick_direction=:out, colorbar_title=L"\log|\tilde{\psi}|")
+        p = heatmap(ω, x, log.(abs.(ψ̃')), tick_direction=:out, colorbar_title=L"\log|\tilde{\psi}|")
         xlabel!(L"\omega")
         ylabel!(L"x")
         xlims!((-sim.box.Nₜ/2*sim.Ω/sim.box.n_periods, sim.box.Nₜ/2*sim.Ω/sim.box.n_periods))
         ylims!((minimum(sim.box.x), maximum(sim.box.x)))
     elseif mode == "lines"
-        ψ̃ = ifftshift(sim.ψ̃, 2)[1:xₛ:end, 1:skip:skip*n_lines]
+        ψ̃ = ifftshift(sim.ψ̃, 1)[1:skip:skip*n_lines, 1:xₛ:end]
         x = sim.box.x[1:xₛ:end]
         labs = reshape([L"\tilde{\psi}_{%$(i-1)}" for i in 1:skip:skip*n_lines], 1, :)
-        p = plot(x, log.(abs.(ψ̃)), label = labs)
+        p = plot(x, log.(abs.(ψ̃')), label = labs)
         xlabel!(L"x")
         ylabel!(L"\log|\tilde{\psi}|")
     end

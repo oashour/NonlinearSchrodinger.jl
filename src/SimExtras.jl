@@ -36,13 +36,13 @@ function Box(xᵣ::Pair, T; dx = 1e-3, Nₜ = 256, n_periods = 1)
     return box
 end
 
-mutable struct Sim{TT<:Real}
+mutable struct Sim{TT<:Real, F}
     λ::Complex{TT}
     T::TT
     Ω::TT
     box::Box{TT}
     ψ₀::Array{Complex{TT}, 1}
-    algorithm::String
+    step::F
     αₚ::TT
     solved::Bool
     ψ::Array{Complex{TT}, 2}
@@ -57,8 +57,8 @@ mutable struct Sim{TT<:Real}
     P::Array{TT, 1}
 end # Simulation
 
-function Sim(λ, box::Box, ψ₀::Array{Complex{TT}, 1}; algorithm = "2S", αₚ = 0.0) where TT <: Real
-    ψ = Array{Complex{TT}}(undef, box.Nₓ, box.Nₜ)
+function Sim(λ, box::Box, ψ₀::Array{Complex{TT}, 1}; step = T2, αₚ = 0.0) where TT <: Real
+    ψ = Array{Complex{TT}}(undef, box.Nₜ, box.Nₓ)
     ψ̃ = similar(ψ)
     E = zeros(box.Nₓ)
     PE = similar(E)    
@@ -74,7 +74,7 @@ function Sim(λ, box::Box, ψ₀::Array{Complex{TT}, 1}; algorithm = "2S", αₚ
     end
     # Compute some parameters
     λ, T, Ω = params(λ = λ)
-    sim = Sim(λ, T, Ω, box, ψ₀, algorithm, αₚ, false, ψ, false, ψ̃, false, E, PE, KE, dE, 
+    sim = Sim(λ, T, Ω, box, ψ₀, step, αₚ, false, ψ, false, ψ̃, false, E, PE, KE, dE, 
     N, P)
    return sim
 end #init_sim
@@ -129,13 +129,13 @@ function print(sim::Sim)
     println("T = $(sim.T)")
     println("------------------------------------------")
     # Should add information about ψ₀
-    if sim.algorithm == "2S"
+    if sim.step === T₂ˢ
         println("Algorithm: second order symplectic")
-    elseif sim.algorithm == "4S"
+    elseif sim.step === T₄ˢ
         println("Algorithm: fourth order symplectic")
-    elseif sim.algorithm == "6S"
+    elseif sim.step === T₆ˢ
         println("Algorithm: sixth order symplectic")
-    elseif sim.algorithm == "8S"
+    elseif sim.step === T₈ˢ
         println("Algorithm: eighth order symplectic")
     else
         throw(ArgumentError("Algorithm type unknown, please check the documentation"))

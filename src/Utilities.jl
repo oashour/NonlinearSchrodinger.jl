@@ -14,7 +14,7 @@ function compute_spectrum!(obj)
     println("==========================================")
     println("Computing spectrum")
     if obj.solved
-        obj.ψ̃ = fftshift(fft(obj.ψ, 2), 2)/obj.box.Nₜ
+        obj.ψ̃ = fftshift(fft(obj.ψ, 1), 1)/obj.box.Nₜ
         obj.spectrum_computed = true
     else
         throw(ArgumentError("Trying to compute spectrum of an unsolved simulation. Please solve the model first."))
@@ -33,7 +33,7 @@ See also: [`NLSS.Plotter.plot_CoM`](@ref)
 """
 function compute_IoM!(obj)
     if ~obj.spectrum_computed
-        println("CoM calculation requested without a spectrum calculation.")
+        println("IoM calculation requested without a spectrum calculation.")
         compute_spectrum!(obj)
     end
     println("==========================================")
@@ -42,10 +42,10 @@ function compute_IoM!(obj)
     # Do I need to find a better way of doing these integrals?
     # We should have 
     # sim.norm = sum(abs.(sim.ψ).^2, dims=2)[:]*sim.box.dt/sim.box.T but dt/T = 1/Nt, thus
-    obj.N = sum(abs2.(obj.ψ), dims=2)[:]/obj.box.Nₜ
-    obj.PE = -0.5*sum(abs2.(obj.ψ).^2,dims=2)[:]./(obj.N*obj.box.Nₜ)
-    obj.KE = 0.5*sum((obj.box.ω'.^2) .* (abs2.(obj.ψ̃)),dims=2)[:]./obj.N
-    obj.P = -imag.(sum(im * (obj.box.ω') .* (abs2.(obj.ψ̃)),dims=2)[:]./obj.N)
+    obj.N = sum(abs2.(obj.ψ), dims=1)[:]/obj.box.Nₜ
+    obj.PE = -0.5*sum(abs2.(obj.ψ).^2,dims=1)[:]./(obj.N*obj.box.Nₜ)
+    obj.KE = 0.5*sum((obj.box.ω.^2) .* (abs2.(obj.ψ̃)),dims=1)[:]./obj.N
+    obj.P = -imag.(sum(im * (obj.box.ω) .* (abs2.(obj.ψ̃)),dims=1)[:]./obj.N)
     obj.E = obj.KE + obj.PE
     obj.dE = obj.E .- obj.E[1]
     println("Integrals of motion computed.")
