@@ -44,8 +44,8 @@ function compute_IoM!(obj)
     # sim.norm = sum(abs.(sim.ψ).^2, dims=2)[:]*sim.box.dt/sim.box.T but dt/T = 1/Nt, thus
     obj.N = sum(abs2.(obj.ψ), dims=1)[:]/obj.box.Nₜ
     obj.PE = -0.5*sum(abs2.(obj.ψ).^2,dims=1)[:]./(obj.N*obj.box.Nₜ)
-    obj.KE = 0.5*sum((obj.box.ω'.^2) .* (abs2.(obj.ψ̃)),dims=1)[:]./obj.N
-    obj.P = -imag.(sum(im * (obj.box.ω') .* (abs2.(obj.ψ̃)),dims=1)[:]./obj.N)
+    obj.KE = 0.5*sum((obj.box.ω.^2) .* (abs2.(obj.ψ̃)),dims=1)[:]./obj.N
+    obj.P = -imag.(sum(im * (obj.box.ω) .* (abs2.(obj.ψ̃)),dims=1)[:]./obj.N)
     obj.E = obj.KE + obj.PE
     obj.dE = obj.E .- obj.E[1]
     println("Integrals of motion computed.")
