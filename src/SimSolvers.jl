@@ -28,9 +28,9 @@ function solve!(sim::Sim)
     W = ifftshift(cis.(sim.box.dx*sim.box.ω.^2/2)) # 9 allocs
     # Step through "time"
     # print("Starting evolution")
-    #@showprogress 1 "Evolving in x" for i = 1:sim.box.Nₓ-1
-    for i = 1:sim.box.Nₓ-1
-        sim.ψ[:, i+1] .= sim.step(sim.ψ[:, i], W, sim.box.dx, F, F̃) # 6 allocs
+    @showprogress 1 "Evolving in x" for i = 1:sim.box.Nₓ-1
+    #for i = 1:sim.box.Nₓ-1
+        @views sim.ψ[:, i+1] .= sim.step(sim.ψ[:, i], W, sim.box.dx, F, F̃) # 6 allocs
         # Pruning TODO: rewrite
         if sim.αₚ > 0 
             ψ = sim.ψ[:, i+1]

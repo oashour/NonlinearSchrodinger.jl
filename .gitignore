@@ -5,3 +5,4 @@
 /docs/build/
 src/example.jl
 test.jld
+src/test.jl

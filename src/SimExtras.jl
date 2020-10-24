@@ -36,13 +36,13 @@ function Box(xᵣ::Pair, T; dx = 1e-3, Nₜ = 256, n_periods = 1)
     return box
 end
 
-mutable struct Sim{TT<:Real}
+mutable struct Sim{TT<:Real, F}
     λ::Complex{TT}
     T::TT
     Ω::TT
     box::Box{TT}
     ψ₀::Array{Complex{TT}, 1}
-    step::Function
+    step::F
     αₚ::TT
     solved::Bool
     ψ::Array{Complex{TT}, 2}
