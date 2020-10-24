@@ -27,10 +27,9 @@ function solve!(sim::Sim)
     # Cache the kinetic factor
     W = ifftshift(cis.(sim.box.dx*sim.box.ω.^2/2)) # 9 allocs
     # Step through "time"
-    # print("Starting evolution")
+    println("Starting evolution")
     @showprogress 1 "Evolving in x" for i = 1:sim.box.Nₓ-1
-    #for i = 1:sim.box.Nₓ-1
-        @views sim.ψ[:, i+1] .= sim.step(sim.ψ[:, i], W, sim.box.dx, F, F̃) # 6 allocs
+        @views sim.ψ[:, i+1] .= sim.step(sim.ψ[:, i], W, sim.box.dx, F, F̃) # 0 allocs
         # Pruning TODO: rewrite
         if sim.αₚ > 0 
             ψ = sim.ψ[:, i+1]
