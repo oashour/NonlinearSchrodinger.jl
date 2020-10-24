@@ -30,15 +30,15 @@ function solve!(sim::Sim)
     println("Starting evolution")
     @showprogress 1 "Evolving in x" for i = 1:sim.box.Nₓ-1
         @views sim.ψ[:, i+1] .= sim.step(sim.ψ[:, i], W, sim.box.dx, F, F̃) # 0 allocs
-        # Pruning TODO: rewrite
+        # Pruning
         if sim.αₚ > 0 
-            ψ = sim.ψ[:, i+1]
-            F*ψ
-            @views ψ[ind_p] .*= exp.(-sim.αₚ*abs.(ψ[ind_p]))
-            inv(F)*ψ
-            sim.ψ[:, i+1] = ψ
-        end
-    end #for
+            F*view(sim.ψ,:,i+1)
+            for j in ind_p
+                sim.ψ[j, i+1] *= exp(-sim.αₚ*abs(sim.ψ[j, i+1]))
+            end
+            F̃*view(sim.ψ,:,i+1)
+        end # if
+    end # for
     sim.solved = true
 
     println("Computation Done!")
