@@ -1,20 +1,20 @@
 
-struct Operators{NLSIntegrator, DispFunc, FFTPlan, InvFFTPlan}
+struct Operators{NLSSIntegrator, DispFunc, FFTPlan, InvFFTPlan}
+    T̂::NLSIntegrator
     K̂::DispFunc
     F̂::FFTPlan
     F̃̂::InvFFTPlan
     B̂::DiffEqBase.DEIntegrator
-    T̂::NLSIntegrator
 end # Simulation
 
 function Operators(sim)
     # Generate FFT Plans to optimize performance
     #println("Generating FFT Plan")
-    F = plan_fft!(@view sim.ψ[:, 1]) # 26 allocs
-    F̃ = plan_ifft!(@view sim.ψ[:, 1]) # 34 allocs
+    F̂ = plan_fft!(@view sim.ψ[:, 1]) # 26 allocs
+    F̃̂ = plan_ifft!(@view sim.ψ[:, 1]) # 34 allocs
 
     # Cache the kinetic factor
-    @memoize function K(dx)
+    @memoize function K̂(dx)
         println("Computing and caching K(dx = $dx)")
         if sim.α == 0
             ifftshift(cis.(dx*sim.box.ω.^2/2))
@@ -26,7 +26,8 @@ function Operators(sim)
     end
 
     # Select algorithm
-    t_algo = BS3() # Default Algorithm
+    T̂ = T₂ˢ # Default algorithm for x
+    t_algo = BS3() # Default Algorithm for t
     if sim.x_order == 1 && sim.α == 0
         T̂ = T₁ˢ 
     elseif sim.x_order == 2 && sim.α == 0
@@ -45,7 +46,7 @@ function Operators(sim)
         T̂ = T₄ʰ 
         t_algo = BS3()
     else
-        throw(ArgumentError("No solver available "))
+        throw(ArgumentError("No solver available for order $x_order in x and order $t_order in t with α=$α"))
     end
 
     # Create the integrator for the Burger term
@@ -65,7 +66,7 @@ function Operators(sim)
         B̂ = init(prob, t_algo; dt=sim.box.dx,save_everystep=false)  
     end
 
-    ops = Operators(K, F, F̃, B̂, T̂)
+    ops = Operators(T̂, K̂, F̂, F̃̂, B̂̂)
 
     return ops
 end
@@ -95,7 +96,7 @@ function solve!(sim::Sim)
     #println("Starting evolution")
     #@showprogress 1 "Evolving in x" for i = 1:sim.box.Nₓ-1
     for i = 1:sim.box.Nₓ-1
-        sim.ψ[:, i+1] .= ops.T̂(sim.ψ[:, i], sim.box.dx, ops)
+        @time sim.ψ[:, i+1] .= ops.T̂(sim.ψ[:, i], sim.box.dx, ops)
         # Pruning
         if sim.αₚ > 0 
             ops.F̂*view(sim.ψ,:,i+1)
