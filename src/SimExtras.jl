@@ -36,14 +36,14 @@ function Box(xᵣ::Pair, T; dx = 1e-3, Nₜ = 256, n_periods = 1)
     return box
 end
 
-mutable struct Sim{TT<:Real, F}
+mutable struct Sim{TT<:Real}
     λ::Complex{TT}
     T::TT
     Ω::TT
     box::Box{TT}
     ψ₀::Array{Complex{TT}, 1}
-    t_order::F
-    x_order::F
+    t_order::Int64
+    x_order::Int64
     α::TT
     αₚ::TT
     solved::Bool
@@ -59,7 +59,7 @@ mutable struct Sim{TT<:Real, F}
     P::Array{TT, 1}
 end # Simulation
 
-function Sim(λ, box::Box, ψ₀::Array{Complex{TT}, 1}; x_order = 2, t_order = 2, α = 0.0, αₚ = 0.0) where TT <: Real
+function Sim(λ, box::Box, ψ₀::Array{Complex{TT}, 1}; t_order = 2, x_order = 2, α = 0.0, αₚ = 0.0) where TT <: Real
     ψ = Array{Complex{TT}}(undef, box.Nₜ, box.Nₓ)
     ψ̃ = similar(ψ)
     E = zeros(box.Nₓ)
@@ -76,7 +76,7 @@ function Sim(λ, box::Box, ψ₀::Array{Complex{TT}, 1}; x_order = 2, t_order = 
     end
     # Compute some parameters
     λ, T, Ω = params(λ = λ)
-    sim = Sim(λ, T, Ω, box, ψ₀, x_order, t_order, α, αₚ, false, ψ, false, ψ̃, false, E, PE, KE, dE, N, P)
+    sim = Sim(λ, T, Ω, box, ψ₀, t_order, x_order, α, αₚ, false, ψ, false, ψ̃, false, E, PE, KE, dE, N, P)
    return sim
 end #init_sim
 
