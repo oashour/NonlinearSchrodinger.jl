@@ -10,15 +10,15 @@ See also: [`solve!`](@ref)
 function T₁ˢ(ψ, K, dx, F, F̃, integrator= 0)
 
     # Nonlinear
-    @inbounds for i in 1:length(ψ)
+    @inbounds for i in eachindex(ψ)
         ψ[i] *= cis(dx * (-1*abs2(ψ[i]))) 
     end
 
     # Kinetic
-    KK = K(dx)
+    disp = K(dx)
     F*ψ 
-    @inbounds for i in 1:length(KK)
-        ψ[i] *= KK[i]
+    @inbounds for i in eachindex(ψ)
+        ψ[i] *= disp[i]
     end
     F̃*ψ 
 end #T₁ʰ
@@ -33,19 +33,20 @@ See also: [`solve!`](@ref)
 """
 function T₂ˢ(ψ, K, dx, F, F̃, integrator = 0)
     # Nonlinear
-    @inbounds for i in 1:length(ψ)
+    @inbounds for i in eachindex(ψ)
         ψ[i] *= cis(dx/2 * (-1*abs2(ψ[i]))) 
     end
-    # Kinetic
-    KK = K(dx)
+
+    # Dispersion
+    disp = K(dx)
     F*ψ # 0 allocs
-    @inbounds for i in 1:length(ψ)
-        ψ[i] *= KK[i]
+    @inbounds for i in eachindex(ψ)
+        ψ[i] *= disp[i]
     end
     F̃*ψ # 0 allocs
 
     # Nonlinear
-    @inbounds for i in 1:length(ψ)
+    @inbounds for i in eachindex(ψ)
         ψ[i] *= cis(dx/2 * (-1*abs2(ψ[i]))) 
     end
 

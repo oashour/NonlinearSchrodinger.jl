@@ -77,7 +77,7 @@ function solve!(sim::Sim)
 
     println("Starting evolution")
     @showprogress 1 "Evolving in x" for i = 1:sim.box.Nₓ-1
-        @views sim.ψ[:, i+1] .= step(sim.ψ[:, i], K, sim.box.dx, F, F̃, integrator)
+        @time sim.ψ[:, i+1] .= step(sim.ψ[:, i], K, sim.box.dx, F, F̃, integrator)
         # Pruning
         if sim.αₚ > 0 
             F*view(sim.ψ,:,i+1)

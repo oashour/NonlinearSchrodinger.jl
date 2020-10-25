@@ -10,15 +10,15 @@ See also: [`solve!`](@ref)
 function T₁ʰ(ψ, K, dx, F, F̃, integrator)
 
     # Nonlinear
-    @inbounds for i in 1:length(ψ)
+    @inbounds for i in eachindex(ψ)
         ψ[i] *= cis(dx * (-1*abs2(ψ[i]))) 
     end
 
-    # Kinetic
-    KK = K(dx)
+    # Dispersion
+    disp = K(dx)
     F*ψ 
-    @inbounds for i in 1:length(KK)
-        ψ[i] *= KK[i]
+    @inbounds for i in eachindex(ψ)
+        ψ[i] *= disp[i]
     end
     F̃*ψ 
 
@@ -38,15 +38,15 @@ See also: [`solve!`](@ref)
 """
 function T₂ʰ(ψ, K, dx, F, F̃, integrator)
     # Nonlinear
-    @inbounds for i in 1:length(ψ)
+    @inbounds for i in eachindex(ψ)
         ψ[i] *= cis(dx/2 * (-1*abs2(ψ[i]))) 
     end
 
-    # Kinetic
-    KK = K(dx/2)
+    # Dispersion
+    disp = K(dx/2)
     F*ψ 
-    @inbounds for i in 1:length(ψ)
-        ψ[i] *= KK[i]
+    @inbounds for i in eachindex(ψ)
+        ψ[i] *= disp[i]
     end
     F̃*ψ 
 
@@ -55,15 +55,15 @@ function T₂ʰ(ψ, K, dx, F, F̃, integrator)
     step!(integrator)
     ψ = integrator.u
 
-    # Kinetic
+    # Dispersion
     F*ψ 
-    @inbounds for i in 1:length(ψ)
-        ψ[i] *= KK[i]
+    @inbounds for i in eachindex(ψ)
+        ψ[i] *= disp[i]
     end
     F̃*ψ 
 
     # Nonlinear
-    @inbounds for i in 1:length(ψ)
+    @inbounds for i in eachindex(ψ)
         ψ[i] *= cis(dx/2 * (-1*abs2(ψ[i]))) 
     end
 
