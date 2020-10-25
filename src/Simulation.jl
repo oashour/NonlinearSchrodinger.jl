@@ -10,5 +10,7 @@ using Memoization
 
 include("SimExtras.jl")
 include("SimSolvers.jl")
+include("CubicSolvers.jl")
+include("HirotaSolvers.jl")
 
 end #module

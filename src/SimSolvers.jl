@@ -36,6 +36,30 @@ function solve!(sim::Sim)
         end
     end
 
+    # Select algorithm
+    if sim.x_order == 1 && sim.α == 0
+        step = T₁ˢ 
+    elseif sim.x_order == 2 && sim.α == 0
+        step = T₂ˢ
+    elseif sim.x_order == 4 && sim.α == 0
+        step = T₄ˢ 
+    elseif sim.x_order == 6 && sim.α == 0
+        step = T₆ˢ 
+    elseif sim.x_order == 8 && sim.α == 0
+        step = T₈ˢ 
+    elseif sim.x_order == 1 && sim.α >= 0
+        step = T₁ʰ 
+        t_algo = BS3()
+    elseif sim.x_order == 2 && sim.α >= 0
+        step = T₂ʰ 
+        algo = BS3()
+    elseif sim.x_order == 2 && sim.α >= 0
+        step = T₄ʰ 
+        algo = Tsit5()
+    else
+        throw(ArgumentError("No solver available "))
+    end
+
     # Create the integrator for the Burger term
     if sim.α > 0
         D = CenteredDifference(1, sim.t_order, sim.box.dt, sim.box.Nₜ) 
@@ -46,28 +70,9 @@ function solve!(sim::Sim)
             du .= 6*sim.α*D*Q*u.*abs2.(u)
         end
         prob = ODEProblem(M!, sim.ψ[:, 1], (t0, t1))
-        integrator = init(prob, BS3(); dt=sim.box.dx,save_everystep=false)  
+        integrator = init(prob, algo; dt=sim.box.dx,save_everystep=false)  
     else
         integrator = 0
-    end
-
-    # Select algorithm
-    if sim.x_order == 1 && sim.α == 0
-        step = T₁ˢ 
-    elseif sim.x_order == 1 && sim.α >= 0
-        step = T₁ˢʰ 
-    elseif sim.x_order == 2 && sim.α == 0
-        step = T₂ˢ
-    elseif sim.x_order == 2 && sim.α >= 0
-        step = T₂ˢʰ 
-    elseif sim.x_order == 4 && sim.α == 0
-        step = T₄ˢ 
-    elseif sim.x_order == 6 && sim.α == 0
-        step = T₆ˢ 
-    elseif sim.x_order == 8 && sim.α == 0
-        step = T₈ˢ 
-    else
-        throw(ArgumentError("No solver available "))
     end
 
     println("Starting evolution")
@@ -89,179 +94,3 @@ function solve!(sim::Sim)
 
     return nothing
 end #solve
-
-#######################################################################################
-# Algorithms
-#######################################################################################
-"""
-    T₁ʰ(ψ, ω, dx, F)
-
-Compute `ψ'`, i.e. `ψ` advanced a step `dx` forward using a symplectic second order
-integrator. `ψ'` is defined on an FFT grid with frequencies `ω` using an FFT plan
-`F`. Do not call this explicitly and use `solve!` instead.
-
-See also: [`solve!`](@ref)
-"""
-function T₁ˢʰ(ψ, K, dx, F, F̃, integrator)
-
-    # Nonlinear
-    @inbounds for i in 1:length(ψ)
-        ψ[i] *= cis(dx * (-1*abs2(ψ[i]))) 
-    end
-
-    # Kinetic
-    KK = K(dx)
-    F*ψ 
-    @inbounds for i in 1:length(KK)
-        ψ[i] *= KK[i]
-    end
-    F̃*ψ 
-
-    # Burger
-    set_u!(integrator, ψ) #1.14k allocs
-    step!(integrator) #1.14k allocs
-    ψ .= integrator.u
-end #T₁ʰ
-"""
-    T₂ˢʰ(ψ, ω, dx, F)
-
-Compute `ψ'`, i.e. `ψ` advanced a step `dx` forward using a symplectic second order
-integrator. `ψ'` is defined on an FFT grid with frequencies `ω` using an FFT plan
-`F`. Do not call this explicitly and use `solve!` instead.
-
-See also: [`solve!`](@ref)
-"""
-function T₂ˢʰ(ψ, K, dx, F, F̃, integrator)
-
-    # Nonlinear
-    @inbounds for i in 1:length(ψ)
-        ψ[i] *= cis(dx/2 * (-1*abs2(ψ[i]))) 
-    end
-
-    # Kinetic
-    F*ψ 
-    KK = K(dx/2)
-    @inbounds for i in 1:length(ψ)
-        ψ[i] *= KK[i]
-    end
-    F̃*ψ 
-
-    # Burger
-    set_u!(integrator, ψ)
-    step!(integrator)
-    ψ = integrator.u
-
-    # Kinetic
-    F*ψ 
-    @inbounds for i in 1:length(ψ)
-        ψ[i] *= KK[i]
-    end
-    F̃*ψ 
-
-    # Nonlinear
-    @inbounds for i in 1:length(ψ)
-        ψ[i] *= cis(dx/2 * (-1*abs2(ψ[i]))) 
-    end
-
-    return ψ
-end #T₁ʰ
-"""
-    T₂ˢ(ψ, ω, dx, F)
-
-Compute `ψ'`, i.e. `ψ` advanced a step `dx` forward using a symplectic second order
-integrator. `ψ'` is defined on an FFT grid with frequencies `ω` using an FFT plan
-`F`. Do not call this explicitly and use `solve!` instead.
-
-See also: [`solve!`](@ref)
-"""
-function T₂ˢ(ψ, K, dx, F, F̃, integrator = 0)
-    # Nonlinear
-    @inbounds for i in 1:length(ψ)
-        ψ[i] *= cis(dx/2 * (-1*abs2(ψ[i]))) 
-    end
-    # Kinetic
-    KK = K(dx)
-    F*ψ # 0 allocs
-    @inbounds for i in 1:length(ψ)
-        ψ[i] *= KK[i]
-    end
-    F̃*ψ # 0 allocs
-
-    # Nonlinear
-    @inbounds for i in 1:length(ψ)
-        ψ[i] *= cis(dx/2 * (-1*abs2(ψ[i]))) 
-    end
-
-    return ψ
-end #T2
-
-"""
-    T₄ˢ(ψ, ω, dx, F)
-
-Compute `ψ'`, i.e. `ψ` advanced a step `dx` forward using a symplectic fourth order
-integrator. `ψ'` is defined on an FFT grid with frequencies `ω` using an FFT plan
-`F`. Do not call this explicitly and use `solve!` instead.
-
-See also: [`solve!`](@ref), [`T2`](@ref)
-"""
-function T₄ˢ(ψ, K, dx, F, F̃, integrator = 0)
-    s = 2^(1 / 3)
-    os = 1 / (2 - s)
-
-    ft = os
-    bt = -s * os
-
-    ψ = T₂ˢ(ψ, K, ft * dx, F, F̃)
-    ψ = T₂ˢ(ψ, K, bt * dx, F, F̃)
-    ψ = T₂ˢ(ψ, K, ft * dx, F, F̃)
-
-    return ψ
-end # T4S
-
-"""
-    T₆ˢ(ψ, ω, dx, F)
-
-Compute `ψ'`, i.e. `ψ` advanced a step `dx` forward using a symplectic sixth order
-integrator. `ψ'` is defined on an FFT grid with frequencies `ω` using an FFT plan
-`F`. Do not call this explicitly and use `solve!` instead.
-
-See also: [`solve!`](@ref), [`T₄ˢ`](@ref)
-"""
-function T₆ˢ(ψ, K, dx, F, F̃, integrator = 0)
-
-    s = 2^(1 / 5)
-    os = 1 / (2 - s)
-
-    ft = os
-    bt = -s * os
-
-    ψ = T₄ˢ(ψ, K, ft * dx, F, F̃)
-    ψ = T₄ˢ(ψ, K, bt * dx, F, F̃)
-    ψ = T₄ˢ(ψ, K, ft * dx, F, F̃)
-
-    return ψ
-end #T6S
-
-"""
-    T₈ˢ(ψ, ω, dx, F)
-
-Compute `ψ'`, i.e. `ψ` advanced a step `dx` forward using a symplectic eighth order
-integrator. `ψ'` is defined on an FFT grid with frequencies `ω` using an FFT plan
-`F`. Do not call this explicitly and use `solve!` instead.
-
-See also: [`solve!`](@ref), [`T₆ˢ`](@ref)
-"""
-function T₈ˢ(ψ, K, dx, F, F̃, integrator = 0)
-
-    s = 2^(1 / 7)
-    os = 1 / (2 - s)
-
-    ft = os
-    bt = -s * os
-
-    ψ = T₆ˢ(ψ, K, ft * dx, F, F̃)
-    ψ = T₆ˢ(ψ, K, bt * dx, F, F̃)
-    ψ = T₆ˢ(ψ, K, ft * dx, F, F̃)
-
-    return ψ
-end #T8S
