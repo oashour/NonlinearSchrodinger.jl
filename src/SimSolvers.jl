@@ -25,14 +25,15 @@ function solve!(sim::Sim)
     F̃ = plan_ifft!(@view sim.ψ[:, 1]) # 34 allocs
 
     # Cache the kinetic factor
-    if sim.α == 0
-        W = ifftshift(cis.(sim.box.dx*sim.box.ω.^2/2)) # 9 allocs
-    elseif sim.α > 0 && sim.x_order == 1
-        W = ifftshift(cis.(sim.box.dx*(sim.box.ω.^2/2 - sim.α*sim.box.ω.^3))) # 9 allocs
-    elseif sim.α > 0 && sim.x_order >= 2
-        W = ifftshift(cis.(sim.box.dx/2*(sim.box.ω.^2/2 - sim.α*sim.box.ω.^3))) # 9 allocs
-    else
-        throw(ArgumentError("Unknown setup α = $(sim.α) and x_order = $(sim.x_order)"))
+    @memoize function K(dx)
+        println("Computing and caching K(dx = $dx)")
+        if sim.α == 0
+            ifftshift(cis.(dx*sim.box.ω.^2/2))
+        elseif sim.α > 0
+            ifftshift(cis.(dx*(sim.box.ω.^2/2 - sim.α*sim.box.ω.^3)))
+        else
+            throw(ArgumentError("Unknown setup α = $(sim.α) and x_order = $(sim.x_order)"))
+        end
     end
 
     # Create the integrator for the Burger term
@@ -55,10 +56,10 @@ function solve!(sim::Sim)
         step = T₁ˢ 
     elseif sim.x_order == 1 && sim.α >= 0
         step = T₁ˢʰ 
-    elseif sim.x_order == 1 && sim.α == 0
+    elseif sim.x_order == 2 && sim.α == 0
         step = T₂ˢ
     elseif sim.x_order == 2 && sim.α >= 0
-        step = T₁ˢʰ 
+        step = T₂ˢʰ 
     elseif sim.x_order == 4 && sim.α == 0
         step = T₄ˢ 
     elseif sim.x_order == 6 && sim.α == 0
@@ -71,7 +72,7 @@ function solve!(sim::Sim)
 
     println("Starting evolution")
     @showprogress 1 "Evolving in x" for i = 1:sim.box.Nₓ-1
-        @views sim.ψ[:, i+1] .= step(sim.ψ[:, i], W, sim.box.dx, F, F̃, integrator)
+        @views sim.ψ[:, i+1] .= step(sim.ψ[:, i], K, sim.box.dx, F, F̃, integrator)
         # Pruning
         if sim.αₚ > 0 
             F*view(sim.ψ,:,i+1)
@@ -101,7 +102,7 @@ integrator. `ψ'` is defined on an FFT grid with frequencies `ω` using an FFT p
 
 See also: [`solve!`](@ref)
 """
-function T₁ˢʰ(ψ, W, dx, F, F̃, integrator)
+function T₁ˢʰ(ψ, K, dx, F, F̃, integrator)
 
     # Nonlinear
     @inbounds for i in 1:length(ψ)
@@ -109,18 +110,17 @@ function T₁ˢʰ(ψ, W, dx, F, F̃, integrator)
     end
 
     # Kinetic
+    KK = K(dx)
     F*ψ 
-    @inbounds for i in 1:length(W)
-        ψ[i] *= W[i]
+    @inbounds for i in 1:length(KK)
+        ψ[i] *= KK[i]
     end
     F̃*ψ 
 
     # Burger
-    set_u!(integrator, ψ)
-    step!(integrator)
-    ψ = integrator.u
-
-    return ψ
+    set_u!(integrator, ψ) #1.14k allocs
+    step!(integrator) #1.14k allocs
+    ψ .= integrator.u
 end #T₁ʰ
 """
     T₂ˢʰ(ψ, ω, dx, F)
@@ -131,7 +131,7 @@ integrator. `ψ'` is defined on an FFT grid with frequencies `ω` using an FFT p
 
 See also: [`solve!`](@ref)
 """
-function T₂ˢʰ(ψ, W, dx, F, F̃, integrator)
+function T₂ˢʰ(ψ, K, dx, F, F̃, integrator)
 
     # Nonlinear
     @inbounds for i in 1:length(ψ)
@@ -140,8 +140,9 @@ function T₂ˢʰ(ψ, W, dx, F, F̃, integrator)
 
     # Kinetic
     F*ψ 
-    @inbounds for i in 1:length(W)
-        ψ[i] *= W[i]
+    KK = K(dx/2)
+    @inbounds for i in 1:length(ψ)
+        ψ[i] *= KK[i]
     end
     F̃*ψ 
 
@@ -152,8 +153,8 @@ function T₂ˢʰ(ψ, W, dx, F, F̃, integrator)
 
     # Kinetic
     F*ψ 
-    @inbounds for i in 1:length(W)
-        ψ[i] *= W[i]
+    @inbounds for i in 1:length(ψ)
+        ψ[i] *= KK[i]
     end
     F̃*ψ 
 
@@ -173,17 +174,23 @@ integrator. `ψ'` is defined on an FFT grid with frequencies `ω` using an FFT p
 
 See also: [`solve!`](@ref)
 """
-function T₂ˢ(ψ, W, dx, F, F̃, integrator = 0)
+function T₂ˢ(ψ, K, dx, F, F̃, integrator = 0)
     # Nonlinear
     @inbounds for i in 1:length(ψ)
         ψ[i] *= cis(dx/2 * (-1*abs2(ψ[i]))) 
     end
     # Kinetic
+    KK = K(dx)
     F*ψ # 0 allocs
-    @inbounds for i in 1:length(W)
-        ψ[i] *= W[i]
+    @inbounds for i in 1:length(ψ)
+        ψ[i] *= KK[i]
     end
     F̃*ψ # 0 allocs
+
+    # Nonlinear
+    @inbounds for i in 1:length(ψ)
+        ψ[i] *= cis(dx/2 * (-1*abs2(ψ[i]))) 
+    end
 
     return ψ
 end #T2
@@ -197,16 +204,16 @@ integrator. `ψ'` is defined on an FFT grid with frequencies `ω` using an FFT p
 
 See also: [`solve!`](@ref), [`T2`](@ref)
 """
-function T₄ˢ(ψ, W, dx, F, F̃, integrator = 0)
+function T₄ˢ(ψ, K, dx, F, F̃, integrator = 0)
     s = 2^(1 / 3)
     os = 1 / (2 - s)
 
     ft = os
     bt = -s * os
 
-    ψ = T₂ˢ(ψ, W, ft * dx, F, F̃)
-    ψ = T₂ˢ(ψ, W, bt * dx, F, F̃)
-    ψ = T₂ˢ(ψ, W, ft * dx, F, F̃)
+    ψ = T₂ˢ(ψ, K, ft * dx, F, F̃)
+    ψ = T₂ˢ(ψ, K, bt * dx, F, F̃)
+    ψ = T₂ˢ(ψ, K, ft * dx, F, F̃)
 
     return ψ
 end # T4S
@@ -220,7 +227,7 @@ integrator. `ψ'` is defined on an FFT grid with frequencies `ω` using an FFT p
 
 See also: [`solve!`](@ref), [`T₄ˢ`](@ref)
 """
-function T₆ˢ(ψ, W, dx, F, F̃, integrator = 0)
+function T₆ˢ(ψ, K, dx, F, F̃, integrator = 0)
 
     s = 2^(1 / 5)
     os = 1 / (2 - s)
@@ -228,9 +235,9 @@ function T₆ˢ(ψ, W, dx, F, F̃, integrator = 0)
     ft = os
     bt = -s * os
 
-    ψ = T₄ˢ(ψ, W, ft * dx, F, F̃)
-    ψ = T₄ˢ(ψ, W, bt * dx, F, F̃)
-    ψ = T₄ˢ(ψ, W, ft * dx, F, F̃)
+    ψ = T₄ˢ(ψ, K, ft * dx, F, F̃)
+    ψ = T₄ˢ(ψ, K, bt * dx, F, F̃)
+    ψ = T₄ˢ(ψ, K, ft * dx, F, F̃)
 
     return ψ
 end #T6S
@@ -244,7 +251,7 @@ integrator. `ψ'` is defined on an FFT grid with frequencies `ω` using an FFT p
 
 See also: [`solve!`](@ref), [`T₆ˢ`](@ref)
 """
-function T₈ˢ(ψ, W, dx, F, F̃, integrator = 0)
+function T₈ˢ(ψ, K, dx, F, F̃, integrator = 0)
 
     s = 2^(1 / 7)
     os = 1 / (2 - s)
@@ -252,9 +259,9 @@ function T₈ˢ(ψ, W, dx, F, F̃, integrator = 0)
     ft = os
     bt = -s * os
 
-    ψ = T₆ˢ(ψ, W, ft * dx, F, F̃)
-    ψ = T₆ˢ(ψ, W, bt * dx, F, F̃)
-    ψ = T₆ˢ(ψ, W, ft * dx, F, F̃)
+    ψ = T₆ˢ(ψ, K, ft * dx, F, F̃)
+    ψ = T₆ˢ(ψ, K, bt * dx, F, F̃)
+    ψ = T₆ˢ(ψ, K, ft * dx, F, F̃)
 
     return ψ
 end #T8S
