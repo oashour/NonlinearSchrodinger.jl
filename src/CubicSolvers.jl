@@ -50,7 +50,7 @@ function T₂ˢ(ψ, K, dx, F, F̃, integrator = 0)
     end
 
     return ψ
-end #T2
+end #T₂ˢ
 
 """
     T₄ˢ(ψ, ω, dx, F)
@@ -73,7 +73,7 @@ function T₄ˢ(ψ, K, dx, F, F̃, integrator = 0)
     ψ = T₂ˢ(ψ, K, ft * dx, F, F̃)
 
     return ψ
-end # T4S
+end # T₄ˢ
 
 """
     T₆ˢ(ψ, ω, dx, F)

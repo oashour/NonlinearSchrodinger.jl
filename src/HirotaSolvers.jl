@@ -68,4 +68,27 @@ function T₂ʰ(ψ, K, dx, F, F̃, integrator)
     end
 
     return ψ
-end #T₁ʰ
+end #T₂ʰ
+"""
+    T₄ʰ(ψ, ω, dx, F)
+
+Compute `ψ'`, i.e. `ψ` advanced a step `dx` forward using a symplectic fourth order
+integrator. `ψ'` is defined on an FFT grid with frequencies `ω` using an FFT plan
+`F`. Do not call this explicitly and use `solve!` instead.
+
+See also: [`solve!`](@ref), [`T2`](@ref)
+"""
+function T₄ʰ(ψ, K, dx, F, F̃, integrator)
+    # This algorithm is broken at the moment
+    s = 2^(1 / 3)
+    os = 1 / (2 - s)
+
+    ft = os
+    bt = -s * os
+
+    ψ = T₂ʰ(ψ, K, ft * dx, F, F̃, integrator)
+    ψ = T₂ʰ(ψ, K, bt * dx, F, F̃, integrator)
+    ψ = T₂ʰ(ψ, K, ft * dx, F, F̃, integrator)
+
+    return ψ
+end # T₄ˢ

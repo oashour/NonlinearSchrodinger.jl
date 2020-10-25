@@ -53,9 +53,9 @@ function solve!(sim::Sim)
     elseif sim.x_order == 2 && sim.α >= 0
         step = T₂ʰ 
         algo = BS3()
-    elseif sim.x_order == 2 && sim.α >= 0
+    elseif sim.x_order == 4 && sim.α >= 0
         step = T₄ʰ 
-        algo = Tsit5()
+        algo = BS3()
     else
         throw(ArgumentError("No solver available "))
     end
