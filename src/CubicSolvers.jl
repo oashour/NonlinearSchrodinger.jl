@@ -10,9 +10,7 @@ See also: [`solve!`](@ref)
 function T₁ˢ(ψ, K, dx, F, F̃, integrator= 0)
 
     # Nonlinear
-    @inbounds for i in eachindex(ψ)
-        ψ[i] *= cis(dx * (-1*abs2(ψ[i]))) 
-    end
+    @. ψ = cis(dx * (-1*abs2(ψ)))*ψ
 
     # Kinetic
     disp = K(dx)
@@ -33,9 +31,7 @@ See also: [`solve!`](@ref)
 """
 function T₂ˢ(ψ, K, dx, F, F̃, integrator = 0)
     # Nonlinear
-    @inbounds for i in eachindex(ψ)
-        ψ[i] *= cis(dx/2 * (-1*abs2(ψ[i]))) 
-    end
+    @. ψ = cis(dx/2 * (-1*abs2(ψ)))*ψ
 
     # Dispersion
     disp = K(dx)
@@ -46,9 +42,7 @@ function T₂ˢ(ψ, K, dx, F, F̃, integrator = 0)
     F̃*ψ # 0 allocs
 
     # Nonlinear
-    @inbounds for i in eachindex(ψ)
-        ψ[i] *= cis(dx/2 * (-1*abs2(ψ[i]))) 
-    end
+    @. ψ = cis(dx/2 * (-1*abs2(ψ)))*ψ
 
     return ψ
 end #T₂ˢ

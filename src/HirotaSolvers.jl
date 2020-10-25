@@ -10,9 +10,7 @@ See also: [`solve!`](@ref)
 function T₁ʰ(ψ, K, dx, F, F̃, integrator)
 
     # Nonlinear
-    @inbounds for i in eachindex(ψ)
-        ψ[i] *= cis(dx * (-1*abs2(ψ[i]))) 
-    end
+    @. ψ = cis(dx * (-1*abs2(ψ)))*ψ
 
     # Dispersion
     disp = K(dx)
@@ -38,9 +36,7 @@ See also: [`solve!`](@ref)
 """
 function T₂ʰ(ψ, K, dx, F, F̃, integrator)
     # Nonlinear
-    @inbounds for i in eachindex(ψ)
-        ψ[i] *= cis(dx/2 * (-1*abs2(ψ[i]))) 
-    end
+    @. ψ = cis(dx/2 * (-1*abs2(ψ)))*ψ
 
     # Dispersion
     disp = K(dx/2)
@@ -63,9 +59,7 @@ function T₂ʰ(ψ, K, dx, F, F̃, integrator)
     F̃*ψ 
 
     # Nonlinear
-    @inbounds for i in eachindex(ψ)
-        ψ[i] *= cis(dx/2 * (-1*abs2(ψ[i]))) 
-    end
+    @. ψ = cis(dx/2 * (-1*abs2(ψ)))*ψ
 
     return ψ
 end #T₂ʰ
