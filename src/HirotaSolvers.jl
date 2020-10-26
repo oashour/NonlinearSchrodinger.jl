@@ -7,25 +7,20 @@ integrator. `ψ'` is defined on an FFT grid with frequencies `ω` using an FFT p
 
 See also: [`solve!`](@ref)
 """
-function T₁ʰ(ψ, K, dx, F, F̃, integrator)
+function T₁ʰ(ψ, dx, ops)
 
     # Nonlinear
-    @inbounds for i in 1:length(ψ)
-        ψ[i] *= cis(dx * (-1*abs2(ψ[i]))) 
-    end
+    @. ψ = cis(dx * (-1*abs2(ψ)))*ψ
 
-    # Kinetic
-    KK = K(dx)
-    F*ψ 
-    @inbounds for i in 1:length(KK)
-        ψ[i] *= KK[i]
-    end
-    F̃*ψ 
+    # Dispersion
+    ops.F̂*ψ 
+    ψ .= ops.K̂(dx) .* ψ
+    ops.F̃̂*ψ
 
     # Burger
-    set_u!(integrator, ψ) #1.14k allocs
-    step!(integrator) #1.14k allocs
-    ψ .= integrator.u
+    set_u!(ops.B̂, ψ) #1.14k allocs
+    step!(ops.B̂) #1.14k allocs
+    ψ .= ops.B̂.u
 end #T₁ʰ
 """
     T₂ʰ(ψ, ω, dx, F)
@@ -36,36 +31,27 @@ integrator. `ψ'` is defined on an FFT grid with frequencies `ω` using an FFT p
 
 See also: [`solve!`](@ref)
 """
-function T₂ʰ(ψ, K, dx, F, F̃, integrator)
+function T₂ʰ(ψ, dx, ops)
     # Nonlinear
-    @inbounds for i in 1:length(ψ)
-        ψ[i] *= cis(dx/2 * (-1*abs2(ψ[i]))) 
-    end
+    @. ψ = cis(dx/2 * (-1*abs2(ψ)))*ψ
 
-    # Kinetic
-    KK = K(dx/2)
-    F*ψ 
-    @inbounds for i in 1:length(ψ)
-        ψ[i] *= KK[i]
-    end
-    F̃*ψ 
+    # Dispersion
+    ops.F̂*ψ 
+    ψ .= ops.K̂(dx/2) .* ψ # 3 allocs
+    ops.F̃̂*ψ
 
     # Burger
-    set_u!(integrator, ψ)
-    step!(integrator)
-    ψ = integrator.u
+    set_u!(ops.B̂, ψ) # 0 allocs 
+    step!(ops.B̂) # 3-4 allocs
+    ψ .= ops.B̂.u # 2 allocs
 
-    # Kinetic
-    F*ψ 
-    @inbounds for i in 1:length(ψ)
-        ψ[i] *= KK[i]
-    end
-    F̃*ψ 
+    # Dispersion
+    ops.F̂*ψ 
+    ψ .= ops.K̂(dx/2) .* ψ # 3 allocs
+    ops.F̃̂*ψ
 
     # Nonlinear
-    @inbounds for i in 1:length(ψ)
-        ψ[i] *= cis(dx/2 * (-1*abs2(ψ[i]))) 
-    end
+    @. ψ = cis(dx/2 * (-1*abs2(ψ)))*ψ
 
     return ψ
 end #T₂ʰ
@@ -78,7 +64,7 @@ integrator. `ψ'` is defined on an FFT grid with frequencies `ω` using an FFT p
 
 See also: [`solve!`](@ref), [`T2`](@ref)
 """
-function T₄ʰ(ψ, K, dx, F, F̃, integrator)
+function T₄ʰ(ψ, dx, ops)
     # This algorithm is broken at the moment
     s = 2^(1 / 3)
     os = 1 / (2 - s)
@@ -86,9 +72,9 @@ function T₄ʰ(ψ, K, dx, F, F̃, integrator)
     ft = os
     bt = -s * os
 
-    ψ = T₂ʰ(ψ, K, ft * dx, F, F̃, integrator)
-    ψ = T₂ʰ(ψ, K, bt * dx, F, F̃, integrator)
-    ψ = T₂ʰ(ψ, K, ft * dx, F, F̃, integrator)
+    ψ = T₂ʰ(ψ, ft*dx, ops)
+    ψ = T₂ʰ(ψ, bt*dx, ops)
+    ψ = T₂ʰ(ψ, ft*dx, ops)
 
     return ψ
 end # T₄ˢ

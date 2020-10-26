@@ -1,6 +1,37 @@
 module Utilities
 using FFTW, JLD
-export compute_energy!, compute_spectrum!
+export compute_energy!, compute_spectrum!, Box
+
+struct Box{TT<:Real}
+    t::Array{TT, 1}
+    ω::Array{TT, 1}
+    x::Array{TT, 1}
+    Nₜ::Int64
+    Nₓ::Int64
+    dt::TT
+    dx::TT
+    n_periods::Int64
+end #SimulationBox
+
+function Box(xᵣ::Pair, T; dx = 1e-3, Nₜ = 256, n_periods = 1)
+    println("==========================================")
+    println("Initializing simulation box with $n_periods period(s) and dx = $dx, Nₜ = $Nₜ.")
+    T = n_periods * T
+    println("Longitudinal range is [$(xᵣ.first), $(xᵣ.second)], transverse range is [$(-T/2), $(T/2))")
+    dt = T / Nₜ
+    t = dt * collect((-Nₜ/2:Nₜ/2-1))
+
+    x = collect(xᵣ.first:dx:xᵣ.second)
+    Nₓ = length(x)
+    ω = 2π/T * collect((-Nₜ/2:Nₜ/2-1))
+
+    box = Box(t, ω, x, Nₜ, Nₓ, dt, dx, n_periods)
+
+    println("Done computing t, x, ω")
+    println("==========================================")
+
+    return box
+end
 
 """
     function compute_spectrum!(obj)
@@ -13,12 +44,8 @@ See also: [`NLSS.Plotter.plot_ψ̃`](@ref)
 function compute_spectrum!(obj)
     println("==========================================")
     println("Computing spectrum")
-    if obj.solved
-        obj.ψ̃ = fftshift(fft(obj.ψ, 1), 1)/obj.box.Nₜ
-        obj.spectrum_computed = true
-    else
-        throw(ArgumentError("Trying to compute spectrum of an unsolved simulation. Please solve the model first."))
-    end
+    # Needs optimization
+    obj.ψ̃ = fftshift(fft(obj.ψ, 1), 1)/obj.box.Nₜ
     println("Spectrum computed")
     println("==========================================")
 end
@@ -32,10 +59,6 @@ Computes the integrals of motion of `obj.ψ` and saves them in respective fields
 See also: [`NLSS.Plotter.plot_CoM`](@ref)
 """
 function compute_IoM!(obj)
-    if ~obj.spectrum_computed
-        println("IoM calculation requested without a spectrum calculation.")
-        compute_spectrum!(obj)
-    end
     println("==========================================")
     println("Computing integrals of motions")
     # Compute the energies
