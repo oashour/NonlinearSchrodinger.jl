@@ -120,9 +120,12 @@ function plot_ψ̃(sim; mode = "density", x_res=500, ω_res=512, skip = 1, n_lin
     elseif mode == "lines"
         ψ̃ = ifftshift(sim.ψ̃, 1)[1:skip:skip*n_lines, 1:xₛ:end]
         labs = reshape([L"\tilde{\psi}_{%$(i-1)}" for i in 1:skip:skip*n_lines], 1, :)
-        p = plot(x, log.(abs.(ψ̃')), label = labs, legend = :outertopright)
-        xlabel!(L"x")
-        ylabel!(L"\log|\tilde{\psi}|")
+        p = plot(x, log.(abs.(ψ̃')), 
+                    label = labs,  
+                    legend = :outertopright,
+                    linewidth=1.5,
+                    xlabel = L"x",
+                    ylabel = L"\log|\tilde{\psi}|")
     end
 
     println("Plotting done!")
