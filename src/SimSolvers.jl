@@ -1,5 +1,4 @@
-
-struct Operators{NLSSIntegrator, DispFunc, FFTPlan, InvFFTPlan}
+struct Operators{NLSIntegrator, DispFunc, FFTPlan, InvFFTPlan}
     T̂::NLSIntegrator
     K̂::DispFunc
     F̂::FFTPlan
@@ -14,19 +13,24 @@ function Operators(sim)
     F̃̂ = plan_ifft!(@view sim.ψ[:, 1]) # 34 allocs
 
     # Cache the kinetic factor
-    @memoize function K̂(dx)
-        println("Computing and caching K(dx = $dx)")
-        if sim.α == 0
-            ifftshift(cis.(dx*sim.box.ω.^2/2))
-        elseif sim.α > 0
-            ifftshift(cis.(dx*(sim.box.ω.^2/2 - sim.α*sim.box.ω.^3)))
-        else
-            throw(ArgumentError("Unknown setup α = $(sim.α) and x_order = $(sim.x_order)"))
+    function K̂(α)
+        fun = if α == 0 
+            @memoize function K_cubic(dx::Real)
+                println("Computing and caching K(dx = $dx) for cubic NLSE")
+                ifftshift(cis.(dx*sim.box.ω.^2/2))
+            end
+            K_cubic
+        elseif α > 0
+            @memoize function K_hirota(dx::Real)
+                println("Computing and caching K(dx = $dx) for Hirota Equation")
+                ifftshift(cis.(dx*(sim.box.ω.^2/2 - sim.α*sim.box.ω.^3)))
+            end
+            K_hirota
         end
+        return fun
     end
 
     # Select algorithm
-    T̂ = T₂ˢ # Default algorithm for x
     t_algo = BS3() # Default Algorithm for t
     if sim.x_order == 1 && sim.α == 0
         T̂ = T₁ˢ 
@@ -66,7 +70,7 @@ function Operators(sim)
         B̂ = init(prob, t_algo; dt=sim.box.dx,save_everystep=false)  
     end
 
-    ops = Operators(T̂, K̂, F̂, F̃̂, B̂̂)
+    ops = Operators(T̂, K̂(sim.α), F̂, F̃̂, B̂)
 
     return ops
 end
@@ -94,9 +98,19 @@ function solve!(sim::Sim)
     ops = Operators(sim)
 
     #println("Starting evolution")
+    soln_loop(sim, ops)
+    sim.solved = true
+
+    #println("Computation Done!")
+    #println("==========================================")
+
+    return nothing
+end #solve
+
+function soln_loop(sim, ops)
     #@showprogress 1 "Evolving in x" for i = 1:sim.box.Nₓ-1
     for i = 1:sim.box.Nₓ-1
-        @time sim.ψ[:, i+1] .= ops.T̂(sim.ψ[:, i], sim.box.dx, ops)
+        @views sim.ψ[:, i+1] .= ops.T̂(sim.ψ[:, i], sim.box.dx, ops)
         # Pruning
         if sim.αₚ > 0 
             ops.F̂*view(sim.ψ,:,i+1)
@@ -106,10 +120,4 @@ function solve!(sim::Sim)
             F̃̂*view(sim.ψ,:,i+1)
         end # if
     end # for
-    sim.solved = true
-
-    #println("Computation Done!")
-    #println("==========================================")
-
-    return nothing
-end #solve
+end

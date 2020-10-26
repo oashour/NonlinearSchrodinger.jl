@@ -37,17 +37,17 @@ function T₂ʰ(ψ, dx, ops)
 
     # Dispersion
     ops.F̂*ψ 
-    ψ .= ops.K̂(dx/2) .* ψ
+    ψ .= ops.K̂(dx/2) .* ψ # 3 allocs
     ops.F̃̂*ψ
 
     # Burger
-    set_u!(ops.B̂, ψ) #1.14k allocs
-    step!(ops.B̂) #1.14k allocs
-    ψ .= ops.B̂.u
+    set_u!(ops.B̂, ψ) # 0 allocs 
+    step!(ops.B̂) # 3-4 allocs
+    ψ .= ops.B̂.u # 2 allocs
 
     # Dispersion
     ops.F̂*ψ 
-    ψ .= ops.K̂(dx/2) .* ψ
+    ψ .= ops.K̂(dx/2) .* ψ # 3 allocs
     ops.F̃̂*ψ
 
     # Nonlinear
