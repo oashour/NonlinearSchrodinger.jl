@@ -18,6 +18,7 @@ ProgressMeter = "92933f4c-e287-5a05-a399-4b506db050ca"
 
 [compat]
 BenchmarkTools = "0.5"
+DiffEqOperators = "4.14"
 FFTW = "1.2"
 JLD = "0.10"
 LaTeXStrings = "1.2"

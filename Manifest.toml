@@ -574,9 +574,9 @@ version = "0.18.1"
 
 [[LazyBandedMatrices]]
 deps = ["ArrayLayouts", "BandedMatrices", "BlockArrays", "BlockBandedMatrices", "FillArrays", "LazyArrays", "LinearAlgebra", "MatrixFactorizations", "SparseArrays"]
-git-tree-sha1 = "0baa6e68d51928ed5dfb387d4d179327bd33f9b8"
+git-tree-sha1 = "620fa671572c1f24bdabcdddffa9cded81ffd637"
 uuid = "d7e5e226-e90b-4449-9968-0f923699bf6f"
-version = "0.3.5"
+version = "0.3.6"
 
 [[LibGit2]]
 deps = ["Printf"]
