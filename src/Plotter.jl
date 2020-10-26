@@ -105,14 +105,11 @@ function plot_ψ̃(sim; mode = "density", x_res=500, ω_res=512, skip = 1, n_lin
     # Compute sampling interval
     xₛ = Int(ceil(sim.box.Nₓ/x_res))
     ωₛ = Int(ceil(sim.box.Nₜ/ω_res))
+    ω = sim.box.ω[1:ωₛ:end]
+    x = sim.box.x[1:xₛ:end]
     # Plot
     if mode == "density"
-        # Compute sampling interval
-        xₛ = Int(ceil(sim.box.Nₓ/x_res))
-        ωₛ = Int(ceil(sim.box.Nₜ/ω_res))
         # Downsample
-        ω = sim.box.ω[1:ωₛ:end]
-        x = sim.box.x[1:xₛ:end]
         ψ̃ = sim.ψ̃[1:ωₛ:end, 1:xₛ:end]
 
         p = heatmap(ω, x, log.(abs.(ψ̃')), tick_direction=:out, colorbar_title=L"\log|\tilde{\psi}|")
@@ -122,9 +119,8 @@ function plot_ψ̃(sim; mode = "density", x_res=500, ω_res=512, skip = 1, n_lin
         ylims!((minimum(sim.box.x), maximum(sim.box.x)))
     elseif mode == "lines"
         ψ̃ = ifftshift(sim.ψ̃, 1)[1:skip:skip*n_lines, 1:xₛ:end]
-        x = sim.box.x[1:xₛ:end]
         labs = reshape([L"\tilde{\psi}_{%$(i-1)}" for i in 1:skip:skip*n_lines], 1, :)
-        p = plot(x, log.(abs.(ψ̃')), label = labs)
+        p = plot(x, log.(abs.(ψ̃')), label = labs, legend = :outertopright)
         xlabel!(L"x")
         ylabel!(L"\log|\tilde{\psi}|")
     end
