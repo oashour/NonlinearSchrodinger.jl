@@ -118,7 +118,8 @@ function plot_ψ̃(sim; mode = "density", x_res=500, ω_res=512, skip = 1, n_lin
         xlims!((-sim.box.Nₜ/2*sim.Ω/sim.box.n_periods, sim.box.Nₜ/2*sim.Ω/sim.box.n_periods))
         ylims!((minimum(sim.box.x), maximum(sim.box.x)))
     elseif mode == "lines"
-        ψ̃ = ifftshift(sim.ψ̃, 1)[1:skip:skip*n_lines, 1:xₛ:end]
+        start = sim.box.Nₜ÷2 + 1
+        ψ̃ = sim.ψ̃[start:skip:start+skip*n_lines-1, 1:xₛ:end]
         labs = reshape([L"\tilde{\psi}_{%$(i-1)}" for i in 1:skip:skip*n_lines], 1, :)
         p = plot(x, log.(abs.(ψ̃')), 
                     label = labs,  
