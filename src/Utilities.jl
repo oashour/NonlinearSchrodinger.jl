@@ -45,7 +45,7 @@ function compute_spectrum!(obj)
     println("==========================================")
     println("Computing spectrum")
     # Needs optimization
-    obj.ψ̃ = fftshift(fft(obj.ψ, 1), 1)/obj.box.Nₜ
+    obj.ψ̃ .= fftshift(fft(obj.ψ, 1), 1)/obj.box.Nₜ
     println("Spectrum computed")
     println("==========================================")
 end
@@ -65,12 +65,12 @@ function compute_IoM!(obj)
     # Do I need to find a better way of doing these integrals?
     # We should have 
     # sim.norm = sum(abs.(sim.ψ).^2, dims=2)[:]*sim.box.dt/sim.box.T but dt/T = 1/Nt, thus
-    obj.N = sum(abs2.(obj.ψ), dims=1)[:]/obj.box.Nₜ
-    obj.PE = -0.5*sum(abs2.(obj.ψ).^2,dims=1)[:]./(obj.N*obj.box.Nₜ)
-    obj.KE = 0.5*sum((obj.box.ω.^2) .* (abs2.(obj.ψ̃)),dims=1)[:]./obj.N
-    obj.P = -imag.(sum(im * (obj.box.ω) .* (abs2.(obj.ψ̃)),dims=1)[:]./obj.N)
-    obj.E = obj.KE + obj.PE
-    obj.dE = obj.E .- obj.E[1]
+    obj.N .= sum(abs2.(obj.ψ), dims=1)[:]/obj.box.Nₜ
+    obj.PE .= -0.5*sum(abs2.(obj.ψ).^2,dims=1)[:]./(obj.N*obj.box.Nₜ)
+    obj.KE .= 0.5*sum((obj.box.ω.^2) .* (abs2.(obj.ψ̃)),dims=1)[:]./obj.N
+    obj.P .= -imag.(sum(im * (obj.box.ω) .* (abs2.(obj.ψ̃)),dims=1)[:]./obj.N)
+    obj.E .= obj.KE + obj.PE
+    obj.dE .= obj.E .- obj.E[1]
     println("Integrals of motion computed.")
     println("==========================================")
 end
