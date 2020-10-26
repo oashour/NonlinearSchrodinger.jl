@@ -2,6 +2,37 @@ module Utilities
 using FFTW, JLD
 export compute_energy!, compute_spectrum!
 
+struct Box{TT<:Real}
+    t::Array{TT, 1}
+    ω::Array{TT, 1}
+    x::Array{TT, 1}
+    Nₜ::Int64
+    Nₓ::Int64
+    dt::TT
+    dx::TT
+    n_periods::Int64
+end #SimulationBox
+
+function Box(xᵣ::Pair, T; dx = 1e-3, Nₜ = 256, n_periods = 1)
+    println("==========================================")
+    println("Initializing simulation box with $n_periods period(s) and dx = $dx, Nₜ = $Nₜ.")
+    T = n_periods * T
+    println("Longitudinal range is [$(xᵣ.first), $(xᵣ.second)], transverse range is [$(-T/2), $(T/2))")
+    dt = T / Nₜ
+    t = dt * collect((-Nₜ/2:Nₜ/2-1))
+
+    x = collect(xᵣ.first:dx:xᵣ.second)
+    Nₓ = length(x)
+    ω = 2π/T * collect((-Nₜ/2:Nₜ/2-1))
+
+    box = Box(t, ω, x, Nₜ, Nₓ, dt, dx, n_periods)
+
+    println("Done computing t, x, ω")
+    println("==========================================")
+
+    return box
+end
+
 """
     function compute_spectrum!(obj)
 
