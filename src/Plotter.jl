@@ -50,9 +50,6 @@ The function can plot either a heatmap (`mode = "density"`) or a 3D surface
 See also: [`Simulation.solve!`](@ref)
 """
 function plot_ψ(sim; mode = "density", power=1, x_res=500, t_res=512)
-    if ~sim.solved
-        throw(ArgumentError("The simulation has not been solved, unable to plot."))
-    end
     println("==========================================")
     println("Plotting |ψ|^$power in $mode mode with ~$x_res longitudinal and ~$t_res transverse points.")
 
@@ -101,9 +98,6 @@ line if `mode = lines`. The latter uses `x_res` points as well.
 See also: [`Simulation.compute_spectrum!`](@ref)
 """
 function plot_ψ̃(sim; mode = "density", x_res=500, ω_res=512, skip = 1, n_lines = 10)
-    if ~sim.solved
-        throw(ArgumentError("The simulation has not been solved, unable to plot."))
-    end
     println("==========================================")
     println("Plotting log(|ψ̃|) in $mode mode with ~$x_res longitudinal and ~$ω_res transverse points.")
 

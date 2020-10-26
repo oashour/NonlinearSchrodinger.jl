@@ -1,6 +1,6 @@
 module Utilities
 using FFTW, JLD
-export compute_energy!, compute_spectrum!
+export compute_energy!, compute_spectrum!, Box
 
 struct Box{TT<:Real}
     t::Array{TT, 1}
@@ -44,12 +44,8 @@ See also: [`NLSS.Plotter.plot_ψ̃`](@ref)
 function compute_spectrum!(obj)
     println("==========================================")
     println("Computing spectrum")
-    if obj.solved
-        obj.ψ̃ = fftshift(fft(obj.ψ, 1), 1)/obj.box.Nₜ
-        obj.spectrum_computed = true
-    else
-        throw(ArgumentError("Trying to compute spectrum of an unsolved simulation. Please solve the model first."))
-    end
+    # Needs optimization
+    obj.ψ̃ = fftshift(fft(obj.ψ, 1), 1)/obj.box.Nₜ
     println("Spectrum computed")
     println("==========================================")
 end
@@ -63,10 +59,6 @@ Computes the integrals of motion of `obj.ψ` and saves them in respective fields
 See also: [`NLSS.Plotter.plot_CoM`](@ref)
 """
 function compute_IoM!(obj)
-    if ~obj.spectrum_computed
-        println("IoM calculation requested without a spectrum calculation.")
-        compute_spectrum!(obj)
-    end
     println("==========================================")
     println("Computing integrals of motions")
     # Compute the energies
