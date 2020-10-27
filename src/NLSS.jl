@@ -10,7 +10,7 @@ using JLD
 # Logging Stuff
 using Logging: global_logger
 using TerminalLoggers: TerminalLogger
-global_logger(TerminalLogger(right_justify=120))
+global_logger(TerminalLogger())
 using ProgressLogging
 
 export compute_IoM!, compute_spectrum!
@@ -20,7 +20,6 @@ export solve!
 export ψ₀_periodic
 
 export Sim, Box
-
 
 include("Types.jl")
 include("Simulation.jl")

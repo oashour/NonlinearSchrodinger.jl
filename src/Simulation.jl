@@ -15,6 +15,7 @@ function solve!(sim::Sim)
     # Find
     sim.ψ[:, 1] = sim.ψ₀
     # Check for pruning and calculate indices
+    ind_p = []
     if sim.αₚ > 0 
         ind_p = [i for i in 2:(sim.box.Nₜ÷2+1) if (i-1)%sim.box.n_periods != 0]
         ind_p = sort([ind_p; sim.box.Nₜ.-ind_p.+2])
@@ -24,8 +25,12 @@ function solve!(sim::Sim)
     ops = Operators(sim)
 
     @info "Starting evolution"
-    soln_loop_A(sim, ops, ind_p)
-    #sim.solved = true
+    if sim.variant == "A" || sim.variant == "FA"
+        soln_loop_A(sim, ops, ind_p)
+    elseif sim.variant == "B"
+        soln_loop_B(sim, ops, ind_p)
+    end
+   #sim.solved = true
 
     @info "Computation Done!"
 
@@ -47,6 +52,9 @@ function soln_loop_A(sim, ops, ind_p)
 end
 
 function soln_loop_B(sim, ops, ind_p)
+    F̂ = plan_fft(@view sim.ψ[:, 1]) # 26 allocs
+    F̃̂ = plan_ifft(@view sim.ψ[:, 1]) # 34 allocs
+    sim.ψ̃[:, 1] .= F̂*view(sim.ψ, :, 1)
     @progress for i = 1:sim.box.Nₓ-1
         @views sim.ψ̃[:, i+1] .= ops.T̂(sim.ψ̃[:, i], sim.box.dx, ops)
         # Pruning
@@ -55,5 +63,6 @@ function soln_loop_B(sim, ops, ind_p)
                 sim.ψ̃[j, i+1] *= exp(-sim.αₚ*abs(sim.ψ̃[j, i+1]))
             end
         end # if
+        sim.ψ[:, i+1] .= F̃̂*view(sim.ψ̃, :, i+1)
     end # for
 end

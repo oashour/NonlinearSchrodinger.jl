@@ -1,3 +1,6 @@
+@enum AlgorithmVariant A B
+@enum AlgorithmType TripleJump SuzukiFractal MultiProduct Optimized 
+
 struct Box{TT<:Real}
     t::Array{TT, 1}
     ω::Array{TT, 1}
@@ -7,7 +10,7 @@ struct Box{TT<:Real}
     dt::TT
     dx::TT
     n_periods::Int64
-end #SimulationBox
+end 
 
 function Box(xᵣ::Pair, T; dx = 1e-3, Nₜ = 256, n_periods = 1)
     @info "Initializing simulation box with $n_periods period(s) and dx = $dx, Nₜ = $Nₜ."
@@ -27,6 +30,29 @@ function Box(xᵣ::Pair, T; dx = 1e-3, Nₜ = 256, n_periods = 1)
     return box
 end
 
+struct Algorithm{F}
+    x_order::Int64
+    t_order::Int64
+    variant::AlgorithmVariant
+    type::AlgorithmType
+    name::String
+    T̂::F
+end #SimulationBox
+
+function Algorithm(;α = 0, x_order = 2, t_order = 2, variant=A, type=TripleJump)
+    if order <= 2 && α == 0
+        @info "Searching for algorithm of order $x_order in x, variant $variant"
+    elseif order > 2 && α == 0
+        @info "Searching for algorithm of order $x_order in x, variant $variant and type $type"
+    elseif order <= 2 && α >= 0
+        @info "Searching for algorithm of order $x_order in x, $t_order in t, variant $variant"
+    elseif order > 2 && α >= 0
+        @info "Searching for algorithm of order $x_order in x, $t_order in t, variant $variant"
+    end
+
+    return box
+end
+
 struct Sim{TT<:Real}
     λ::Complex{TT}
     T::TT
@@ -35,6 +61,7 @@ struct Sim{TT<:Real}
     ψ₀::Array{Complex{TT}, 1}
     t_order::Int64
     x_order::Int64
+    variant::String #Should be that stuff like :A
     α::TT
     αₚ::TT
     ψ::Array{Complex{TT}, 2}
@@ -42,12 +69,11 @@ struct Sim{TT<:Real}
     E::Array{TT, 1}
     PE::Array{TT, 1}
     KE::Array{TT, 1}
-    #dE::Array{TT, 1}
     N::Array{TT, 1}
     P::Array{TT, 1}
 end # Simulation
 
-function Sim(λ, box::Box, ψ₀::Array{Complex{TT}, 1}; t_order = 2, x_order = 2, α = 0.0, αₚ = 0.0) where TT <: Real
+function Sim(λ, box::Box, ψ₀::Array{Complex{TT}, 1}; t_order = 2, x_order = 2, variant = "A", α = 0.0, αₚ = 0.0) where TT <: Real
     ψ = Array{Complex{TT}}(undef, box.Nₜ, box.Nₓ)
     ψ̃ = similar(ψ)
     E = zeros(box.Nₓ)
@@ -63,7 +89,7 @@ function Sim(λ, box::Box, ψ₀::Array{Complex{TT}, 1}; t_order = 2, x_order = 
     end
     # Compute some parameters
     λ, T, Ω = params(λ = λ)
-    sim = Sim(λ, T, Ω, box, ψ₀, t_order, x_order, α, αₚ, ψ, ψ̃, E, PE, KE, N, P)
+    sim = Sim(λ, T, Ω, box, ψ₀, t_order, x_order, variant, α, αₚ, ψ, ψ̃, E, PE, KE, N, P)
    return sim
 end #init_sim
 struct Operators{NLSIntegrator, DispFunc, FFTPlan, InvFFTPlan}
@@ -100,16 +126,28 @@ function Operators(sim)
 
     # Select algorithm
     t_algo = BS3() # Default Algorithm for t
-    if sim.x_order == 1 && sim.α == 0
-        T̂ = T₁ˢ 
-    elseif sim.x_order == 2 && sim.α == 0
-        T̂ = T₂ˢ
-    elseif sim.x_order == 4 && sim.α == 0
-        T̂ = T₄ˢ 
-    elseif sim.x_order == 6 && sim.α == 0
-        T̂ = T₆ˢ 
-    elseif sim.x_order == 8 && sim.α == 0
-        T̂ = T₈ˢ 
+    if sim.x_order == 1 && sim.α == 0 && sim.variant == "A"
+        T̂ = T1A
+    elseif sim.x_order == 1 && sim.α == 0 && sim.variant == "B"
+        T̂ = T1B
+    elseif sim.x_order == 2 && sim.α == 0 && sim.variant == "A"
+        T̂ = T2A
+    elseif sim.x_order == 2 && sim.α == 0 && sim.variant == "B"
+        T̂ = T2B
+    elseif sim.x_order == 4 && sim.α == 0 && sim.variant == "A"
+        T̂ = T4A_TJ
+    elseif sim.x_order == 4 && sim.α == 0 && sim.variant == "FA"
+        T̂ = T4A_SF
+    elseif sim.x_order == 4 && sim.α == 0 && sim.variant == "B"
+        T̂ = T4B_TJ
+    elseif sim.x_order == 6 && sim.α == 0 && sim.variant == "A"
+        T̂ = T6A_TJ
+    elseif sim.x_order == 6 && sim.α == 0 && sim.variant == "B"
+        T̂ = T6B_TJ
+    elseif sim.x_order == 8 && sim.α == 0 && sim.variant == "A"
+        T̂ = T8A_TJ
+    elseif sim.x_order == 8 && sim.α == 0 && sim.variant == "B"
+        T̂ = T8B_TJ
     elseif sim.x_order == 1 && sim.α >= 0
         T̂ = T₁ʰ 
     elseif sim.x_order == 2 && sim.α >= 0
