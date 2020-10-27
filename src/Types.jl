@@ -149,11 +149,11 @@ function Operators(sim)
     elseif sim.x_order == 8 && sim.α == 0 && sim.variant == "B"
         T̂ = T8B_TJ
     elseif sim.x_order == 1 && sim.α >= 0
-        T̂ = T₁ʰ 
+        T̂ = T1A_H 
     elseif sim.x_order == 2 && sim.α >= 0
-        T̂ = T₂ʰ 
+        T̂ = T2A_H
     elseif sim.x_order == 4 && sim.α >= 0
-        T̂ = T₄ʰ 
+        T̂ = T4A_H 
         t_algo = BS3()
     else
         throw(ArgumentError("No solver available for order $x_order in x and order $t_order in t with α=$α"))

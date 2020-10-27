@@ -7,7 +7,7 @@ integrator. `ψ'` is defined on an FFT grid with frequencies `ω` using an FFT p
 
 See also: [`solve!`](@ref)
 """
-function T₁ʰ(ψ, dx, ops)
+function T1A_H(ψ, dx, ops)
 
     # Nonlinear
     @. ψ = cis(dx * (-1*abs2(ψ)))*ψ
@@ -31,7 +31,7 @@ integrator. `ψ'` is defined on an FFT grid with frequencies `ω` using an FFT p
 
 See also: [`solve!`](@ref)
 """
-function T₂ʰ(ψ, dx, ops)
+function T2A_H(ψ, dx, ops)
     # Nonlinear
     @. ψ = cis(dx/2 * (-1*abs2(ψ)))*ψ
 
@@ -64,7 +64,7 @@ integrator. `ψ'` is defined on an FFT grid with frequencies `ω` using an FFT p
 
 See also: [`solve!`](@ref), [`T2`](@ref)
 """
-function T₄ʰ(ψ, dx, ops)
+function T4A_TJ_H(ψ, dx, ops)
     # This algorithm is broken at the moment
     s = 2^(1 / 3)
     os = 1 / (2 - s)
@@ -72,9 +72,9 @@ function T₄ʰ(ψ, dx, ops)
     ft = os
     bt = -s * os
 
-    ψ = T₂ʰ(ψ, ft*dx, ops)
-    ψ = T₂ʰ(ψ, bt*dx, ops)
-    ψ = T₂ʰ(ψ, ft*dx, ops)
+    ψ = T2A_H(ψ, ft*dx, ops)
+    ψ = T2A_H(ψ, bt*dx, ops)
+    ψ = T2A_H(ψ, ft*dx, ops)
 
     return ψ
 end # T₄ˢ
