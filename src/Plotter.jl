@@ -16,7 +16,7 @@ error, particle number and momentum
 
 See also: [`Simulation.compute_CoM!`](@ref)
 """
-function plot_IoM(obj, x_res = 500)
+function plot_IoM(obj; x_res = 500, mode = "merged")
     println("Plotting energy with a resolution of $x_res")
     xₛ = Int(ceil(obj.box.Nₜ/x_res))
     p1 = plot(obj.box.x[1:xₛ:end], [obj.E[1:xₛ:end], obj.KE[1:xₛ:end], obj.PE[1:xₛ:end]], label = [L"E" L"T" L"V"])
@@ -36,7 +36,13 @@ function plot_IoM(obj, x_res = 500)
     ylabel!(L"N")
     xlims!((minimum(obj.box.x), maximum(obj.box.x)))
 
-    return p1, p2, p3, p4
+    if mode == "merged"
+        p = plot(p1, p2, p3, p4, layout=(2,2))
+    elseif mode == "separate"
+        p = (p1, p2, p3, p4)
+    end
+
+    return p
 end
 
 """
