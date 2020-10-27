@@ -18,7 +18,7 @@ See also: [`Simulation.compute_CoM!`](@ref)
 """
 function plot_IoM(obj; x_res = 500, mode = "merged")
     println("Plotting IoM with a resolution of $x_res")
-    xₛ = Int(ceil(obj.box.Nₜ/x_res))
+    xₛ = Int(ceil(obj.box.Nₓ/x_res))
     x = obj.box.x[1:xₛ:end]
     p1 = plot(x, [obj.E[1:xₛ:end], obj.KE[1:xₛ:end], obj.PE[1:xₛ:end]], label = [L"E" L"T" L"V"])
     xlabel!(L"x")
