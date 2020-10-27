@@ -14,22 +14,22 @@ function params(; kwargs...)
         λ = im * sqrt(2 * param[:a])
         T = π/sqrt(1 - imag(λ)^2)
         Ω = 2π/T
-        println("Passed a = $(param[:a]), computed λ = $λ, T = $T and Ω = $Ω")
+        @info "Passed a = $(param[:a]), computed λ = $λ, T = $T and Ω = $Ω"
     elseif :λ  in keys(param)
         λ = param[:λ]
         T = π/sqrt(1 - imag(λ)^2)
         Ω = 2π/T
-        println("Passed λ=$λ, computed T = $T and Ω = $Ω")
+        @info "Passed λ=$λ, computed T = $T and Ω = $Ω"
     elseif :Ω in keys(param)
         λ = im * sqrt((1 - (param[:Ω] / 2)^2))
         T = π/sqrt(1 - imag(λ)^2)
         Ω = param[:Ω]
-        println("Passed Ω=$Ω, computed λ = $λ and T = $T")
+        @info "Passed Ω=$Ω, computed λ = $λ and T = $T"
     elseif :T in keys(param)
         λ = im * sqrt((1 - ((2*π/param[:T]) / 2)^2))
         T = param[:T]
         Ω = 2π/T
-        println("Passed T = $T, computed λ = $λ and Ω = $Ω")
+        @info "Passed T = $T, computed λ = $λ and Ω = $Ω"
     end
 
     return λ, T, Ω
@@ -77,19 +77,16 @@ and coefficients ``A_1...n`` = `coeff` and an overall phase `exp(i phase t)`, i.
 See also: [`init_sim`](@ref)
 """
 function ψ₀_periodic(coeff::Array, box::Box, Ω; phase=0)
-    println("==========================================")
-    println("Initializing periodic ψ₀")
+    @info "Initializing periodic ψ₀"
     for (n, An) in enumerate(coeff)
         if abs(An) >= 1
-            println("The absolute value of the coefficient A($(n+1)) = $(An) is greater than 1. psi_0 needs to be normalizable.")
-        else
-            println("A($(n)) = $(An)")
+            @error "The absolute value of the coefficient A($(n+1)) = $(An) is greater than 1. psi_0 needs to be normalizable."
         end #if
     end #for
 
-    println("Computing A₀ to preserve normalization.")
+    @info "Computing A₀ to preserve normalization."
     A0 = sqrt(1 - 2 * sum([abs(An) .^ 2 for An in coeff]))
-    println("Computed A₀ = $A0")
+    @info "Computed A₀ = $A0"
     #A0 = 1
     if phase != 0
         str = "ψ₀ = exp(i $phase t) ($A0 + "
@@ -109,7 +106,7 @@ function ψ₀_periodic(coeff::Array, box::Box, Ω; phase=0)
         str = string(str, ")")
     end
 
-    println(str)
+    @info str
     println("==========================================")
 
     return ψ₀

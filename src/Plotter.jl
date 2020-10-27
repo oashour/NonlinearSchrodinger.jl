@@ -17,7 +17,7 @@ error, particle number and momentum
 See also: [`Simulation.compute_CoM!`](@ref)
 """
 function plot_IoM(obj; x_res = 500, mode = "merged")
-    println("Plotting IoM with a resolution of $x_res")
+    @info "Plotting IoM with a resolution of $x_res"
     xₛ = Int(ceil(obj.box.Nₓ/x_res))
     x = obj.box.x[1:xₛ:end]
     p1 = plot(x, [obj.E[1:xₛ:end], obj.KE[1:xₛ:end], obj.PE[1:xₛ:end]], label = [L"E" L"T" L"V"])
@@ -46,6 +46,7 @@ function plot_IoM(obj; x_res = 500, mode = "merged")
         p = (p1, p2, p3, p4)
     end
 
+    @info "Plotting IoM Done"
     return p
 end
 
@@ -61,8 +62,7 @@ The function can plot either a heatmap (`mode = "density"`) or a 3D surface
 See also: [`Simulation.solve!`](@ref)
 """
 function plot_ψ(sim; mode = "density", power=1, x_res=500, t_res=512)
-    println("==========================================")
-    println("Plotting |ψ|^$power in $mode mode with ~$x_res longitudinal and ~$t_res transverse points.")
+    @info "Plotting |ψ|^$power in $mode mode with ~$x_res longitudinal and ~$t_res transverse points."
 
     # Compute sampling interval
     xₛ = Int(ceil(sim.box.Nₓ/x_res))
@@ -170,10 +170,9 @@ function plot_ψ(sim; mode = "density", power=1, x_res=500, t_res=512)
     xlims!((-sim.T/2*sim.box.n_periods, sim.T/2*sim.box.n_periods))
     ylims!((minimum(sim.box.x), maximum(sim.box.x)))
 
-    println("Plotting done!")
-    println("==========================================")
-
+    @info "Plotting ψ done!"
     return p
+
 end #plot_ψ
 
 """
@@ -188,8 +187,7 @@ line if `mode = lines`. The latter uses `x_res` points as well.
 See also: [`Simulation.compute_spectrum!`](@ref)
 """
 function plot_ψ̃(sim; mode = "density", x_res=500, ω_res=512, skip = 1, n_lines = 10)
-    println("==========================================")
-    println("Plotting log(|ψ̃|) in $mode mode with ~$x_res longitudinal and ~$ω_res transverse points.")
+    @info "Plotting log(|ψ̃|) in $mode mode with ~$x_res longitudinal and ~$ω_res transverse points."
 
     # Figure out labels
     # Compute sampling interval
@@ -228,8 +226,7 @@ function plot_ψ̃(sim; mode = "density", x_res=500, ω_res=512, skip = 1, n_lin
         xlims!((minimum(sim.box.x), maximum(sim.box.x)))
     end
 
-    println("Plotting done!")
-    println("==========================================")
+    @info "Plotting ψ̃ done!"
 
     return p
 end #plot_ψ̃

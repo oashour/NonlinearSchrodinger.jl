@@ -1,13 +1,19 @@
 module Simulation
 
-using ProgressMeter
 using FFTW
-using DiffEqOperators
+using DifferentialEquations, DiffEqOperators
 using NumericalIntegration
-using DifferentialEquations
-export solve!
 using Memoization
 using ..Utilities
+
+
+# Logging Stuff
+using Logging: global_logger
+using TerminalLoggers: TerminalLogger
+global_logger(TerminalLogger(right_justify=120))
+using ProgressLogging
+
+export solve!
 
 struct Sim{TT<:Real}
     λ::Complex{TT}
@@ -66,13 +72,13 @@ function Operators(sim)
     function K̂(α)
         fun = if α == 0 
             @memoize function K_cubic(dx::Real)
-                #println("Computing and caching K(dx = $dx) for cubic NLSE")
+                @debug "Computing and caching K(dx = $dx) for cubic NLSE"
                 ifftshift(cis.(dx*sim.box.ω.^2/2))
             end
             K_cubic
         elseif α > 0
             @memoize function K_hirota(dx::Real)
-                #println("Computing and caching K(dx = $dx) for Hirota Equation")
+                @debug "Computing and caching K(dx = $dx) for Hirota Equation"
                 ifftshift(cis.(dx*(sim.box.ω.^2/2 - sim.α*sim.box.ω.^3)))
             end
             K_hirota
@@ -133,9 +139,8 @@ Solves the `Simulation` object `sim` using the techniques its attributes specify
 See also: [`init_sim`](@ref), [`NLSS.Plotter.plot_ψ`](@ref)
 """
 function solve!(sim::Sim)
-    #println("==========================================")
-    #println("Solving cubic NLSE with the following options:")
-    #print(sim)       
+    @info println("Solving cubic NLSE with the following options:")
+    print(sim)       
 
     # Find
     sim.ψ[:, 1] = sim.ψ₀
@@ -143,23 +148,22 @@ function solve!(sim::Sim)
     if sim.αₚ > 0 
         ind_p = [i for i in 2:(sim.box.Nₜ÷2+1) if (i-1)%sim.box.n_periods != 0]
         ind_p = sort([ind_p; sim.box.Nₜ.-ind_p.+2])
+        @debug "Computed pruning indices $ind_p"
     end
     
     ops = Operators(sim)
 
-    #println("Starting evolution")
+    @info "Starting evolution"
     soln_loop(sim, ops)
     #sim.solved = true
 
-    #println("Computation Done!")
-    #println("==========================================")
+    @info "Computation Done!"
 
     return nothing
 end #solve
 
 function soln_loop(sim, ops)
-    #@showprogress 1 "Evolving in x" for i = 1:sim.box.Nₓ-1
-    for i = 1:sim.box.Nₓ-1
+    @progress for i = 1:sim.box.Nₓ-1
         @views sim.ψ[:, i+1] .= ops.T̂(sim.ψ[:, i], sim.box.dx, ops)
         # Pruning
         if sim.αₚ > 0 
