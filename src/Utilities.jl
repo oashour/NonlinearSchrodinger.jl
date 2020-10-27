@@ -62,21 +62,28 @@ Computes the integrals of motion of `obj.ψ` and saves them in respective fields
 
 See also: [`NLSS.Plotter.plot_CoM`](@ref)
 """
-function compute_IoM!(obj)
-    println("==========================================")
-    println("Computing integrals of motions")
-    # Compute the energies
-    # Do I need to find a better way of doing these integrals?
-    # We should have 
-    # sim.norm = sum(abs.(sim.ψ).^2, dims=2)[:]*sim.box.dt/sim.box.T but dt/T = 1/Nt, thus
-    obj.N .= sum(abs2.(obj.ψ), dims=1)[:]/obj.box.Nₜ
-    obj.PE .= -0.5*sum(abs2.(obj.ψ).^2,dims=1)[:]./(obj.N*obj.box.Nₜ)
-    obj.KE .= 0.5*sum((obj.box.ω.^2) .* (abs2.(obj.ψ̃)),dims=1)[:]./obj.N
-    obj.P .= imag.(sum(im * (obj.box.ω) .* (abs2.(obj.ψ̃)),dims=1)[:]./obj.N)
-    obj.E .= obj.KE + obj.PE
-    #obj.dE .= obj.E .- obj.E[1]
-    println("Integrals of motion computed.")
-    println("==========================================")
+function compute_IoM!(obj; normalize=false)
+    #println("==========================================")
+    #println("Computing integrals of motions")
+    ψ² = abs2.(obj.ψ)
+    ψ̃² = abs2.(obj.ψ̃)
+    # The norm is preserved extremely well so if the W.F. is normalized we do not worry about dividing the IoM by the norm to improve performance
+    if normalize
+        obj.N .= sum(ψ², dims=1)[:]./obj.box.Nₜ
+        obj.PE .= -0.5*sum(ψ².^2,dims=1)[:]./(obj.N*obj.box.Nₜ)
+        obj.KE .= 0.5*sum((obj.box.ω.^2 .* ψ̃²),dims=1)[:]./obj.N
+        obj.P .= imag.(sum(im * obj.box.ω.* ψ̃²,dims=1)[:]./obj.N)
+        obj.E .= obj.KE .+ obj.PE
+    else
+        obj.N .= sum(ψ², dims=1)[:]./obj.box.Nₜ
+        obj.PE .= -0.5*sum(ψ².^2,dims=1)[:]./obj.box.Nₜ
+        obj.KE .= 0.5*sum((obj.box.ω.^2 .* ψ̃²),dims=1)[:]
+        obj.P .= imag.(sum(im * obj.box.ω.* ψ̃²,dims=1)[:])
+        obj.E .= obj.KE .+ obj.PE
+    end
+
+    #println("Integrals of motion computed.")
+    #rintln("==========================================")
 end
 
 function save(obj, filename)
