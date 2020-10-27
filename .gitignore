@@ -6,3 +6,4 @@
 src/example.jl
 test.jld
 src/test.jl
+src/type_example.jl

@@ -24,7 +24,7 @@ struct Sim{TT<:Real}
     E::Array{TT, 1}
     PE::Array{TT, 1}
     KE::Array{TT, 1}
-    dE::Array{TT, 1}
+    #dE::Array{TT, 1}
     N::Array{TT, 1}
     P::Array{TT, 1}
 end # Simulation
@@ -35,7 +35,6 @@ function Sim(λ, box::Box, ψ₀::Array{Complex{TT}, 1}; t_order = 2, x_order = 
     E = zeros(box.Nₓ)
     PE = similar(E)    
     KE = similar(E)
-    dE = similar(E)
     N = similar(E)
     P = similar(E)
     if αₚ < 0.0 
@@ -46,7 +45,7 @@ function Sim(λ, box::Box, ψ₀::Array{Complex{TT}, 1}; t_order = 2, x_order = 
     end
     # Compute some parameters
     λ, T, Ω = params(λ = λ)
-    sim = Sim(λ, T, Ω, box, ψ₀, t_order, x_order, α, αₚ, ψ, ψ̃, E, PE, KE, dE, N, P)
+    sim = Sim(λ, T, Ω, box, ψ₀, t_order, x_order, α, αₚ, ψ, ψ̃, E, PE, KE, N, P)
    return sim
 end #init_sim
 struct Operators{NLSIntegrator, DispFunc, FFTPlan, InvFFTPlan}
