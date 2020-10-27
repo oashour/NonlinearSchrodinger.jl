@@ -22,8 +22,9 @@ export ψ₀_periodic
 export Sim, Box
 
 
-include("Utilities.jl")
+include("Types.jl")
 include("Simulation.jl")
+include("Utilities.jl")
 include("Plotter.jl")
 
 end #module
