@@ -32,9 +32,9 @@ version = "0.0.4"
 
 [[ArrayInterface]]
 deps = ["LinearAlgebra", "Requires", "SparseArrays"]
-git-tree-sha1 = "920136b6b8ae5bd28a3c45d68e55421dec156d7f"
+git-tree-sha1 = "bd09109dffaa3926a20178cb8432edd729be0db0"
 uuid = "4fba245c-0d91-5ea0-9b3e-6abc04ee57a9"
-version = "2.13.6"
+version = "2.13.7"
 
 [[ArrayLayouts]]
 deps = ["Compat", "FillArrays", "LinearAlgebra", "SparseArrays"]
@@ -83,9 +83,9 @@ version = "0.12.3"
 
 [[BlockArrays]]
 deps = ["ArrayLayouts", "Compat", "FillArrays", "LinearAlgebra"]
-git-tree-sha1 = "991ebcb0a29450b861b5521c3217b5444f16cc2a"
+git-tree-sha1 = "824b1094a47d7da81f9ff77cb56c3341f2f92097"
 uuid = "8e7c35d0-a365-5155-bbbb-fb81a777f24e"
-version = "0.12.13"
+version = "0.12.14"
 
 [[BlockBandedMatrices]]
 deps = ["ArrayLayouts", "BandedMatrices", "BlockArrays", "Distributed", "FillArrays", "LinearAlgebra", "MatrixFactorizations", "Pkg", "SharedArrays", "SparseArrays", "Statistics"]
@@ -353,9 +353,9 @@ version = "0.3.2"
 
 [[FileIO]]
 deps = ["Pkg"]
-git-tree-sha1 = "992b4aeb62f99b69fcf0cb2085094494cc05dfb3"
+git-tree-sha1 = "cad2e71389ecb2f4480e0de74faab04af13d7929"
 uuid = "5789e2e9-d7fb-5bc7-8068-2c6fae9b9549"
-version = "1.4.3"
+version = "1.4.4"
 
 [[FileWatching]]
 uuid = "7b1f6079-737a-58dc-b8bc-7a2ca5c1b5ee"
@@ -580,9 +580,9 @@ version = "0.18.1"
 
 [[LazyBandedMatrices]]
 deps = ["ArrayLayouts", "BandedMatrices", "BlockArrays", "BlockBandedMatrices", "FillArrays", "LazyArrays", "LinearAlgebra", "MatrixFactorizations", "SparseArrays"]
-git-tree-sha1 = "0baa6e68d51928ed5dfb387d4d179327bd33f9b8"
+git-tree-sha1 = "620fa671572c1f24bdabcdddffa9cded81ffd637"
 uuid = "d7e5e226-e90b-4449-9968-0f923699bf6f"
-version = "0.3.5"
+version = "0.3.6"
 
 [[LeftChildRightSiblingTrees]]
 deps = ["AbstractTrees"]
@@ -663,9 +663,9 @@ uuid = "d6f4376e-aef5-505a-96c1-9c027394607a"
 
 [[MatrixFactorizations]]
 deps = ["ArrayLayouts", "LinearAlgebra", "Random"]
-git-tree-sha1 = "cf040e1d053a83cde01ea964232e0c35a3dbed54"
+git-tree-sha1 = "292e5f9f0761f3511edfb5420b4feadd9ba165b0"
 uuid = "a3b82374-2e81-5b9e-98ce-41277c0e4c87"
-version = "0.6.0"
+version = "0.6.1"
 
 [[MbedTLS]]
 deps = ["Dates", "MbedTLS_jll", "Random", "Sockets"]

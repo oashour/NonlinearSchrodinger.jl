@@ -1,7 +1,7 @@
 name = "NLSS"
 uuid = "b3fbeaf7-5746-403c-a6b7-06939dc82746"
 authors = ["Omar Ashour"]
-version = "0.0.2"
+version = "0.0.3"
 
 [deps]
 BenchmarkTools = "6e4b80f9-dd63-53aa-95a3-0cdb28fa8baf"
