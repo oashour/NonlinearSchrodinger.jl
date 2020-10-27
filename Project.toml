@@ -21,6 +21,7 @@ TerminalLoggers = "5d786b92-1e48-4d6f-9151-6b4477ca9bed"
 
 [compat]
 BenchmarkTools = "0.5"
+DiffEqOperators = "4.14"
 FFTW = "1.2"
 JLD = "0.10"
 LaTeXStrings = "1.2"
