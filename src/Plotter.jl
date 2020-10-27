@@ -19,25 +19,29 @@ See also: [`Simulation.compute_CoM!`](@ref)
 function plot_IoM(obj; x_res = 500, mode = "merged")
     println("Plotting energy with a resolution of $x_res")
     xₛ = Int(ceil(obj.box.Nₜ/x_res))
-    p1 = plot(obj.box.x[1:xₛ:end], [obj.E[1:xₛ:end], obj.KE[1:xₛ:end], obj.PE[1:xₛ:end]], label = [L"E" L"T" L"V"])
+    x = obj.box.x[1:xₛ:end]
+    p1 = plot(x, [obj.E[1:xₛ:end], obj.KE[1:xₛ:end], obj.PE[1:xₛ:end]], label = [L"E" L"T" L"V"])
     xlabel!(L"x")
     ylabel!(L"E")
     xlims!((minimum(obj.box.x), maximum(obj.box.x)))
-    p2 = plot(obj.box.x[1:xₛ:end], obj.dE[1:xₛ:end], label = "")
+    δE = obj.E[1:xₛ:end] .- obj.E[1]
+    p2 = plot(x, δE, label = "")
     xlabel!(L"x")
     ylabel!(L"\delta E")
     xlims!((minimum(obj.box.x), maximum(obj.box.x)))
-    p3 = plot(obj.box.x[1:xₛ:end], [obj.P[1:xₛ:end]], label = "")
+    δP = obj.P[1:xₛ:end] .- obj.P[1]
+    p3 = plot(x, δP, label = "")
     xlabel!(L"x")
-    ylabel!(L"P")
+    ylabel!(L"\delta P")
     xlims!((minimum(obj.box.x), maximum(obj.box.x)))
-    p4 = plot(obj.box.x[1:xₛ:end], [obj.N[1:xₛ:end]], label = "")
+    δN = obj.N[1:xₛ:end] .- obj.N[1]
+    p4 = plot(x, δN, label = "")
     xlabel!(L"x")
-    ylabel!(L"N")
+    ylabel!(L"\delta N")
     xlims!((minimum(obj.box.x), maximum(obj.box.x)))
 
     if mode == "merged"
-        p = plot(p1, p2, p3, p4, layout=(2,2))
+        p = plot(p1, p2, p3, p4, layout=(2,2), link = :x)
     elseif mode == "separate"
         p = (p1, p2, p3, p4)
     end
