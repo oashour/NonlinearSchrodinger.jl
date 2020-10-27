@@ -3,6 +3,7 @@ using TerminalLoggers: TerminalLogger
 global_logger(TerminalLogger(right_justify=120))
 using ProgressLogging
 
+include("test2.jl")
 @progress for i=1:100
     if i == 50
         @info "Middle of computation" i

@@ -1,12 +1,3 @@
-module Plotter
-using ..Simulation
-using Plots; gr()
-using Plots.PlotMeasures
-using LaTeXStrings
-using FFTW
-
-export plot_ψ, plot_ψ̃, plot_CoM
-
 """
     function plot_IoM(sim::Sim, x_res::Int64 = 500)
 
@@ -230,4 +221,3 @@ function plot_ψ̃(sim; mode = "density", x_res=500, ω_res=512, skip = 1, n_lin
 
     return p
 end #plot_ψ̃
-end

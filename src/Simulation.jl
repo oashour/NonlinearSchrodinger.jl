@@ -1,25 +1,11 @@
-module Simulation
-
-using FFTW
-using DifferentialEquations, DiffEqOperators
-using NumericalIntegration
-using Memoization
-using ..Utilities
-
-
-# Logging Stuff
-using Logging: global_logger
-using TerminalLoggers: TerminalLogger
-global_logger(TerminalLogger(right_justify=120))
-using ProgressLogging
-
-export solve!
+include("CubicSolvers.jl")
+include("HirotaSolvers.jl")
 
 struct Sim{TT<:Real}
     λ::Complex{TT}
     T::TT
     Ω::TT
-    box::Utilities.Box{TT}
+    box::Box{TT}
     ψ₀::Array{Complex{TT}, 1}
     t_order::Int64
     x_order::Int64
@@ -175,9 +161,3 @@ function soln_loop(sim, ops)
         end # if
     end # for
 end
-
-include("SimUtils.jl")
-include("CubicSolvers.jl")
-include("HirotaSolvers.jl")
-
-end #module
