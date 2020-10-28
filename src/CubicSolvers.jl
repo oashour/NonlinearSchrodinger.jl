@@ -296,36 +296,36 @@ end
 # Multi-Product Nystrom
 ####################################################################
 function T4A_N(ψ, dx, ops)
-    ψ .= 4/3*T2A(copy(ψ), dx,ops) - 1/3*T2A(T2A(copy(ψ),dx/2,ops),dx/2,ops)
+    ψ .= 4/3*T2A(copy(ψ), dx,ops) .- 1/3*T2A(T2A(copy(ψ),dx/2,ops),dx/2,ops)
 end
 
 function T4B_N(ψ, dx, ops)
-    ψ .= 4/3*T2B(copy(ψ), dx,ops) - 1/3*T2B(T2B(copy(ψ),dx/2,ops),dx/2,ops)
+    ψ .= 4/3*T2B(copy(ψ), dx,ops) .- 1/3*T2B(T2B(copy(ψ),dx/2,ops),dx/2,ops)
 end
 
 function T6A_N(ψ, dx, ops)
-    ψ .= 81/40*T2A(T2A(T2A(copy(ψ),dx/3.0,ops),dx/3.0,ops),dx/3.0,ops) +
-         -16/15*T2A(T2A(copy(ψ),dx/2.0,ops),dx/2.0,ops) + 
+    ψ .= 81/40*T2A(T2A(T2A(copy(ψ),dx/3.0,ops),dx/3.0,ops),dx/3.0,ops) .+
+         -16/15*T2A(T2A(copy(ψ),dx/2.0,ops),dx/2.0,ops) .+ 
          1/24*T2A(copy(ψ),dx,ops)
 end
 
 function T6B_N(ψ, dx, ops)
-    ψ .= 81/40*T2B(T2B(T2B(copy(ψ),dx/3.0,ops),dx/3.0,ops),dx/3.0,ops) +
-         -16/15*T2B(T2B(copy(ψ),dx/2.0,ops),dx/2.0,ops) + 
+    ψ .= 81/40*T2B(T2B(T2B(copy(ψ),dx/3.0,ops),dx/3.0,ops),dx/3.0,ops) .+
+         -16/15*T2B(T2B(copy(ψ),dx/2.0,ops),dx/2.0,ops) .+ 
          1/24*T2B(copy(ψ),dx,ops)
 end
 
 function T8A_N(ψ, dx, ops)
-    ψ .= 1024/315*T2A(T2A(T2A(T2A(copy(ψ),dx/4.0,ops),dx/4.0,ops),dx/4.0,ops),dx/4.0,ops) +
-         -729/280*T2A(T2A(T2A(copy(ψ),dx/3.0,ops),dx/3.0,ops),dx/3.0,ops) +
-         16/45*T2A(T2A(copy(ψ),dx/2.0,ops),dx/2.0,ops) + 
+    ψ .= 1024/315*T2A(T2A(T2A(T2A(copy(ψ),dx/4.0,ops),dx/4.0,ops),dx/4.0,ops),dx/4.0,ops) .+
+         -729/280*T2A(T2A(T2A(copy(ψ),dx/3.0,ops),dx/3.0,ops),dx/3.0,ops) .+
+         16/45*T2A(T2A(copy(ψ),dx/2.0,ops),dx/2.0,ops) .+ 
          -1/360*T2A(copy(ψ),dx,ops)
 end
 
 function T8B_N(ψ, dx, ops)
-    ψ .= 1024/315*T2B(T2B(T2B(T2B(copy(ψ),dx/4.0,ops),dx/4.0,ops),dx/4.0,ops),dx/4.0,ops) +
-         -729/280*T2B(T2B(T2B(copy(ψ),dx/3.0,ops),dx/3.0,ops),dx/3.0,ops) +
-         16/45*T2B(T2B(copy(ψ),dx/2.0,ops),dx/2.0,ops) + 
+    ψ .= 1024/315*T2B(T2B(T2B(T2B(copy(ψ),dx/4.0,ops),dx/4.0,ops),dx/4.0,ops),dx/4.0,ops) .+
+         -729/280*T2B(T2B(T2B(copy(ψ),dx/3.0,ops),dx/3.0,ops),dx/3.0,ops) .+
+         16/45*T2B(T2B(copy(ψ),dx/2.0,ops),dx/2.0,ops) .+ 
          -1/360*T2B(copy(ψ),dx,ops)
 end
 
