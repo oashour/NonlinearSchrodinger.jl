@@ -87,7 +87,9 @@ function T2B(ψ, dx, ops)
     ψ .= ops.K̂(dx/2) .* ψ
 
 end
-
+####################################################################
+# Triple Jump
+####################################################################
 """
     T4A_TJ(ψ, ω, dx, F)
 
@@ -267,7 +269,7 @@ function T4B_SF(ψ, dx, ops)
 
     ψ = T2B(ψ, ft*dx, ops)
     ψ = T2B(ψ, ft*dx, ops)
-    ψ = T2A(ψ, bt*dx, ops)
+    ψ = T2B(ψ, bt*dx, ops)
     ψ = T2B(ψ, ft*dx, ops)
     ψ = T2B(ψ, ft*dx, ops)
 
@@ -336,4 +338,40 @@ function T8B_SF(ψ, dx, ops)
     ψ = T6B_SF(ψ, ft*dx, ops)
 
     return ψ
+end
+####################################################################
+# Multi-Product Nystrom
+####################################################################
+function T4A_N(ψ, dx, ops)
+    ψ .= 4/3*T2A(copy(ψ), dx,ops) - 1/3*T2A(T2A(copy(ψ),dx/2,ops),dx/2,ops)
+end
+
+function T4B_N(ψ, dx, ops)
+    ψ .= 4/3*T2B(copy(ψ), dx,ops) - 1/3*T2B(T2B(copy(ψ),dx/2,ops),dx/2,ops)
+end
+
+function T6A_N(ψ, dx, ops)
+    ψ .= 81/40*T2A(T2A(T2A(copy(ψ),dx/3.0,ops),dx/3.0,ops),dx/3.0,ops) +
+         -16/15*T2A(T2A(copy(ψ),dx/2.0,ops),dx/2.0,ops) + 
+         1/24*T2A(copy(ψ),dx,ops)
+end
+
+function T6B_N(ψ, dx, ops)
+    ψ .= 81/40*T2B(T2B(T2B(copy(ψ),dx/3.0,ops),dx/3.0,ops),dx/3.0,ops) +
+         -16/15*T2B(T2B(copy(ψ),dx/2.0,ops),dx/2.0,ops) + 
+         1/24*T2B(copy(ψ),dx,ops)
+end
+
+function T8A_N(ψ, dx, ops)
+    ψ .= 1024/315*T2A(T2A(T2A(T2A(copy(ψ),dx/4.0,ops),dx/4.0,ops),dx/4.0,ops),dx/4.0,ops) +
+         -729/280*T2A(T2A(T2A(copy(ψ),dx/3.0,ops),dx/3.0,ops),dx/3.0,ops) +
+         16/45*T2A(T2A(copy(ψ),dx/2.0,ops),dx/2.0,ops) + 
+         -1/360*T2A(copy(ψ),dx,ops)
+end
+
+function T8B_N(ψ, dx, ops)
+    ψ .= 1024/315*T2B(T2B(T2B(T2B(copy(ψ),dx/4.0,ops),dx/4.0,ops),dx/4.0,ops),dx/4.0,ops) +
+         -729/280*T2B(T2B(T2B(copy(ψ),dx/3.0,ops),dx/3.0,ops),dx/3.0,ops) +
+         16/45*T2B(T2B(copy(ψ),dx/2.0,ops),dx/2.0,ops) + 
+         -1/360*T2B(copy(ψ),dx,ops)
 end
