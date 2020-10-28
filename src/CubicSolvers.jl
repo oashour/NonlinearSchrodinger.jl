@@ -102,13 +102,10 @@ See also: [`solve!`](@ref), [`T2`](@ref)
 function T4A_TJ(ψ, dx, ops)
     s = 2^(1 / 3)
     os = 1 / (2 - s)
-
     ft = os
     bt = -s * os
 
-    ψ = T2A(ψ, ft*dx, ops)
-    ψ = T2A(ψ, bt*dx, ops)
-    ψ = T2A(ψ, ft*dx, ops)
+    ψ .= T2A(T2A(T2A(ψ, ft*dx, ops),bt*dx,ops),ft*dx,ops)
 
     return ψ
 end
@@ -129,9 +126,7 @@ function T4B_TJ(ψ, dx, ops)
     ft = os
     bt = -s * os
 
-    ψ = T2B(ψ, ft*dx, ops)
-    ψ = T2B(ψ, bt*dx, ops)
-    ψ = T2B(ψ, ft*dx, ops)
+    ψ .= T2B(T2B(T2B(ψ, ft*dx, ops),bt*dx,ops),ft*dx,ops)
 
     return ψ
 end
@@ -146,17 +141,12 @@ integrator. `ψ'` is defined on an FFT grid with frequencies `ω` using an FFT p
 See also: [`solve!`](@ref), [`T₄ˢ`](@ref)
 """
 function T6A_TJ(ψ, dx, ops)
-
     s = 2^(1 / 5)
     os = 1 / (2 - s)
-
     ft = os
     bt = -s * os
 
-    ψ = T4A_TJ(ψ, ft*dx, ops)
-    ψ = T4A_TJ(ψ, bt*dx, ops)
-    ψ = T4A_TJ(ψ, ft*dx, ops)
-FT4A_TJ
+    ψ .= T4A_TJ(T4A_TJ(T4A_TJ(ψ, ft*dx, ops),bt*dx,ops),ft*dx,ops)
     return ψ
 end
 
@@ -170,16 +160,12 @@ integrator. `ψ'` is defined on an FFT grid with frequencies `ω` using an FFT p
 See also: [`solve!`](@ref), [`T₄ˢ`](@ref)
 """
 function T6B_TJ(ψ, dx, ops)
-
     s = 2^(1 / 5)
     os = 1 / (2 - s)
-
     ft = os
     bt = -s * os
 
-    ψ = T4B_TJ(ψ, ft*dx, ops)
-    ψ = T4B_TJ(ψ, bt*dx, ops)
-    ψ = T4B_TJ(ψ, ft*dx, ops)
+    ψ .= T4B_TJ(T4B_TJ(T4B_TJ(ψ, ft*dx, ops),bt*dx,ops),ft*dx,ops)
 
     return ψ
 end
@@ -194,16 +180,12 @@ integrator. `ψ'` is defined on an FFT grid with frequencies `ω` using an FFT p
 See also: [`solve!`](@ref), [`T₆ˢ`](@ref)
 """
 function T8A_TJ(ψ, dx, ops)
-
     s = 2^(1 / 7)
     os = 1 / (2 - s)
-
     ft = os
     bt = -s * os
 
-    ψ = T6A_TJ(ψ, ft*dx, ops)
-    ψ = T6A_TJ(ψ, bt*dx, ops)
-    ψ = T6A_TJ(ψ, ft*dx, ops)
+    ψ .= T6A_TJ(T6A_TJ(T6A_TJ(ψ, ft*dx, ops),bt*dx,ops),ft*dx,ops)
 
     return ψ
 end 
@@ -218,16 +200,12 @@ integrator. `ψ'` is defined on an FFT grid with frequencies `ω` using an FFT p
 See also: [`solve!`](@ref), [`T₆ˢ`](@ref)
 """
 function T8B_TJ(ψ, dx, ops)
-
     s = 2^(1 / 7)
     os = 1 / (2 - s)
-
     ft = os
     bt = -s * os
 
-    ψ = T6B_TJ(ψ, ft*dx, ops)
-    ψ = T6B_TJ(ψ, bt*dx, ops)
-    ψ = T6B_TJ(ψ, ft*dx, ops)
+    ψ .= T6B_TJ(T6B_TJ(T6B_TJ(ψ, ft*dx, ops),bt*dx,ops),ft*dx,ops)
 
     return ψ
 end 
@@ -250,7 +228,7 @@ function T4A_SF(ψ, dx, ops)
     ft = os
     bt = -s*os
 
-    ψ = T2A(T2A(T2A(T2A(T2A(ψ,ft*dx, ops),ft*dx,ops),bt*dx,ops),ft*dx,ops)
+    ψ .= T2A(T2A(T2A(T2A(T2A(ψ,ft*dx, ops),ft*dx,ops),bt*dx,ops),ft*dx,ops)
                ,ft*dx,ops)
 
     return ψ
@@ -262,7 +240,7 @@ function T4B_SF(ψ, dx, ops)
     ft = os
     bt = -s*os
 
-    ψ = T2B(T2B(T2B(T2B(T2B(ψ,ft*dx, ops),ft*dx,ops),bt*dx,ops),ft*dx,ops)
+    ψ .= T2B(T2B(T2B(T2B(T2B(ψ,ft*dx, ops),ft*dx,ops),bt*dx,ops),ft*dx,ops)
                ,ft*dx,ops)
 
     return ψ
@@ -274,7 +252,7 @@ function T6A_SF(ψ, dx, ops)
     ft = os
     bt = -s*os
 
-    ψ = T4A_SF(T4A_SF(T4A_SF(T4A_SF(T4A_SF(ψ,ft*dx, ops),ft*dx,ops),bt*dx,ops),ft*dx,ops)
+    ψ .= T4A_SF(T4A_SF(T4A_SF(T4A_SF(T4A_SF(ψ,ft*dx, ops),ft*dx,ops),bt*dx,ops),ft*dx,ops)
                ,ft*dx,ops)
 
     return ψ
@@ -286,7 +264,7 @@ function T6B_SF(ψ, dx, ops)
     ft = os
     bt = -s*os
 
-    ψ = T4B_SF(T4B_SF(T4B_SF(T4B_SF(T4B_SF(ψ,ft*dx, ops),ft*dx,ops),bt*dx,ops),ft*dx,ops)
+    ψ .= T4B_SF(T4B_SF(T4B_SF(T4B_SF(T4B_SF(ψ,ft*dx, ops),ft*dx,ops),bt*dx,ops),ft*dx,ops)
                ,ft*dx,ops)
 
     return ψ
@@ -298,7 +276,7 @@ function T8A_SF(ψ, dx, ops)
     ft = os
     bt = -s*os
 
-    ψ = T6A_SF(T6A_SF(T6A_SF(T6A_SF(T6A_SF(ψ,ft*dx, ops),ft*dx,ops),bt*dx,ops),ft*dx,ops)
+    ψ .= T6A_SF(T6A_SF(T6A_SF(T6A_SF(T6A_SF(ψ,ft*dx, ops),ft*dx,ops),bt*dx,ops),ft*dx,ops)
                ,ft*dx,ops)
     return ψ
 end
@@ -309,7 +287,7 @@ function T8B_SF(ψ, dx, ops)
     ft = os
     bt = -s*os
 
-    ψ = T6B_SF(T6B_SF(T6B_SF(T6B_SF(T6B_SF(ψ,ft*dx, ops),ft*dx,ops),bt*dx,ops),ft*dx,ops)
+    ψ .= T6B_SF(T6B_SF(T6B_SF(T6B_SF(T6B_SF(ψ,ft*dx, ops),ft*dx,ops),bt*dx,ops),ft*dx,ops)
                ,ft*dx,ops)
 
     return ψ
@@ -354,3 +332,80 @@ end
 ####################################################################
 # Optimized
 ####################################################################
+function T6A_OP(ψ, dx, ops)
+    γ₁ = 0.392256805238773 
+    γ₂ = γ₁
+    γ₃ = 0.1177866066796810
+    γ₄ = γ₃
+    γ₅ = -0.5888399920894384
+    γ₆ = γ₅
+    γ₇ = 0.6575931603419684 
+    γ₈ = γ₇
+    γ₉ = γ₅
+    γ₁₀ = γ₅
+    γ₁₁ = γ₃
+    γ₁₂ = γ₃
+    γ₁₃ = γ₁
+    γ₁₄ = γ₁
+    ψ .= T2A(T2A(T2A(T2A(T2A(T2A(T2A(T2A(T2A(T2A(T2A(T2A(T2A(T2A(ψ,γ₁*dx,ops),γ₂*dx,ops),
+    γ₃*dx,ops),γ₄*dx,ops),γ₅*dx,ops),γ₆*dx,ops),γ₇*dx,ops),γ₈*dx,ops),γ₉*dx,ops),γ₁₀*dx,ops)
+    ,γ₁₁*dx,ops),γ₁₂*dx,ops),γ₁₃*dx,ops),γ₁₄*dx,ops) 
+end
+
+function T6B_OP(ψ, dx, ops)
+    γ₁ = 0.392256805238773 
+    γ₂ = γ₁
+    γ₃ = 0.1177866066796810
+    γ₄ = γ₃
+    γ₅ = -0.5888399920894384
+    γ₆ = γ₅
+    γ₇ = 0.6575931603419684 
+    γ₈ = γ₇
+    γ₉ = γ₅
+    γ₁₀ = γ₅
+    γ₁₁ = γ₃
+    γ₁₂ = γ₃
+    γ₁₃ = γ₁
+    γ₁₄ = γ₁
+    ψ .= T2B(T2B(T2B(T2B(T2B(T2B(T2B(T2B(T2B(T2B(T2B(T2B(T2B(T2B(ψ,γ₁*dx,ops),γ₂*dx,ops),
+    γ₃*dx,ops),γ₄*dx,ops),γ₅*dx,ops),γ₆*dx,ops),γ₇*dx,ops),γ₈*dx,ops),γ₉*dx,ops),γ₁₀*dx,ops)
+    ,γ₁₁*dx,ops),γ₁₂*dx,ops),γ₁₃*dx,ops),γ₁₄*dx,ops) 
+end
+
+function T8A_OP(ψ, dx, ops)
+    γ₁ = 0.7416703643506129534482278
+    γ₂ = -0.409100825800031593997300
+    γ₃ = 0.1907547102962383799538763
+    γ₄ = -0.5738624711160822666563877
+    γ₅ = 0.2990641813036559238444635
+    γ₆ = 0.3346249182452981837849580
+    γ₇ = 0.3152930923967665966320567
+    γ₈ = -0.7968879393529163540197888
+    γ₉ = γ₇
+    γ₁₀ = γ₆
+    γ₁₁ = γ₅
+    γ₁₂ = γ₄
+    γ₁₃ = γ₃
+    γ₁₄ = γ₂
+    γ₁₅ = γ₁
+    ψ .= T2A(T2A(T2A(T2A(T2A(T2A(T2A(T2A(T2A(T2A(T2A(T2A(T2A(T2A(T2A(ψ,γ₁*dx,ops),γ₂*dx,ops),γ₃*dx,ops),γ₄*dx,ops),γ₅*dx,ops),γ₆*dx,ops),γ₇*dx,ops),γ₈*dx,ops),γ₉*dx,ops),γ₁₀*dx,ops),γ₁₁*dx,ops),γ₁₂*dx,ops),γ₁₃*dx,ops),γ₁₄*dx,ops),γ₁₅*dx,ops)
+end
+
+function T8B_OP(ψ, dx, ops)
+    γ₁ = 0.7416703643506129534482278
+    γ₂ = -0.409100825800031593997300
+    γ₃ = 0.1907547102962383799538763
+    γ₄ = -0.5738624711160822666563877
+    γ₅ = 0.2990641813036559238444635
+    γ₆ = 0.3346249182452981837849580
+    γ₇ = 0.3152930923967665966320567
+    γ₈ = -0.7968879393529163540197888
+    γ₉ = γ₇
+    γ₁₀ = γ₆
+    γ₁₁ = γ₅
+    γ₁₂ = γ₄
+    γ₁₃ = γ₃
+    γ₁₄ = γ₂
+    γ₁₅ = γ₁
+    ψ .= T2B(T2B(T2B(T2B(T2B(T2B(T2B(T2B(T2B(T2B(T2B(T2B(T2B(T2B(T2B(ψ,γ₁*dx,ops),γ₂*dx,ops),γ₃*dx,ops),γ₄*dx,ops),γ₅*dx,ops),γ₆*dx,ops),γ₇*dx,ops),γ₈*dx,ops),γ₉*dx,ops),γ₁₀*dx,ops),γ₁₁*dx,ops),γ₁₂*dx,ops),γ₁₃*dx,ops),γ₁₄*dx,ops),γ₁₅*dx,ops)
+end
