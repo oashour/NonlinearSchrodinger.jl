@@ -25,9 +25,9 @@ function solve!(sim::Sim)
     ops = Operators(sim)
 
     @info "Starting evolution"
-    if sim.algorithm.variant === :A
+    if sim.T̂ ∈ (T1A, T2A, T4A_TJ, T6A_TJ, T8A_TJ, T4A_SF, T4A_SF, T6A_SF, T8A_SF, T1A_H, T2A_H, T4A_TJ_H)
         soln_loop_A(sim, ops, ind_p)
-    elseif sim.algorithm.variant === :B
+    elseif sim.T̂ ∈ (T1B, T2B, T4B_TJ, T6B_TJ, T8B_TJ, T4B_SF, T6B_SF, T8B_SF)
         soln_loop_B(sim, ops, ind_p)
     end
 
@@ -35,9 +35,8 @@ function solve!(sim::Sim)
 end #solve
 
 function soln_loop_A(sim, ops, ind_p)
-    F̂ = plan_fft(@view sim.ψ[:, 1]) # 26 allocs
     @progress for i = 1:sim.box.Nₓ-1
-        @time @views sim.ψ[:, i+1] .= sim.algorithm.T̂(sim.ψ[:, i], sim.box.dx, ops)
+        @views sim.ψ[:, i+1] .= sim.T̂(sim.ψ[:, i], sim.box.dx, ops)
         # Pruning
         if sim.αₚ > 0 
             ops.F̂*view(sim.ψ,:,i+1)
@@ -46,23 +45,28 @@ function soln_loop_A(sim, ops, ind_p)
             end
             ops.F̃̂*view(sim.ψ,:,i+1)
         end # if
-        @views sim.ψ̃[:, i+1] .= fftshift(F̂*sim.ψ[:, i+1])/sim.box.Nₜ
     end # for
+    @info "Computing Spectrum"
+    sim.ψ̃ .= fftshift(fft(sim.ψ, 1), 1)./sim.box.Nₜ
 end
 
 function soln_loop_B(sim, ops, ind_p)
-    F̃̂ = plan_ifft(@view sim.ψ[:, 1]) # 34 allocs
-    F̂ = plan_fft(@view sim.ψ[:, 1]) # 26 allocs
+    F̃̂ = plan_ifft(@view sim.ψ[:, 1]) 
+    F̂ = plan_fft(@view sim.ψ[:, 1])
     sim.ψ̃[:, 1] .= F̂*view(sim.ψ, :, 1)
     @progress for i = 1:sim.box.Nₓ-1
-        @time sim.ψ̃[:, i+1] .= sim.algorithm.T̂(sim.ψ̃[:, i], sim.box.dx, ops)
+        @views sim.ψ̃[:, i+1] .= sim.T̂(sim.ψ̃[:, i], sim.box.dx, ops)
         # Pruning
         if sim.αₚ > 0 
             for j in ind_p
                 sim.ψ̃[j, i+1] *= exp(-sim.αₚ*abs(sim.ψ̃[j, i+1]))
             end
         end 
-        sim.ψ[:, i+1] .= F̃̂*view(sim.ψ̃, :, i+1)
+        # Compute the actual ψ
+        #sim.ψ[:, i+1] .= F̃̂*view(sim.ψ̃, :, i+1)
     end
-    sim.ψ̃ .= fftshift(sim.ψ̃, 1)
+    # Shift the FT
+    @info "Computing Spectrum"
+    sim.ψ .= ifft(sim.ψ̃, 1)
+    sim.ψ̃ .= fftshift(sim.ψ̃, 1)./sim.box.Nₜ
 end

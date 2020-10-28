@@ -27,87 +27,13 @@ function Box(xᵣ::Pair, T; dx = 1e-3, Nₜ = 256, n_periods = 1)
     return box
 end
 
-struct Algorithm{F <: Function}
-    x_order::Int64
-    t_order::Int64
-    variant::Symbol
-    name::String
-    T̂::F
-end #SimulationBox
-
-function Algorithm(;α = 0.0, x_order = 2, t_order = 2, variant=:A, type=:TripleJump)
-    if x_order <= 2 && α == 0.0
-        @info "Searching for algorithm of order $x_order in x, variant $variant"
-    elseif x_order > 2 && α == 0.0
-        @info "Searching for algorithm of order $x_order in x, variant $variant and type $type"
-    elseif x_order <= 2 && α >= 0.0
-        @info "Searching for algorithm of order $x_order in x, $t_order in t, variant $variant"
-    elseif x_order > 2 && α >= 0.0
-        @info "Searching for algorithm of order $x_order in x, $t_order in t, variant $variant and type $type"
-    end
-
-    # Select algorithm
-    #if x_order == 1 && α == 0.0 && variant === :A
-    #    T̂ = T1A
-    #    name = "Euler A (1A)"
-    #elseif x_order == 1 && α == 0.0 && variant === :B
-    #    T̂ = T1B
-    #    name = "Euler B (1B)"
-    #elseif x_order == 2 && α == 0.0 && variant === :A
-    #    T̂ = T2A
-    #    name = "Velocity Verlet (2A)"
-    #elseif x_order == 2 && α == 0.0 && variant === :B
-    #    T̂ = T2B
-    #    name = "Position Verlet (2B)"
-    #elseif x_order == 4 && α == 0.0 && variant === :A && type === :TripleJump
-    #    T̂ = T4A_TJ
-    #    name = "Fourth-order triple jump A (4A_TJ)"
-    #elseif x_order == 4 && α == 0.0 && variant === :A && type === :SuzukiFractal
-    #    T̂ = T4A_SF
-    #    name = "Fourth-order Suzuki fractal A (4A_SF)"
-    #elseif x_order == 4 && α == 0 && variant === :B && type === :TripleJump
-    #    T̂ = T4B_TJ
-    #    name = "Fourth-order triple jump B (4B_TJ)"
-    #elseif x_order == 6 && α == 0 && variant === :A && type === :TripleJump
-    #    T̂ = T6A_TJ
-    #    name = "Sixth-order triple jump A (6A_TJ)"
-    #elseif x_order == 6 && α == 0 && variant === :B && type === :TripleJump
-    #    T̂ = T6B_TJ
-    #    name = "Sixth-order triple jump B (6B_TJ)"
-    #elseif x_order == 8 && α == 0 && variant === :A && type === :TripleJump
-    #    T̂ = T8A_TJ
-    #    name = "Eighth-order triple jump A (8A_TJ)"
-    #elseif x_order == 8 && α == 0 && variant === :B && type === :TripleJump
-    #    T̂ = T8B_TJ
-    #    name = "Eighth-order triple jump B (8B_TJ)"
-    #elseif x_order == 1 && α > 0 && variant === :A && type === :TripleJump
-    #    T̂ = T1A_H 
-    #    name = "Euler A for Hirota (1A_H)"
-    #elseif x_order == 2 && α > 0 && variant === :A && type === :TripleJump
-    #    T̂ = T2A_H
-    #    name = "Velocity Verlet for Hirota (2A_H)"
-    #elseif x_order == 4 && α > 0 && variant === :A && type === :TripleJump
-    #    T̂ = T4A_TJ_H 
-    #    name = "Fourth-order triple jump A for Hirota (4A_TJ_H)"
-    #else
-    #    throw(ArgumentError("No solver available."))
-    #end
-
-    @info "Using algorithm: $name"
-
-    T̂ = T1A
-    name = "zabry"
-    algorithm = Algorithm(x_order, t_order, variant, name, T̂)
-    return algorithm
-end
-
-struct Sim{TT<:Real}
+struct Sim{TT<:Real, F}
     λ::Complex{TT}
     T::TT
     Ω::TT
     box::Box{TT}
     ψ₀::Array{Complex{TT}, 1}
-    algorithm::Algorithm
+    T̂::F
     α::TT
     αₚ::TT
     ψ::Array{Complex{TT}, 2}
@@ -119,7 +45,7 @@ struct Sim{TT<:Real}
     P::Array{TT, 1}
 end # Simulation
 
-function Sim(λ, box::Box, ψ₀::Array{Complex{TT}, 1}, algo::Algorithm; α = 0.0, αₚ = 0.0) where TT <: Real
+function Sim(λ, box::Box, ψ₀::Array{Complex{TT}, 1}, T̂; α = 0.0, αₚ = 0.0) where TT <: Real
     ψ = Array{Complex{TT}}(undef, box.Nₜ, box.Nₓ)
     ψ̃ = similar(ψ)
     E = zeros(box.Nₓ)
@@ -135,7 +61,7 @@ function Sim(λ, box::Box, ψ₀::Array{Complex{TT}, 1}, algo::Algorithm; α = 0
     end
     # Compute some parameters
     λ, T, Ω = params(λ = λ)
-    sim = Sim(λ, T, Ω, box, ψ₀, algo, α, αₚ, ψ, ψ̃, E, PE, KE, N, P)
+    sim = Sim(λ, T, Ω, box, ψ₀, T̂, α, αₚ, ψ, ψ̃, E, PE, KE, N, P)
    return sim
 end #init_sim
 

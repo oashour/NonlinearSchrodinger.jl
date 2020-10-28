@@ -126,7 +126,7 @@ function print(sim::Sim)
     else
         println("Unknown equation with α = $(sim.α)")
     end
-    println("Algorithm: $(sim.algorithm.name)")
+    println("Algorithm: $(sim.T̂)")
     println("------------------------------------------")
 end
 

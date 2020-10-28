@@ -35,7 +35,7 @@ function T1B(ψ, dx, ops)
 
     # Nonlinear
     ops.F̃̂*ψ
-    ψ = cis.(dx .* (-1*abs2.(ψ))).*ψ
+    @. ψ = cis(dx * (-1*abs2(ψ)))*ψ
     ops.F̂*ψ
 
 end
@@ -80,7 +80,7 @@ function T2B(ψ, dx, ops)
 
     # Nonlinear
     ops.F̃̂*ψ
-    ψ = cis.(dx .* (-1*abs2.(ψ))).*ψ
+    @. ψ = cis(dx * (-1*abs2(ψ)))*ψ
     ops.F̂*ψ
 
     # Dispersion
@@ -143,7 +143,7 @@ integrator. `ψ'` is defined on an FFT grid with frequencies `ω` using an FFT p
 
 See also: [`solve!`](@ref), [`T₄ˢ`](@ref)
 """
-function T₆ᵃ⁽ˢ⁾(ψ, dx, ops)
+function T6A_TJ(ψ, dx, ops)
 
     s = 2^(1 / 5)
     os = 1 / (2 - s)
@@ -230,8 +230,9 @@ function T8B_TJ(ψ, dx, ops)
     return ψ
 end 
 
+####################################################################
 # Suzuki Fractal
-
+####################################################################
 """
     T₄ˢ(ψ, ω, dx, F)
 FT4A_TJ
@@ -242,17 +243,97 @@ integrator. `ψ'` is defined on an FFT grid with frequencies `ω` using an FFT p
 See also: [`solve!`](@ref), [`T2`](@ref)
 """
 function T4A_SF(ψ, dx, ops)
-    s = 4^(1 / 3)
-    os = 1 / (4 - s)
+    s = 4^(1/3)
+    os = 1/(4 - s)
 
     ft = os
-    bt = -s * os
+    bt = -s*os
 
     ψ = T2A(ψ, ft*dx, ops)
     ψ = T2A(ψ, ft*dx, ops)
     ψ = T2A(ψ, bt*dx, ops)
     ψ = T2A(ψ, ft*dx, ops)
     ψ = T2A(ψ, ft*dx, ops)
+
+    return ψ
+end
+
+function T4B_SF(ψ, dx, ops)
+    s = 4^(1/3)
+    os = 1/(4 - s)
+
+    ft = os
+    bt = -s*os
+
+    ψ = T2B(ψ, ft*dx, ops)
+    ψ = T2B(ψ, ft*dx, ops)
+    ψ = T2A(ψ, bt*dx, ops)
+    ψ = T2B(ψ, ft*dx, ops)
+    ψ = T2B(ψ, ft*dx, ops)
+
+    return ψ
+end
+
+function T6A_SF(ψ, dx, ops)
+    s = 4^(1/5)
+    os = 1/(4 - s)
+
+    ft = os
+    bt = -s*os
+
+    ψ = T4A_SF(ψ, ft*dx, ops)
+    ψ = T4A_SF(ψ, ft*dx, ops)
+    ψ = T4A_SF(ψ, bt*dx, ops)
+    ψ = T4A_SF(ψ, ft*dx, ops)
+    ψ = T4A_SF(ψ, ft*dx, ops)
+
+    return ψ
+end
+
+function T6B_SF(ψ, dx, ops)
+    s = 4^(1/5)
+    os = 1/(4 - s)
+
+    ft = os
+    bt = -s*os
+
+    ψ = T4B_SF(ψ, ft*dx, ops)
+    ψ = T4B_SF(ψ, ft*dx, ops)
+    ψ = T4B_SF(ψ, bt*dx, ops)
+    ψ = T4B_SF(ψ, ft*dx, ops)
+    ψ = T4B_SF(ψ, ft*dx, ops)
+
+    return ψ
+end
+
+function T8A_SF(ψ, dx, ops)
+    s = 4^(1/7)
+    os = 1/(4 - s)
+
+    ft = os
+    bt = -s*os
+
+    ψ = T6A_SF(ψ, ft*dx, ops)
+    ψ = T6A_SF(ψ, ft*dx, ops)
+    ψ = T6A_SF(ψ, bt*dx, ops)
+    ψ = T6A_SF(ψ, ft*dx, ops)
+    ψ = T6A_SF(ψ, ft*dx, ops)
+
+    return ψ
+end
+
+function T8B_SF(ψ, dx, ops)
+    s = 4^(1/7)
+    os = 1/(4 - s)
+
+    ft = os
+    bt = -s*os
+
+    ψ = T6B_SF(ψ, ft*dx, ops)
+    ψ = T6B_SF(ψ, ft*dx, ops)
+    ψ = T6B_SF(ψ, bt*dx, ops)
+    ψ = T6B_SF(ψ, ft*dx, ops)
+    ψ = T6B_SF(ψ, ft*dx, ops)
 
     return ψ
 end

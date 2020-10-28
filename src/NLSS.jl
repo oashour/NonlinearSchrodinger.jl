@@ -21,6 +21,10 @@ export ψ₀_periodic
 export AlgorithmType, AlgorithmVariant
 
 export Sim, Box, Algorithm
+export T1A, T1B, T2A, T2B
+export T4A_TJ, T4B_TJ, T6A_TJ, T6B_TJ, T8A_TJ, T8B_TJ
+export T4A_SF, T4B_SF, T6A_SF, T6B_SF, T8A_SF, T8B_SF
+export T1A_H, T2A_H, T4A_TJ_H
 
 include("Types.jl")
 include("Simulation.jl")
