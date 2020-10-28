@@ -65,16 +65,19 @@ function Sim(λ, box::Box, ψ₀::Array{Complex{TT}, 1}, T̂; α = 0.0, αₚ = 
    return sim
 end #init_sim
 
-struct Operators{DispFunc, FFTPlan, InvFFTPlan}
+struct Operators{T, DispFunc, FFTPlan, InvFFTPlan}
     K̂::DispFunc
     F̂::FFTPlan
     F̃̂::InvFFTPlan
     B̂::DiffEqBase.DEIntegrator
+    ψ₁::T
+    ψ₂::T
+    ψ₃::T
 end # Simulation
 
 function Operators(sim)
     # Generate FFT Plans to optimize performance
-    #println("Generating FFT Plan")
+    @info "Generating FFT plans"
     F̂ = plan_fft!(@view sim.ψ[:, 1]) # 26 allocs
     F̃̂ = plan_ifft!(@view sim.ψ[:, 1]) # 34 allocs
 
@@ -96,10 +99,12 @@ function Operators(sim)
         return fun
     end
 
+    # This stuff should be user controllable
     t_algo = BS3()
+    t_order = 2
     # Create the integrator for the Burger term
     if sim.α > 0
-        D = CenteredDifference(1, sim.algorithm.t_order, sim.box.dt, sim.box.Nₜ) 
+        D = CenteredDifference(1, t_order, sim.box.dt, sim.box.Nₜ) 
         Q = PeriodicBC(Float64)
         function MB!(du, u,p,t)
             du .= 6*sim.α*D*Q*u.*abs2.(u)
@@ -113,8 +118,11 @@ function Operators(sim)
         prob = ODEProblem(M0!, sim.ψ[:, 1], (0, sim.box.dx))
         B̂ = init(prob, t_algo; dt=sim.box.dx,save_everystep=false)  
     end
-
-    ops = Operators(K̂(sim.α), F̂, F̃̂, B̂)
+    
+    ψ₁ = similar(sim.ψ₀)
+    ψ₂ = similar(sim.ψ₀)
+    ψ₃ = similar(sim.ψ₀)
+    ops = Operators(K̂(sim.α), F̂, F̃̂, B̂, ψ₁, ψ₂, ψ₃)
 
     return ops
 end

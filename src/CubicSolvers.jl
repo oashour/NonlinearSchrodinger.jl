@@ -7,332 +7,311 @@ integrator. `ψ'` is defined on an FFT grid with frequencies `ω` using an FFT p
 
 See also: [`solve!`](@ref)
 """
-function T1A(ψ, dx, ops)
+####################################################################
+# Symplectic
+####################################################################
+function T1A!(ψₒ, ψᵢ, dx, ops)
 
     # Nonlinear
-    @. ψ = cis(dx * (-1*abs2(ψ)))*ψ
+    @. ψₒ = cis(dx * (-1*abs2(ψᵢ)))*ψᵢ
 
     # Dispersion
-    ops.F̂*ψ 
-    ψ .= ops.K̂(dx) .* ψ
-    ops.F̃̂*ψ
-     
+    ops.F̂*ψₒ
+    ψₒ .= ops.K̂(dx) .* ψₒ
+    ops.F̃̂*ψₒ
 end
 
-"""
-    T₁ᵇ⁽ˢ⁾(ψ, ω, dx, F)
-
-Compute `ψ'`, i.e. `ψ` advanced a step `dx` forward using a symplectic second order
-integrator. `ψ'` is defined on an FFT grid with frequencies `ω` using an FFT plan
-`F`. Do not call this explicitly and use `solve!` instead.
-
-See also: [`solve!`](@ref)
-"""
-function T1B(ψ, dx, ops)
+function T1B!(ψₒ, ψᵢ, dx, ops)
 
     # Dispersion
-    ψ .= ops.K̂(dx) .* ψ
+    ψₒ .= ops.K̂(dx) .* ψᵢ
 
     # Nonlinear
-    ops.F̃̂*ψ
-    @. ψ = cis(dx * (-1*abs2(ψ)))*ψ
-    ops.F̂*ψ
-
+    ops.F̃̂*ψₒ
+    @. ψₒ = cis(dx * (-1*abs2(ψₒ)))*ψₒ
+    ops.F̂*ψₒ
 end
 
-"""
-    function T2A(ψ, dx, ops)
-
-Compute `ψ'`, i.e. `ψ` advanced a step `dx` forward using a symplectic second order
-integrator. `ψ'` is defined on an FFT grid with frequencies `ω` using an FFT plan
-`F`. Do not call this explicitly and use `solve!` instead.
-
-See also: [`solve!`](@ref)
-"""
-function T2A(ψ, dx, ops)
+function T2A!(ψₒ, ψᵢ, dx, ops)
     # Nonlinear
-    @. ψ = cis(dx/2 * (-1*abs2(ψ)))*ψ
+    @. ψₒ = cis(dx/2 * (-1*abs2(ψᵢ)))*ψᵢ
 
     # Dispersion
-    ops.F̂*ψ 
-    ψ .= ops.K̂(dx) .* ψ
-    ops.F̃̂*ψ
+    ops.F̂*ψₒ
+    ψₒ .= ops.K̂(dx) .* ψₒ
+    ops.F̃̂*ψₒ
 
     # Nonlinear
-    @. ψ = cis(dx/2 * (-1*abs2(ψ)))*ψ
-
-    return ψ
+    @. ψₒ = cis(dx/2 * (-1*abs2(ψₒ)))*ψₒ
 end 
 
-"""
-    T2B(ψ, ω, dx, F)
-
-Compute `ψ'`, i.e. `ψ` advanced a step `dx` forward using a symplectic second order
-integrator. `ψ'` is defined on an FFT grid with frequencies `ω` using an FFT plan
-`F`. Do not call this explicitly and use `solve!` instead.
-
-See also: [`solve!`](@ref)
-"""
-function T2B(ψ, dx, ops)
+function T2B!(ψₒ, ψᵢ, dx, ops)
 
     # Dispersion
-    ψ .= ops.K̂(dx/2) .* ψ
+    ψₒ .= ops.K̂(dx/2) .* ψᵢ
 
     # Nonlinear
-    ops.F̃̂*ψ
-    @. ψ = cis(dx * (-1*abs2(ψ)))*ψ
-    ops.F̂*ψ
+    ops.F̃̂*ψₒ
+    @. ψₒ = cis(dx * (-1*abs2(ψₒ)))*ψₒ
+    ops.F̂*ψₒ
 
     # Dispersion
-    ψ .= ops.K̂(dx/2) .* ψ
-
+    ψₒ .= ops.K̂(dx/2) .* ψₒ
 end
 ####################################################################
 # Triple Jump
 ####################################################################
-"""
-    T4A_TJ(ψ, ω, dx, F)
-
-Compute `ψ'`, i.e. `ψ` advanced a step `dx` forward using a symplectic fourth order
-integrator. `ψ'` is defined on an FFT grid with frequencies `ω` using an FFT plan
-`F`. Do not call this explicitly and use `solve!` instead.
-
-See also: [`solve!`](@ref), [`T2`](@ref)
-"""
-function T4A_TJ(ψ, dx, ops)
+function T4A_TJ!(ψₒ, ψᵢ, dx, ops)
     s = 2^(1 / 3)
     os = 1 / (2 - s)
     ft = os
     bt = -s * os
 
-    ψ .= T2A(T2A(T2A(ψ, ft*dx, ops),bt*dx,ops),ft*dx,ops)
-
-    return ψ
+    T2A!(ψₒ, ψᵢ, ft*dx, ops)
+    T2A!(ψₒ, ψₒ, bt*dx, ops)
+    T2A!(ψₒ, ψₒ, ft*dx, ops)
 end
 
-"""
-    T4B_TJ(ψ, ω, dx, F)
-
-Compute `ψ'`, i.e. `ψ` advanced a step `dx` forward using a symplectic fourth order
-integrator. `ψ'` is defined on an FFT grid with frequencies `ω` using an FFT plan
-`F`. Do not call this explicitly and use `solve!` instead.
-
-See also: [`solve!`](@ref), [`T2`](@ref)
-"""
-function T4B_TJ(ψ, dx, ops)
+function T4B_TJ!(ψₒ, ψᵢ, dx, ops)
     s = 2^(1 / 3)
     os = 1 / (2 - s)
-
     ft = os
     bt = -s * os
 
-    ψ .= T2B(T2B(T2B(ψ, ft*dx, ops),bt*dx,ops),ft*dx,ops)
-
-    return ψ
+    T2B!(ψₒ, ψᵢ, ft*dx, ops)
+    T2B!(ψₒ, ψₒ, bt*dx, ops)
+    T2B!(ψₒ, ψₒ, ft*dx, ops)
 end
 
-"""
-    T₆ˢ(ψ, ω, dx, F)
-
-Compute `ψ'`, i.e. `ψ` advanced a step `dx` forward using a symplectic sixth order
-integrator. `ψ'` is defined on an FFT grid with frequencies `ω` using an FFT plan
-`F`. Do not call this explicitly and use `solve!` instead.
-
-See also: [`solve!`](@ref), [`T₄ˢ`](@ref)
-"""
-function T6A_TJ(ψ, dx, ops)
+function T6A_TJ!(ψₒ, ψᵢ, dx, ops)
     s = 2^(1 / 5)
     os = 1 / (2 - s)
     ft = os
     bt = -s * os
 
-    ψ .= T4A_TJ(T4A_TJ(T4A_TJ(ψ, ft*dx, ops),bt*dx,ops),ft*dx,ops)
-    return ψ
+    T4A_TJ!(ψₒ, ψᵢ, ft*dx, ops)
+    T4A_TJ!(ψₒ, ψₒ, bt*dx, ops)
+    T4A_TJ!(ψₒ, ψₒ, ft*dx, ops)
 end
 
-"""
-    T₆ˢ(ψ, ω, dx, F)
-
-Compute `ψ'`, i.e. `ψ` advanced a step `dx` forward using a symplectic sixth order
-integrator. `ψ'` is defined on an FFT grid with frequencies `ω` using an FFT plan
-`F`. Do not call this explicitly and use `solve!` instead.
-
-See also: [`solve!`](@ref), [`T₄ˢ`](@ref)
-"""
-function T6B_TJ(ψ, dx, ops)
+function T6B_TJ!(ψₒ, ψᵢ, dx, ops)
     s = 2^(1 / 5)
     os = 1 / (2 - s)
     ft = os
     bt = -s * os
 
-    ψ .= T4B_TJ(T4B_TJ(T4B_TJ(ψ, ft*dx, ops),bt*dx,ops),ft*dx,ops)
-
-    return ψ
+    T4B_TJ!(ψₒ, ψᵢ, ft*dx, ops)
+    T4B_TJ!(ψₒ, ψₒ, bt*dx, ops)
+    T4B_TJ!(ψₒ, ψₒ, ft*dx, ops)
 end
 
-"""
-    T₈ˢ(ψ, ω, dx, F)
-
-Compute `ψ'`, i.e. `ψ` advanced a step `dx` forward using a symplectic eighth order
-integrator. `ψ'` is defined on an FFT grid with frequencies `ω` using an FFT plan
-`F`. Do not call this explicitly and use `solve!` instead.
-
-See also: [`solve!`](@ref), [`T₆ˢ`](@ref)
-"""
-function T8A_TJ(ψ, dx, ops)
+function T8A_TJ!(ψₒ, ψᵢ, dx, ops)
     s = 2^(1 / 7)
     os = 1 / (2 - s)
     ft = os
     bt = -s * os
 
-    ψ .= T6A_TJ(T6A_TJ(T6A_TJ(ψ, ft*dx, ops),bt*dx,ops),ft*dx,ops)
-
-    return ψ
+    T6A_TJ!(ψₒ, ψᵢ, ft*dx, ops)
+    T6A_TJ!(ψₒ, ψₒ, bt*dx, ops)
+    T6A_TJ!(ψₒ, ψₒ, ft*dx, ops)
 end 
 
-"""
-    T₈ˢ(ψ, ω, dx, F)
-
-Compute `ψ'`, i.e. `ψ` advanced a step `dx` forward using a symplectic eighth order
-integrator. `ψ'` is defined on an FFT grid with frequencies `ω` using an FFT plan
-`F`. Do not call this explicitly and use `solve!` instead.
-
-See also: [`solve!`](@ref), [`T₆ˢ`](@ref)
-"""
-function T8B_TJ(ψ, dx, ops)
+function T8B_TJ!(ψₒ, ψᵢ, dx, ops)
     s = 2^(1 / 7)
     os = 1 / (2 - s)
     ft = os
     bt = -s * os
 
-    ψ .= T6B_TJ(T6B_TJ(T6B_TJ(ψ, ft*dx, ops),bt*dx,ops),ft*dx,ops)
-
-    return ψ
+    T6B_TJ!(ψₒ, ψᵢ, ft*dx, ops)
+    T6B_TJ!(ψₒ, ψₒ, bt*dx, ops)
+    T6B_TJ!(ψₒ, ψₒ, ft*dx, ops)
 end 
 
 ####################################################################
 # Suzuki Fractal
 ####################################################################
-"""
-    T₄ˢ(ψ, ω, dx, F)
-FT4A_TJ
-Compute `ψ'`, i.e. `ψ` advanced a step `dx` forward using a symplectic fourth order
-integrator. `ψ'` is defined on an FFT grid with frequencies `ω` using an FFT plan
-`F`. Do not call this explicitly and use `solve!` instead.
-
-See also: [`solve!`](@ref), [`T2`](@ref)
-"""
-function T4A_SF(ψ, dx, ops)
+function T4A_SF!(ψₒ, ψᵢ, dx, ops)
     s = 4^(1/3)
     os = 1/(4 - s)
     ft = os
     bt = -s*os
 
-    ψ .= T2A(T2A(T2A(T2A(T2A(ψ,ft*dx, ops),ft*dx,ops),bt*dx,ops),ft*dx,ops)
-               ,ft*dx,ops)
-
-    return ψ
+    T2A!(ψₒ, ψᵢ, ft*dx, ops)
+    T2A!(ψₒ, ψₒ, ft*dx, ops)
+    T2A!(ψₒ, ψₒ, bt*dx, ops)
+    T2A!(ψₒ, ψₒ, ft*dx, ops)
+    T2A!(ψₒ, ψₒ, ft*dx, ops)
 end
 
-function T4B_SF(ψ, dx, ops)
+function T4B_SF!(ψₒ, ψᵢ, dx, ops)
     s = 4^(1/3)
     os = 1/(4 - s)
     ft = os
     bt = -s*os
 
-    ψ .= T2B(T2B(T2B(T2B(T2B(ψ,ft*dx, ops),ft*dx,ops),bt*dx,ops),ft*dx,ops)
-               ,ft*dx,ops)
-
-    return ψ
+    T2B!(ψₒ, ψᵢ, ft*dx, ops)
+    T2B!(ψₒ, ψₒ, ft*dx, ops)
+    T2B!(ψₒ, ψₒ, bt*dx, ops)
+    T2B!(ψₒ, ψₒ, ft*dx, ops)
+    T2B!(ψₒ, ψₒ, ft*dx, ops)
 end
 
-function T6A_SF(ψ, dx, ops)
+function T6A_SF!(ψₒ, ψᵢ, dx, ops)
     s = 4^(1/5)
     os = 1/(4 - s)
     ft = os
     bt = -s*os
 
-    ψ .= T4A_SF(T4A_SF(T4A_SF(T4A_SF(T4A_SF(ψ,ft*dx, ops),ft*dx,ops),bt*dx,ops),ft*dx,ops)
-               ,ft*dx,ops)
-
-    return ψ
+    T4A_SF!(ψₒ, ψᵢ, ft*dx, ops)
+    T4A_SF!(ψₒ, ψₒ, ft*dx, ops)
+    T4A_SF!(ψₒ, ψₒ, bt*dx, ops)
+    T4A_SF!(ψₒ, ψₒ, ft*dx, ops)
+    T4A_SF!(ψₒ, ψₒ, ft*dx, ops)
 end
 
-function T6B_SF(ψ, dx, ops)
+function T6B_SF!(ψₒ, ψᵢ, dx, ops)
     s = 4^(1/5)
     os = 1/(4 - s)
     ft = os
     bt = -s*os
 
-    ψ .= T4B_SF(T4B_SF(T4B_SF(T4B_SF(T4B_SF(ψ,ft*dx, ops),ft*dx,ops),bt*dx,ops),ft*dx,ops)
-               ,ft*dx,ops)
-
-    return ψ
+    T4B_SF!(ψₒ, ψᵢ, ft*dx, ops)
+    T4B_SF!(ψₒ, ψₒ, ft*dx, ops)
+    T4B_SF!(ψₒ, ψₒ, bt*dx, ops)
+    T4B_SF!(ψₒ, ψₒ, ft*dx, ops)
+    T4B_SF!(ψₒ, ψₒ, ft*dx, ops)
 end
 
-function T8A_SF(ψ, dx, ops)
+function T8A_SF!(ψₒ, ψᵢ, dx, ops)
     s = 4^(1/7)
     os = 1/(4 - s)
     ft = os
     bt = -s*os
 
-    ψ .= T6A_SF(T6A_SF(T6A_SF(T6A_SF(T6A_SF(ψ,ft*dx, ops),ft*dx,ops),bt*dx,ops),ft*dx,ops)
-               ,ft*dx,ops)
-    return ψ
+    T6A_SF!(ψₒ, ψᵢ, ft*dx, ops)
+    T6A_SF!(ψₒ, ψₒ, ft*dx, ops)
+    T6A_SF!(ψₒ, ψₒ, bt*dx, ops)
+    T6A_SF!(ψₒ, ψₒ, ft*dx, ops)
+    T6A_SF!(ψₒ, ψₒ, ft*dx, ops)
 end
 
-function T8B_SF(ψ, dx, ops)
+function T8B_SF!(ψₒ, ψᵢ, dx, ops)
     s = 4^(1/7)
     os = 1/(4 - s)
     ft = os
     bt = -s*os
 
-    ψ .= T6B_SF(T6B_SF(T6B_SF(T6B_SF(T6B_SF(ψ,ft*dx, ops),ft*dx,ops),bt*dx,ops),ft*dx,ops)
-               ,ft*dx,ops)
-
-    return ψ
+    T6B_SF!(ψₒ, ψᵢ, ft*dx, ops)
+    T6B_SF!(ψₒ, ψₒ, ft*dx, ops)
+    T6B_SF!(ψₒ, ψₒ, bt*dx, ops)
+    T6B_SF!(ψₒ, ψₒ, ft*dx, ops)
+    T6B_SF!(ψₒ, ψₒ, ft*dx, ops)
 end
 ####################################################################
 # Multi-Product Nystrom
 ####################################################################
-function T4A_N(ψ, dx, ops)
-    ψ .= 4/3*T2A(copy(ψ), dx,ops) - 1/3*T2A(T2A(copy(ψ),dx/2,ops),dx/2,ops)
+function T4A_N!(ψₒ, ψᵢ, dx, ops)
+    T2A!(ψₒ, ψᵢ, dx/2, ops)
+    T2A!(ψₒ, ψₒ, dx/2, ops)
+    ψₒ .*= -1/3
+
+    T2A!(ops.ψ₁, ψᵢ, dx,ops)
+    ops.ψ₁ .*= 4/3
+
+    ψₒ .+= ops.ψ₁
 end
 
-function T4B_N(ψ, dx, ops)
-    ψ .= 4/3*T2B(copy(ψ), dx,ops) - 1/3*T2B(T2B(copy(ψ),dx/2,ops),dx/2,ops)
+function T4B_N!(ψₒ, ψᵢ, dx, ops)
+    T2B!(ψₒ, ψᵢ, dx/2, ops)
+    T2B!(ψₒ, ψₒ, dx/2, ops)
+    ψₒ .*= -1/3
+
+    T2B!(ops.ψ₁, ψᵢ, dx,ops)
+    ops.ψ₁ .*= 4/3
+
+    ψₒ .+= ops.ψ₁
 end
 
-function T6A_N(ψ, dx, ops)
-    ψ .= 81/40*T2A(T2A(T2A(copy(ψ),dx/3.0,ops),dx/3.0,ops),dx/3.0,ops) +
-         -16/15*T2A(T2A(copy(ψ),dx/2.0,ops),dx/2.0,ops) + 
-         1/24*T2A(copy(ψ),dx,ops)
+function T6A_N!(ψₒ, ψᵢ, dx, ops)
+    T2A!(ψₒ, ψᵢ, dx/3, ops)
+    T2A!(ψₒ, ψₒ, dx/3, ops)
+    T2A!(ψₒ, ψₒ, dx/3, ops)
+    ψₒ .*= 81/40
+
+    T2A!(ops.ψ₁, ψᵢ, dx/2, ops)
+    T2A!(ops.ψ₁, ops.ψ₁, dx/2, ops)
+    ops.ψ₁ .*= -16/15
+
+    T2A!(ops.ψ₂, ψᵢ, dx, ops)
+    ops.ψ₂ .*= 1/24
+
+    ψₒ .+= ops.ψ₁ .+ ops.ψ₂
 end
 
-function T6B_N(ψ, dx, ops)
-    ψ .= 81/40*T2B(T2B(T2B(copy(ψ),dx/3.0,ops),dx/3.0,ops),dx/3.0,ops) +
-         -16/15*T2B(T2B(copy(ψ),dx/2.0,ops),dx/2.0,ops) + 
-         1/24*T2B(copy(ψ),dx,ops)
+function T6B_N!(ψₒ, ψᵢ, dx, ops)
+    T2B!(ψₒ, ψᵢ, dx/3, ops)
+    T2B!(ψₒ, ψₒ, dx/3, ops)
+    T2B!(ψₒ, ψₒ, dx/3, ops)
+    ψₒ .*= 81/40
+
+    T2B!(ops.ψ₁, ψᵢ, dx/2, ops)
+    T2B!(ops.ψ₁, ops.ψ₁, dx/2, ops)
+    ops.ψ₁ .*= -16/15
+
+    T2B!(ops.ψ₂, ψᵢ, dx, ops)
+    ops.ψ₂ .*= 1/24
+
+    ψₒ .+= ops.ψ₁ .+ ops.ψ₂
 end
 
-function T8A_N(ψ, dx, ops)
-    ψ .= 1024/315*T2A(T2A(T2A(T2A(copy(ψ),dx/4.0,ops),dx/4.0,ops),dx/4.0,ops),dx/4.0,ops) +
-         -729/280*T2A(T2A(T2A(copy(ψ),dx/3.0,ops),dx/3.0,ops),dx/3.0,ops) +
-         16/45*T2A(T2A(copy(ψ),dx/2.0,ops),dx/2.0,ops) + 
-         -1/360*T2A(copy(ψ),dx,ops)
+function T8A_N!(ψₒ, ψᵢ, dx, ops)
+    T2A!(ψₒ, ψᵢ, dx/4, ops)
+    T2A!(ψₒ, ψₒ, dx/4, ops)
+    T2A!(ψₒ, ψₒ, dx/4, ops)
+    T2A!(ψₒ, ψₒ, dx/4, ops)
+    ψₒ .*= 1024/315
+
+    T2A!(ops.ψ₁, ψᵢ, dx/3, ops)
+    T2A!(ops.ψ₁, ops.ψ₁, dx/3, ops)
+    T2A!(ops.ψ₁, ops.ψ₁, dx/3, ops)
+    ops.ψ₁ .*= -729/280
+
+    T2A!(ops.ψ₂, ψᵢ, dx/2, ops)
+    T2A!(ops.ψ₂, ops.ψ₂, dx/2, ops)
+    ops.ψ₂ .*= 16/45
+
+    T2A!(ops.ψ₃, ψᵢ, dx, ops)
+    ops.ψ₃ .*= -1/360
+
+    ψₒ .+= ops.ψ₁ .+ ops.ψ₂ .+ ops.ψ₃
 end
 
-function T8B_N(ψ, dx, ops)
-    ψ .= 1024/315*T2B(T2B(T2B(T2B(copy(ψ),dx/4.0,ops),dx/4.0,ops),dx/4.0,ops),dx/4.0,ops) +
-         -729/280*T2B(T2B(T2B(copy(ψ),dx/3.0,ops),dx/3.0,ops),dx/3.0,ops) +
-         16/45*T2B(T2B(copy(ψ),dx/2.0,ops),dx/2.0,ops) + 
-         -1/360*T2B(copy(ψ),dx,ops)
+function T8B_N!(ψₒ, ψᵢ, dx, ops)
+    T2B!(ψₒ, ψᵢ, dx/4, ops)
+    T2B!(ψₒ, ψₒ, dx/4, ops)
+    T2B!(ψₒ, ψₒ, dx/4, ops)
+    T2B!(ψₒ, ψₒ, dx/4, ops)
+    ψₒ .*= 1024/315
+
+    T2B!(ops.ψ₁, ψᵢ, dx/3, ops)
+    T2B!(ops.ψ₁, ops.ψ₁, dx/3, ops)
+    T2B!(ops.ψ₁, ops.ψ₁, dx/3, ops)
+    ops.ψ₁ .*= -729/280
+
+    T2B!(ops.ψ₂, ψᵢ, dx/2, ops)
+    T2B!(ops.ψ₂, ops.ψ₂, dx/2, ops)
+    ops.ψ₂ .*= 16/45
+
+    T2B!(ops.ψ₃, ψᵢ, dx, ops)
+    ops.ψ₃ .*= -1/360
+
+    ψₒ .+= ops.ψ₁ .+ ops.ψ₂ .+ ops.ψ₃
 end
 
 ####################################################################
 # Optimized
 ####################################################################
-function T6A_OP(ψ, dx, ops)
+function T6A_OP!(ψₒ, ψᵢ, dx, ops)
     γ₁ = 0.392256805238773 
     γ₂ = γ₁
     γ₃ = 0.1177866066796810
@@ -347,12 +326,24 @@ function T6A_OP(ψ, dx, ops)
     γ₁₂ = γ₃
     γ₁₃ = γ₁
     γ₁₄ = γ₁
-    ψ .= T2A(T2A(T2A(T2A(T2A(T2A(T2A(T2A(T2A(T2A(T2A(T2A(T2A(T2A(ψ,γ₁*dx,ops),γ₂*dx,ops),
-    γ₃*dx,ops),γ₄*dx,ops),γ₅*dx,ops),γ₆*dx,ops),γ₇*dx,ops),γ₈*dx,ops),γ₉*dx,ops),γ₁₀*dx,ops)
-    ,γ₁₁*dx,ops),γ₁₂*dx,ops),γ₁₃*dx,ops),γ₁₄*dx,ops) 
+
+    T2A!(ψₒ, ψᵢ, γ₁*dx, ops)
+    T2A!(ψₒ, ψₒ, γ₂*dx, ops)
+    T2A!(ψₒ, ψₒ, γ₃*dx, ops)
+    T2A!(ψₒ, ψₒ, γ₄*dx, ops)
+    T2A!(ψₒ, ψₒ, γ₅*dx, ops)
+    T2A!(ψₒ, ψₒ, γ₆*dx, ops)
+    T2A!(ψₒ, ψₒ, γ₇*dx, ops)
+    T2A!(ψₒ, ψₒ, γ₈*dx, ops)
+    T2A!(ψₒ, ψₒ, γ₉*dx, ops)
+    T2A!(ψₒ, ψₒ, γ₁₀*dx, ops)
+    T2A!(ψₒ, ψₒ, γ₁₁*dx, ops)
+    T2A!(ψₒ, ψₒ, γ₁₂*dx, ops)
+    T2A!(ψₒ, ψₒ, γ₁₃*dx, ops)
+    T2A!(ψₒ, ψₒ, γ₁₄*dx, ops)
 end
 
-function T6B_OP(ψ, dx, ops)
+function T6B_OP!(ψₒ, ψᵢ, dx, ops)
     γ₁ = 0.392256805238773 
     γ₂ = γ₁
     γ₃ = 0.1177866066796810
@@ -367,12 +358,24 @@ function T6B_OP(ψ, dx, ops)
     γ₁₂ = γ₃
     γ₁₃ = γ₁
     γ₁₄ = γ₁
-    ψ .= T2B(T2B(T2B(T2B(T2B(T2B(T2B(T2B(T2B(T2B(T2B(T2B(T2B(T2B(ψ,γ₁*dx,ops),γ₂*dx,ops),
-    γ₃*dx,ops),γ₄*dx,ops),γ₅*dx,ops),γ₆*dx,ops),γ₇*dx,ops),γ₈*dx,ops),γ₉*dx,ops),γ₁₀*dx,ops)
-    ,γ₁₁*dx,ops),γ₁₂*dx,ops),γ₁₃*dx,ops),γ₁₄*dx,ops) 
+
+    T2B!(ψₒ, ψᵢ, γ₁*dx, ops)
+    T2B!(ψₒ, ψₒ, γ₂*dx, ops)
+    T2B!(ψₒ, ψₒ, γ₃*dx, ops)
+    T2B!(ψₒ, ψₒ, γ₄*dx, ops)
+    T2B!(ψₒ, ψₒ, γ₅*dx, ops)
+    T2B!(ψₒ, ψₒ, γ₆*dx, ops)
+    T2B!(ψₒ, ψₒ, γ₇*dx, ops)
+    T2B!(ψₒ, ψₒ, γ₈*dx, ops)
+    T2B!(ψₒ, ψₒ, γ₉*dx, ops)
+    T2B!(ψₒ, ψₒ, γ₁₀*dx, ops)
+    T2B!(ψₒ, ψₒ, γ₁₁*dx, ops)
+    T2B!(ψₒ, ψₒ, γ₁₂*dx, ops)
+    T2B!(ψₒ, ψₒ, γ₁₃*dx, ops)
+    T2B!(ψₒ, ψₒ, γ₁₄*dx, ops)
 end
 
-function T8A_OP(ψ, dx, ops)
+function T8A_OP!(ψₒ, ψᵢ, dx, ops)
     γ₁ = 0.7416703643506129534482278
     γ₂ = -0.409100825800031593997300
     γ₃ = 0.1907547102962383799538763
@@ -388,10 +391,25 @@ function T8A_OP(ψ, dx, ops)
     γ₁₃ = γ₃
     γ₁₄ = γ₂
     γ₁₅ = γ₁
-    ψ .= T2A(T2A(T2A(T2A(T2A(T2A(T2A(T2A(T2A(T2A(T2A(T2A(T2A(T2A(T2A(ψ,γ₁*dx,ops),γ₂*dx,ops),γ₃*dx,ops),γ₄*dx,ops),γ₅*dx,ops),γ₆*dx,ops),γ₇*dx,ops),γ₈*dx,ops),γ₉*dx,ops),γ₁₀*dx,ops),γ₁₁*dx,ops),γ₁₂*dx,ops),γ₁₃*dx,ops),γ₁₄*dx,ops),γ₁₅*dx,ops)
+
+    T2A!(ψₒ, ψᵢ, γ₁*dx, ops)
+    T2A!(ψₒ, ψₒ, γ₂*dx, ops)
+    T2A!(ψₒ, ψₒ, γ₃*dx, ops)
+    T2A!(ψₒ, ψₒ, γ₄*dx, ops)
+    T2A!(ψₒ, ψₒ, γ₅*dx, ops)
+    T2A!(ψₒ, ψₒ, γ₆*dx, ops)
+    T2A!(ψₒ, ψₒ, γ₇*dx, ops)
+    T2A!(ψₒ, ψₒ, γ₈*dx, ops)
+    T2A!(ψₒ, ψₒ, γ₉*dx, ops)
+    T2A!(ψₒ, ψₒ, γ₁₀*dx, ops)
+    T2A!(ψₒ, ψₒ, γ₁₁*dx, ops)
+    T2A!(ψₒ, ψₒ, γ₁₂*dx, ops)
+    T2A!(ψₒ, ψₒ, γ₁₃*dx, ops)
+    T2A!(ψₒ, ψₒ, γ₁₄*dx, ops)
+    T2A!(ψₒ, ψₒ, γ₁₅*dx, ops)
 end
 
-function T8B_OP(ψ, dx, ops)
+function T8B_OP!(ψₒ, ψᵢ, dx, ops)
     γ₁ = 0.7416703643506129534482278
     γ₂ = -0.409100825800031593997300
     γ₃ = 0.1907547102962383799538763
@@ -407,5 +425,20 @@ function T8B_OP(ψ, dx, ops)
     γ₁₃ = γ₃
     γ₁₄ = γ₂
     γ₁₅ = γ₁
-    ψ .= T2B(T2B(T2B(T2B(T2B(T2B(T2B(T2B(T2B(T2B(T2B(T2B(T2B(T2B(T2B(ψ,γ₁*dx,ops),γ₂*dx,ops),γ₃*dx,ops),γ₄*dx,ops),γ₅*dx,ops),γ₆*dx,ops),γ₇*dx,ops),γ₈*dx,ops),γ₉*dx,ops),γ₁₀*dx,ops),γ₁₁*dx,ops),γ₁₂*dx,ops),γ₁₃*dx,ops),γ₁₄*dx,ops),γ₁₅*dx,ops)
+
+    T2B!(ψₒ, ψᵢ, γ₁*dx, ops)
+    T2B!(ψₒ, ψₒ, γ₂*dx, ops)
+    T2B!(ψₒ, ψₒ, γ₃*dx, ops)
+    T2B!(ψₒ, ψₒ, γ₄*dx, ops)
+    T2B!(ψₒ, ψₒ, γ₅*dx, ops)
+    T2B!(ψₒ, ψₒ, γ₆*dx, ops)
+    T2B!(ψₒ, ψₒ, γ₇*dx, ops)
+    T2B!(ψₒ, ψₒ, γ₈*dx, ops)
+    T2B!(ψₒ, ψₒ, γ₉*dx, ops)
+    T2B!(ψₒ, ψₒ, γ₁₀*dx, ops)
+    T2B!(ψₒ, ψₒ, γ₁₁*dx, ops)
+    T2B!(ψₒ, ψₒ, γ₁₂*dx, ops)
+    T2B!(ψₒ, ψₒ, γ₁₃*dx, ops)
+    T2B!(ψₒ, ψₒ, γ₁₄*dx, ops)
+    T2B!(ψₒ, ψₒ, γ₁₅*dx, ops)
 end
