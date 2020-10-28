@@ -126,7 +126,7 @@ function print(sim::Sim)
     else
         println("Unknown equation with α = $(sim.α)")
     end
-    println("Algorithm of order $(sim.x_order) in x and $(sim.t_order) in t")
+    println("Algorithm: $(sim.algorithm.name)")
     println("------------------------------------------")
 end
 

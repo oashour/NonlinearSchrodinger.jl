@@ -25,21 +25,19 @@ function solve!(sim::Sim)
     ops = Operators(sim)
 
     @info "Starting evolution"
-    if sim.variant == "A" || sim.variant == "FA"
+    if sim.algorithm.variant === :A
         soln_loop_A(sim, ops, ind_p)
-    elseif sim.variant == "B"
+    elseif sim.algorithm.variant === :B
         soln_loop_B(sim, ops, ind_p)
     end
-   #sim.solved = true
 
     @info "Computation Done!"
-
-    return nothing
 end #solve
 
 function soln_loop_A(sim, ops, ind_p)
+    F̂ = plan_fft(@view sim.ψ[:, 1]) # 26 allocs
     @progress for i = 1:sim.box.Nₓ-1
-        @views sim.ψ[:, i+1] .= ops.T̂(sim.ψ[:, i], sim.box.dx, ops)
+        @time @views sim.ψ[:, i+1] .= sim.algorithm.T̂(sim.ψ[:, i], sim.box.dx, ops)
         # Pruning
         if sim.αₚ > 0 
             ops.F̂*view(sim.ψ,:,i+1)
@@ -48,21 +46,23 @@ function soln_loop_A(sim, ops, ind_p)
             end
             ops.F̃̂*view(sim.ψ,:,i+1)
         end # if
+        @views sim.ψ̃[:, i+1] .= fftshift(F̂*sim.ψ[:, i+1])/sim.box.Nₜ
     end # for
 end
 
 function soln_loop_B(sim, ops, ind_p)
-    F̂ = plan_fft(@view sim.ψ[:, 1]) # 26 allocs
     F̃̂ = plan_ifft(@view sim.ψ[:, 1]) # 34 allocs
+    F̂ = plan_fft(@view sim.ψ[:, 1]) # 26 allocs
     sim.ψ̃[:, 1] .= F̂*view(sim.ψ, :, 1)
     @progress for i = 1:sim.box.Nₓ-1
-        @views sim.ψ̃[:, i+1] .= ops.T̂(sim.ψ̃[:, i], sim.box.dx, ops)
+        @time sim.ψ̃[:, i+1] .= sim.algorithm.T̂(sim.ψ̃[:, i], sim.box.dx, ops)
         # Pruning
         if sim.αₚ > 0 
             for j in ind_p
                 sim.ψ̃[j, i+1] *= exp(-sim.αₚ*abs(sim.ψ̃[j, i+1]))
             end
-        end # if
+        end 
         sim.ψ[:, i+1] .= F̃̂*view(sim.ψ̃, :, i+1)
-    end # for
+    end
+    sim.ψ̃ .= fftshift(sim.ψ̃, 1)
 end

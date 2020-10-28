@@ -18,8 +18,9 @@ export plot_ψ, plot_ψ̃, plot_IoM
 export params, print, save, load
 export solve!
 export ψ₀_periodic
+export AlgorithmType, AlgorithmVariant
 
-export Sim, Box
+export Sim, Box, Algorithm
 
 include("Types.jl")
 include("Simulation.jl")

@@ -1,6 +1,3 @@
-@enum AlgorithmVariant A B
-@enum AlgorithmType TripleJump SuzukiFractal MultiProduct Optimized 
-
 struct Box{TT<:Real}
     t::Array{TT, 1}
     ω::Array{TT, 1}
@@ -30,27 +27,78 @@ function Box(xᵣ::Pair, T; dx = 1e-3, Nₜ = 256, n_periods = 1)
     return box
 end
 
-struct Algorithm{F}
+struct Algorithm{F <: Function}
     x_order::Int64
     t_order::Int64
-    variant::AlgorithmVariant
-    type::AlgorithmType
+    variant::Symbol
     name::String
     T̂::F
 end #SimulationBox
 
-function Algorithm(;α = 0, x_order = 2, t_order = 2, variant=A, type=TripleJump)
-    if order <= 2 && α == 0
+function Algorithm(;α = 0.0, x_order = 2, t_order = 2, variant=:A, type=:TripleJump)
+    if x_order <= 2 && α == 0.0
         @info "Searching for algorithm of order $x_order in x, variant $variant"
-    elseif order > 2 && α == 0
+    elseif x_order > 2 && α == 0.0
         @info "Searching for algorithm of order $x_order in x, variant $variant and type $type"
-    elseif order <= 2 && α >= 0
+    elseif x_order <= 2 && α >= 0.0
         @info "Searching for algorithm of order $x_order in x, $t_order in t, variant $variant"
-    elseif order > 2 && α >= 0
-        @info "Searching for algorithm of order $x_order in x, $t_order in t, variant $variant"
+    elseif x_order > 2 && α >= 0.0
+        @info "Searching for algorithm of order $x_order in x, $t_order in t, variant $variant and type $type"
     end
 
-    return box
+    # Select algorithm
+    #if x_order == 1 && α == 0.0 && variant === :A
+    #    T̂ = T1A
+    #    name = "Euler A (1A)"
+    #elseif x_order == 1 && α == 0.0 && variant === :B
+    #    T̂ = T1B
+    #    name = "Euler B (1B)"
+    #elseif x_order == 2 && α == 0.0 && variant === :A
+    #    T̂ = T2A
+    #    name = "Velocity Verlet (2A)"
+    #elseif x_order == 2 && α == 0.0 && variant === :B
+    #    T̂ = T2B
+    #    name = "Position Verlet (2B)"
+    #elseif x_order == 4 && α == 0.0 && variant === :A && type === :TripleJump
+    #    T̂ = T4A_TJ
+    #    name = "Fourth-order triple jump A (4A_TJ)"
+    #elseif x_order == 4 && α == 0.0 && variant === :A && type === :SuzukiFractal
+    #    T̂ = T4A_SF
+    #    name = "Fourth-order Suzuki fractal A (4A_SF)"
+    #elseif x_order == 4 && α == 0 && variant === :B && type === :TripleJump
+    #    T̂ = T4B_TJ
+    #    name = "Fourth-order triple jump B (4B_TJ)"
+    #elseif x_order == 6 && α == 0 && variant === :A && type === :TripleJump
+    #    T̂ = T6A_TJ
+    #    name = "Sixth-order triple jump A (6A_TJ)"
+    #elseif x_order == 6 && α == 0 && variant === :B && type === :TripleJump
+    #    T̂ = T6B_TJ
+    #    name = "Sixth-order triple jump B (6B_TJ)"
+    #elseif x_order == 8 && α == 0 && variant === :A && type === :TripleJump
+    #    T̂ = T8A_TJ
+    #    name = "Eighth-order triple jump A (8A_TJ)"
+    #elseif x_order == 8 && α == 0 && variant === :B && type === :TripleJump
+    #    T̂ = T8B_TJ
+    #    name = "Eighth-order triple jump B (8B_TJ)"
+    #elseif x_order == 1 && α > 0 && variant === :A && type === :TripleJump
+    #    T̂ = T1A_H 
+    #    name = "Euler A for Hirota (1A_H)"
+    #elseif x_order == 2 && α > 0 && variant === :A && type === :TripleJump
+    #    T̂ = T2A_H
+    #    name = "Velocity Verlet for Hirota (2A_H)"
+    #elseif x_order == 4 && α > 0 && variant === :A && type === :TripleJump
+    #    T̂ = T4A_TJ_H 
+    #    name = "Fourth-order triple jump A for Hirota (4A_TJ_H)"
+    #else
+    #    throw(ArgumentError("No solver available."))
+    #end
+
+    @info "Using algorithm: $name"
+
+    T̂ = T1A
+    name = "zabry"
+    algorithm = Algorithm(x_order, t_order, variant, name, T̂)
+    return algorithm
 end
 
 struct Sim{TT<:Real}
@@ -59,9 +107,7 @@ struct Sim{TT<:Real}
     Ω::TT
     box::Box{TT}
     ψ₀::Array{Complex{TT}, 1}
-    t_order::Int64
-    x_order::Int64
-    variant::String #Should be that stuff like :A
+    algorithm::Algorithm
     α::TT
     αₚ::TT
     ψ::Array{Complex{TT}, 2}
@@ -73,7 +119,7 @@ struct Sim{TT<:Real}
     P::Array{TT, 1}
 end # Simulation
 
-function Sim(λ, box::Box, ψ₀::Array{Complex{TT}, 1}; t_order = 2, x_order = 2, variant = "A", α = 0.0, αₚ = 0.0) where TT <: Real
+function Sim(λ, box::Box, ψ₀::Array{Complex{TT}, 1}, algo::Algorithm; α = 0.0, αₚ = 0.0) where TT <: Real
     ψ = Array{Complex{TT}}(undef, box.Nₜ, box.Nₓ)
     ψ̃ = similar(ψ)
     E = zeros(box.Nₓ)
@@ -89,11 +135,11 @@ function Sim(λ, box::Box, ψ₀::Array{Complex{TT}, 1}; t_order = 2, x_order = 
     end
     # Compute some parameters
     λ, T, Ω = params(λ = λ)
-    sim = Sim(λ, T, Ω, box, ψ₀, t_order, x_order, variant, α, αₚ, ψ, ψ̃, E, PE, KE, N, P)
+    sim = Sim(λ, T, Ω, box, ψ₀, algo, α, αₚ, ψ, ψ̃, E, PE, KE, N, P)
    return sim
 end #init_sim
-struct Operators{NLSIntegrator, DispFunc, FFTPlan, InvFFTPlan}
-    T̂::NLSIntegrator
+
+struct Operators{DispFunc, FFTPlan, InvFFTPlan}
     K̂::DispFunc
     F̂::FFTPlan
     F̃̂::InvFFTPlan
@@ -124,44 +170,10 @@ function Operators(sim)
         return fun
     end
 
-    # Select algorithm
-    t_algo = BS3() # Default Algorithm for t
-    if sim.x_order == 1 && sim.α == 0 && sim.variant == "A"
-        T̂ = T1A
-    elseif sim.x_order == 1 && sim.α == 0 && sim.variant == "B"
-        T̂ = T1B
-    elseif sim.x_order == 2 && sim.α == 0 && sim.variant == "A"
-        T̂ = T2A
-    elseif sim.x_order == 2 && sim.α == 0 && sim.variant == "B"
-        T̂ = T2B
-    elseif sim.x_order == 4 && sim.α == 0 && sim.variant == "A"
-        T̂ = T4A_TJ
-    elseif sim.x_order == 4 && sim.α == 0 && sim.variant == "FA"
-        T̂ = T4A_SF
-    elseif sim.x_order == 4 && sim.α == 0 && sim.variant == "B"
-        T̂ = T4B_TJ
-    elseif sim.x_order == 6 && sim.α == 0 && sim.variant == "A"
-        T̂ = T6A_TJ
-    elseif sim.x_order == 6 && sim.α == 0 && sim.variant == "B"
-        T̂ = T6B_TJ
-    elseif sim.x_order == 8 && sim.α == 0 && sim.variant == "A"
-        T̂ = T8A_TJ
-    elseif sim.x_order == 8 && sim.α == 0 && sim.variant == "B"
-        T̂ = T8B_TJ
-    elseif sim.x_order == 1 && sim.α >= 0
-        T̂ = T1A_H 
-    elseif sim.x_order == 2 && sim.α >= 0
-        T̂ = T2A_H
-    elseif sim.x_order == 4 && sim.α >= 0
-        T̂ = T4A_H 
-        t_algo = BS3()
-    else
-        throw(ArgumentError("No solver available for order $x_order in x and order $t_order in t with α=$α"))
-    end
-
+    t_algo = BS3()
     # Create the integrator for the Burger term
     if sim.α > 0
-        D = CenteredDifference(1, sim.t_order, sim.box.dt, sim.box.Nₜ) 
+        D = CenteredDifference(1, sim.algorithm.t_order, sim.box.dt, sim.box.Nₜ) 
         Q = PeriodicBC(Float64)
         function MB!(du, u,p,t)
             du .= 6*sim.α*D*Q*u.*abs2.(u)
@@ -176,7 +188,7 @@ function Operators(sim)
         B̂ = init(prob, t_algo; dt=sim.box.dx,save_everystep=false)  
     end
 
-    ops = Operators(T̂, K̂(sim.α), F̂, F̃̂, B̂)
+    ops = Operators(K̂(sim.α), F̂, F̃̂, B̂)
 
     return ops
 end
