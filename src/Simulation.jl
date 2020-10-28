@@ -25,7 +25,8 @@ function solve!(sim::Sim)
     ops = Operators(sim)
 
     @info "Starting evolution"
-    if sim.T̂ ∈ (T1A!, T2A!, T4A_TJ!, T6A_TJ!, T8A_TJ!, T4A_SF!, T4A_SF!, T6A_SF!, T8A_SF!, T4A_N!, T6A_N!, T8A_N!, T6A_OP!, T8A_OP!, T1A_H, T2A_H, T4A_TJ_H)
+    # Define these tuples as global consts
+    if sim.T̂ ∈ (T1A!, T2A!, T4A_TJ!, T6A_TJ!, T8A_TJ!, T4A_SF!, T4A_SF!, T6A_SF!, T8A_SF!, T4A_N!, T6A_N!, T8A_N!, T6A_OP!, T8A_OP!, T1A_H!, T2A_H!)
         soln_loop_A(sim, ops, ind_p)
     elseif sim.T̂ ∈ (T1B!, T2B!, T4B_TJ!, T6B_TJ!, T8B_TJ!, T4B_SF!, T6B_SF!, T8B_SF!, T4B_N!, T6B_N!, T8B_N!, T6B_OP!, T8B_OP!)
         soln_loop_B(sim, ops, ind_p)
@@ -36,7 +37,6 @@ end #solve
 
 function soln_loop_A(sim, ops, ind_p)
     @progress for i = 1:sim.box.Nₓ-1
-        #@views sim.ψ[:, i+1] .= sim.T̂(sim.ψ[:, i], sim.box.dx, ops)
         @views sim.T̂(sim.ψ[:, i+1], sim.ψ[:, i], sim.box.dx, ops)
         # Pruning
         if sim.αₚ > 0 
