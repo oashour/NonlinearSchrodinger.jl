@@ -247,15 +247,11 @@ See also: [`solve!`](@ref), [`T2`](@ref)
 function T4A_SF(ψ, dx, ops)
     s = 4^(1/3)
     os = 1/(4 - s)
-
     ft = os
     bt = -s*os
 
-    ψ = T2A(ψ, ft*dx, ops)
-    ψ = T2A(ψ, ft*dx, ops)
-    ψ = T2A(ψ, bt*dx, ops)
-    ψ = T2A(ψ, ft*dx, ops)
-    ψ = T2A(ψ, ft*dx, ops)
+    ψ = T2A(T2A(T2A(T2A(T2A(ψ,ft*dx, ops),ft*dx,ops),bt*dx,ops),ft*dx,ops)
+               ,ft*dx,ops)
 
     return ψ
 end
@@ -263,15 +259,11 @@ end
 function T4B_SF(ψ, dx, ops)
     s = 4^(1/3)
     os = 1/(4 - s)
-
     ft = os
     bt = -s*os
 
-    ψ = T2B(ψ, ft*dx, ops)
-    ψ = T2B(ψ, ft*dx, ops)
-    ψ = T2B(ψ, bt*dx, ops)
-    ψ = T2B(ψ, ft*dx, ops)
-    ψ = T2B(ψ, ft*dx, ops)
+    ψ = T2B(T2B(T2B(T2B(T2B(ψ,ft*dx, ops),ft*dx,ops),bt*dx,ops),ft*dx,ops)
+               ,ft*dx,ops)
 
     return ψ
 end
@@ -279,15 +271,11 @@ end
 function T6A_SF(ψ, dx, ops)
     s = 4^(1/5)
     os = 1/(4 - s)
-
     ft = os
     bt = -s*os
 
-    ψ = T4A_SF(ψ, ft*dx, ops)
-    ψ = T4A_SF(ψ, ft*dx, ops)
-    ψ = T4A_SF(ψ, bt*dx, ops)
-    ψ = T4A_SF(ψ, ft*dx, ops)
-    ψ = T4A_SF(ψ, ft*dx, ops)
+    ψ = T4A_SF(T4A_SF(T4A_SF(T4A_SF(T4A_SF(ψ,ft*dx, ops),ft*dx,ops),bt*dx,ops),ft*dx,ops)
+               ,ft*dx,ops)
 
     return ψ
 end
@@ -295,15 +283,11 @@ end
 function T6B_SF(ψ, dx, ops)
     s = 4^(1/5)
     os = 1/(4 - s)
-
     ft = os
     bt = -s*os
 
-    ψ = T4B_SF(ψ, ft*dx, ops)
-    ψ = T4B_SF(ψ, ft*dx, ops)
-    ψ = T4B_SF(ψ, bt*dx, ops)
-    ψ = T4B_SF(ψ, ft*dx, ops)
-    ψ = T4B_SF(ψ, ft*dx, ops)
+    ψ = T4B_SF(T4B_SF(T4B_SF(T4B_SF(T4B_SF(ψ,ft*dx, ops),ft*dx,ops),bt*dx,ops),ft*dx,ops)
+               ,ft*dx,ops)
 
     return ψ
 end
@@ -311,31 +295,22 @@ end
 function T8A_SF(ψ, dx, ops)
     s = 4^(1/7)
     os = 1/(4 - s)
-
     ft = os
     bt = -s*os
 
-    ψ = T6A_SF(ψ, ft*dx, ops)
-    ψ = T6A_SF(ψ, ft*dx, ops)
-    ψ = T6A_SF(ψ, bt*dx, ops)
-    ψ = T6A_SF(ψ, ft*dx, ops)
-    ψ = T6A_SF(ψ, ft*dx, ops)
-
+    ψ = T6A_SF(T6A_SF(T6A_SF(T6A_SF(T6A_SF(ψ,ft*dx, ops),ft*dx,ops),bt*dx,ops),ft*dx,ops)
+               ,ft*dx,ops)
     return ψ
 end
 
 function T8B_SF(ψ, dx, ops)
     s = 4^(1/7)
     os = 1/(4 - s)
-
     ft = os
     bt = -s*os
 
-    ψ = T6B_SF(ψ, ft*dx, ops)
-    ψ = T6B_SF(ψ, ft*dx, ops)
-    ψ = T6B_SF(ψ, bt*dx, ops)
-    ψ = T6B_SF(ψ, ft*dx, ops)
-    ψ = T6B_SF(ψ, ft*dx, ops)
+    ψ = T6B_SF(T6B_SF(T6B_SF(T6B_SF(T6B_SF(ψ,ft*dx, ops),ft*dx,ops),bt*dx,ops),ft*dx,ops)
+               ,ft*dx,ops)
 
     return ψ
 end
@@ -375,3 +350,7 @@ function T8B_N(ψ, dx, ops)
          16/45*T2B(T2B(copy(ψ),dx/2.0,ops),dx/2.0,ops) + 
          -1/360*T2B(copy(ψ),dx,ops)
 end
+
+####################################################################
+# Optimized
+####################################################################
