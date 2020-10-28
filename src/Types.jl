@@ -65,11 +65,14 @@ function Sim(λ, box::Box, ψ₀::Array{Complex{TT}, 1}, T̂; α = 0.0, αₚ = 
    return sim
 end #init_sim
 
-struct Operators{DispFunc, FFTPlan, InvFFTPlan}
+struct Operators{T, DispFunc, FFTPlan, InvFFTPlan}
     K̂::DispFunc
     F̂::FFTPlan
     F̃̂::InvFFTPlan
     B̂::DiffEqBase.DEIntegrator
+    ψ₁::T
+    ψ₂::T
+    ψ₃::T
 end # Simulation
 
 function Operators(sim)
@@ -113,8 +116,11 @@ function Operators(sim)
         prob = ODEProblem(M0!, sim.ψ[:, 1], (0, sim.box.dx))
         B̂ = init(prob, t_algo; dt=sim.box.dx,save_everystep=false)  
     end
-
-    ops = Operators(K̂(sim.α), F̂, F̃̂, B̂)
+    
+    ψ₁ = similar(sim.ψ₀)
+    ψ₂ = similar(sim.ψ₀)
+    ψ₃ = similar(sim.ψ₀)
+    ops = Operators(K̂(sim.α), F̂, F̃̂, B̂, ψ₁, ψ₂, ψ₃)
 
     return ops
 end

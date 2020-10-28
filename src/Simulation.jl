@@ -36,7 +36,8 @@ end #solve
 
 function soln_loop_A(sim, ops, ind_p)
     @progress for i = 1:sim.box.Nₓ-1
-        @views sim.ψ[:, i+1] .= sim.T̂(sim.ψ[:, i], sim.box.dx, ops)
+        #@views sim.ψ[:, i+1] .= sim.T̂(sim.ψ[:, i], sim.box.dx, ops)
+        @views sim.T̂(sim.ψ[:, i+1], sim.ψ[:, i], sim.box.dx, ops)
         # Pruning
         if sim.αₚ > 0 
             ops.F̂*view(sim.ψ,:,i+1)
@@ -55,7 +56,7 @@ function soln_loop_B(sim, ops, ind_p)
     F̂ = plan_fft(@view sim.ψ[:, 1])
     sim.ψ̃[:, 1] .= F̂*view(sim.ψ, :, 1)
     @progress for i = 1:sim.box.Nₓ-1
-        @views sim.ψ̃[:, i+1] .= sim.T̂(sim.ψ̃[:, i], sim.box.dx, ops)
+        @views sim.T̂(sim.ψ̃[:, i+1], sim.ψ̃[:, i], sim.box.dx, ops)
         # Pruning
         if sim.αₚ > 0 
             for j in ind_p
