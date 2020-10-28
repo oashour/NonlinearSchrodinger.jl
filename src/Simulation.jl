@@ -1,122 +1,6 @@
 include("CubicSolvers.jl")
 include("HirotaSolvers.jl")
 
-struct Sim{TT<:Real}
-    λ::Complex{TT}
-    T::TT
-    Ω::TT
-    box::Box{TT}
-    ψ₀::Array{Complex{TT}, 1}
-    t_order::Int64
-    x_order::Int64
-    α::TT
-    αₚ::TT
-    ψ::Array{Complex{TT}, 2}
-    ψ̃::Array{Complex{TT}, 2}
-    E::Array{TT, 1}
-    PE::Array{TT, 1}
-    KE::Array{TT, 1}
-    #dE::Array{TT, 1}
-    N::Array{TT, 1}
-    P::Array{TT, 1}
-end # Simulation
-
-function Sim(λ, box::Box, ψ₀::Array{Complex{TT}, 1}; t_order = 2, x_order = 2, α = 0.0, αₚ = 0.0) where TT <: Real
-    ψ = Array{Complex{TT}}(undef, box.Nₜ, box.Nₓ)
-    ψ̃ = similar(ψ)
-    E = zeros(box.Nₓ)
-    PE = similar(E)    
-    KE = similar(E)
-    N = similar(E)
-    P = similar(E)
-    if αₚ < 0.0 
-        throw(ArgumentError("αₚ < 0. Set αₚ = 0 to disable pruning or αₚ = Inf for fixed pruning. See documentation)"))
-    end
-    if αₚ > 0.0 && box.n_periods == 1 
-        throw(ArgumentError("Pruning is only applicable when n_periods > 1."))
-    end
-    # Compute some parameters
-    λ, T, Ω = params(λ = λ)
-    sim = Sim(λ, T, Ω, box, ψ₀, t_order, x_order, α, αₚ, ψ, ψ̃, E, PE, KE, N, P)
-   return sim
-end #init_sim
-struct Operators{NLSIntegrator, DispFunc, FFTPlan, InvFFTPlan}
-    T̂::NLSIntegrator
-    K̂::DispFunc
-    F̂::FFTPlan
-    F̃̂::InvFFTPlan
-    B̂::DiffEqBase.DEIntegrator
-end # Simulation
-
-function Operators(sim)
-    # Generate FFT Plans to optimize performance
-    #println("Generating FFT Plan")
-    F̂ = plan_fft!(@view sim.ψ[:, 1]) # 26 allocs
-    F̃̂ = plan_ifft!(@view sim.ψ[:, 1]) # 34 allocs
-
-    # Cache the kinetic factor
-    function K̂(α)
-        fun = if α == 0 
-            @memoize function K_cubic(dx::Real)
-                @debug "Computing and caching K(dx = $dx) for cubic NLSE"
-                ifftshift(cis.(dx*sim.box.ω.^2/2))
-            end
-            K_cubic
-        elseif α > 0
-            @memoize function K_hirota(dx::Real)
-                @debug "Computing and caching K(dx = $dx) for Hirota Equation"
-                ifftshift(cis.(dx*(sim.box.ω.^2/2 - sim.α*sim.box.ω.^3)))
-            end
-            K_hirota
-        end
-        return fun
-    end
-
-    # Select algorithm
-    t_algo = BS3() # Default Algorithm for t
-    if sim.x_order == 1 && sim.α == 0
-        T̂ = T₁ˢ 
-    elseif sim.x_order == 2 && sim.α == 0
-        T̂ = T₂ˢ
-    elseif sim.x_order == 4 && sim.α == 0
-        T̂ = T₄ˢ 
-    elseif sim.x_order == 6 && sim.α == 0
-        T̂ = T₆ˢ 
-    elseif sim.x_order == 8 && sim.α == 0
-        T̂ = T₈ˢ 
-    elseif sim.x_order == 1 && sim.α >= 0
-        T̂ = T₁ʰ 
-    elseif sim.x_order == 2 && sim.α >= 0
-        T̂ = T₂ʰ 
-    elseif sim.x_order == 4 && sim.α >= 0
-        T̂ = T₄ʰ 
-        t_algo = BS3()
-    else
-        throw(ArgumentError("No solver available for order $x_order in x and order $t_order in t with α=$α"))
-    end
-
-    # Create the integrator for the Burger term
-    if sim.α > 0
-        D = CenteredDifference(1, sim.t_order, sim.box.dt, sim.box.Nₜ) 
-        Q = PeriodicBC(Float64)
-        function MB!(du, u,p,t)
-            du .= 6*sim.α*D*Q*u.*abs2.(u)
-        end
-        prob = ODEProblem(MB!, sim.ψ[:, 1], (0, sim.box.dx))
-        B̂ = init(prob, t_algo; dt=sim.box.dx,save_everystep=false)  
-    else
-        function M0!(du, u,p,t)
-            du .= 0*u 
-        end
-        prob = ODEProblem(M0!, sim.ψ[:, 1], (0, sim.box.dx))
-        B̂ = init(prob, t_algo; dt=sim.box.dx,save_everystep=false)  
-    end
-
-    ops = Operators(T̂, K̂(sim.α), F̂, F̃̂, B̂)
-
-    return ops
-end
-
 """
     solve!(sim::Simulation)
 
@@ -131,6 +15,7 @@ function solve!(sim::Sim)
     # Find
     sim.ψ[:, 1] = sim.ψ₀
     # Check for pruning and calculate indices
+    ind_p = []
     if sim.αₚ > 0 
         ind_p = [i for i in 2:(sim.box.Nₜ÷2+1) if (i-1)%sim.box.n_periods != 0]
         ind_p = sort([ind_p; sim.box.Nₜ.-ind_p.+2])
@@ -140,24 +25,48 @@ function solve!(sim::Sim)
     ops = Operators(sim)
 
     @info "Starting evolution"
-    soln_loop(sim, ops)
-    #sim.solved = true
+    if sim.T̂ ∈ (T1A, T2A, T4A_TJ, T6A_TJ, T8A_TJ, T4A_SF, T4A_SF, T6A_SF, T8A_SF, T4A_N, T6A_N, T8A_N, T6A_OP, T8A_OP, T1A_H, T2A_H, T4A_TJ_H)
+        soln_loop_A(sim, ops, ind_p)
+    elseif sim.T̂ ∈ (T1B, T2B, T4B_TJ, T6B_TJ, T8B_TJ, T4B_SF, T6B_SF, T8B_SF, T4B_N, T6B_N, T8B_N, T6B_OP, T8B_OP)
+        soln_loop_B(sim, ops, ind_p)
+    end
 
     @info "Computation Done!"
-
-    return nothing
 end #solve
 
-function soln_loop(sim, ops)
+function soln_loop_A(sim, ops, ind_p)
     @progress for i = 1:sim.box.Nₓ-1
-        @views sim.ψ[:, i+1] .= ops.T̂(sim.ψ[:, i], sim.box.dx, ops)
+        @views sim.ψ[:, i+1] .= sim.T̂(sim.ψ[:, i], sim.box.dx, ops)
         # Pruning
         if sim.αₚ > 0 
             ops.F̂*view(sim.ψ,:,i+1)
             for j in ind_p
                 sim.ψ[j, i+1] *= exp(-sim.αₚ*abs(sim.ψ[j, i+1]))
             end
-            F̃̂*view(sim.ψ,:,i+1)
+            ops.F̃̂*view(sim.ψ,:,i+1)
         end # if
     end # for
+    @info "Computing Spectrum"
+    sim.ψ̃ .= fftshift(fft(sim.ψ, 1), 1)./sim.box.Nₜ
+end
+
+function soln_loop_B(sim, ops, ind_p)
+    F̃̂ = plan_ifft(@view sim.ψ[:, 1]) 
+    F̂ = plan_fft(@view sim.ψ[:, 1])
+    sim.ψ̃[:, 1] .= F̂*view(sim.ψ, :, 1)
+    @progress for i = 1:sim.box.Nₓ-1
+        @views sim.ψ̃[:, i+1] .= sim.T̂(sim.ψ̃[:, i], sim.box.dx, ops)
+        # Pruning
+        if sim.αₚ > 0 
+            for j in ind_p
+                sim.ψ̃[j, i+1] *= exp(-sim.αₚ*abs(sim.ψ̃[j, i+1]))
+            end
+        end 
+        # Compute the actual ψ
+        #sim.ψ[:, i+1] .= F̃̂*view(sim.ψ̃, :, i+1)
+    end
+    # Shift the FT
+    @info "Computing Spectrum"
+    sim.ψ .= ifft(sim.ψ̃, 1)
+    sim.ψ̃ .= fftshift(sim.ψ̃, 1)./sim.box.Nₜ
 end
