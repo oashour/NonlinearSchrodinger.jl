@@ -65,6 +65,46 @@ function Sim(λ, box::Box, ψ₀::Array{Complex{TT}, 1}, T̂; α = 0.0, αₚ = 
    return sim
 end #init_sim
 
+struct Calc{TT<:Real}
+    λ::Array{Complex{TT}, 1}
+    T::Array{Complex{TT}, 1}
+    Ω::Array{Complex{TT}, 1}
+    tₛ::Array{TT, 1}
+    xₛ::Array{TT, 1}
+    seed::String # Should be an enum
+    box::Box{TT}
+    m::TT
+    ψ::Array{Complex{TT}, 2}
+    ψ̃::Array{Complex{TT}, 2}
+    E::Array{TT, 1}
+    PE::Array{TT, 1}
+    KE::Array{TT, 1}
+    N::Array{TT, 1}
+    P::Array{TT, 1}
+end # Simulation
+
+function Calc(λ::Array{Complex{TT}}, tₛ, xₛ, seed, box; m=0.0) where TT <: Real
+    if ~(length(λ) == length(tₛ) == length(xₛ))
+        throw(ArgumentError("Length of shifts and eigenvalue array should be the same."))
+    end
+    # Elliptic modulus
+    @assert m <= 1 && m >= 0
+    Ω = similar(λ)
+    T = similar(Ω)
+    @. Ω = 2*sqrt(1 - imag(λ)^2)
+    @. T = 2π/Ω
+
+    ψ = Array{Complex{TT}}(undef, box.Nₜ, box.Nₓ)
+    ψ̃ = similar(ψ)
+    E = zeros(box.Nₓ)
+    PE = similar(E)    
+    KE = similar(E)
+    N = similar(E)
+    P = similar(E)
+
+    calc = Calc(λ, T, Ω, tₛ, xₛ, seed, box, m, ψ, ψ̃, E, PE, KE, N, P)
+end #init_sim
+
 struct Operators{T, DispFunc, FFTPlan, InvFFTPlan}
     K̂::DispFunc
     F̂::FFTPlan
