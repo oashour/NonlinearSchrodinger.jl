@@ -19,7 +19,13 @@ function T1A_H!(ψₒ, ψᵢ, dx, ops)
     # Burger
     set_u!(ops.B̂, ψₒ)
     step!(ops.B̂) 
-    ψₒ .= ops.B̂.u
+    ops.ψ₁ .= ops.B̂.u
+
+    set_u!(ops.B̂B, ψₒ)
+    step!(ops.B̂B) 
+    ops.ψ₂ .+= ops.B̂B.u
+
+    ψₒ .= ops.ψ₁ .+ ops.ψ₂
 end #T₁ʰ
 """
     T₂ʰ(ψ, ω, dx, F)
