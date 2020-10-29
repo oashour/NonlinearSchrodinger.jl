@@ -87,9 +87,9 @@ end
         ifftshift(cis.(dx*K̂.ω.^2/2))
     elseif K̂.α != 0 && K̂.ϵ == 0 # Hirota Equation
         @info "Caching Hirota at dx = $dx"
-        ifftshift(cis.(dx*(K̂.ω.^2/2 - K̂.α*K̂.ω.^3)))
+        ifftshift(cis.(dx*(K̂.ω.^2/2 .- K̂.α*K̂.ω.^3)))
     elseif K̂.α == 0 && K̂.ϵ != 0 # Sasa-Satsuma Equation
-        ifftshift(cis.(dx*(K̂.ω.^2/2 + K̂.ϵ*K̂.ω.^3)))
+        ifftshift(cis.(dx*(K̂.ω.^2/2 .+ K̂.ϵ*K̂.ω.^3)))
     end
 end
 
@@ -101,24 +101,24 @@ function Operators(sim)
 
     # This stuff should be user controllable
     t_algo = BS3()
-    t_order = 2
+    t_order = 4
     # Create the integrator for the Burger term
     if sim.α != 0 && sim.ϵ == 0
         @info "Setting up Burger operator for Hirota equation"
         D = CenteredDifference(1, t_order, sim.box.dt, sim.box.Nₜ) 
         Q = PeriodicBC(Float64)
-        function MB!(du, u,p,t)
+        function MH!(du, u,p,t)
             du .= 6*sim.α*D*Q*u.*abs2.(u)
         end
-        prob = ODEProblem(MB!, sim.ψ[:, 1], (0, sim.box.dx))
+        prob = ODEProblem(MH!, sim.ψ[:, 1], (0, sim.box.dx))
         B̂ = init(prob, t_algo; dt=sim.box.dx,save_everystep=false)  
     elseif sim.α == 0 && sim.ϵ != 0
         D = CenteredDifference(1, t_order, sim.box.dt, sim.box.Nₜ) 
         Q = PeriodicBC(Float64)
-        function MB!(du, u,p,t)
+        function MSS!(du, u,p,t)
             du .= 6*sim.ϵ*D*Q*u.*abs2.(u) + 3*sim.ϵ*D*Q*abs2.(u).*u
         end
-        prob = ODEProblem(MB!, sim.ψ[:, 1], (0, sim.box.dx))
+        prob = ODEProblem(MSS!, sim.ψ[:, 1], (0, sim.box.dx))
         B̂ = init(prob, t_algo; dt=sim.box.dx,save_everystep=false)  
     else
         function M0!(du, u,p,t)
