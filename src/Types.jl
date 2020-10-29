@@ -35,6 +35,7 @@ struct Sim{TT<:Real, F}
     ψ₀::Array{Complex{TT}, 1}
     T̂::F
     α::TT
+    ϵ::TT
     αₚ::TT
     ψ::Array{Complex{TT}, 2}
     ψ̃::Array{Complex{TT}, 2}
@@ -45,7 +46,7 @@ struct Sim{TT<:Real, F}
     P::Array{TT, 1}
 end # Simulation
 
-function Sim(λ, box::Box, ψ₀::Array{Complex{TT}, 1}, T̂; α = 0.0, αₚ = 0.0) where TT <: Real
+function Sim(λ, box::Box, ψ₀::Array{Complex{TT}, 1}, T̂; α = 0.0, ϵ = 0.0, αₚ = 0.0) where TT <: Real
     ψ = Array{Complex{TT}}(undef, box.Nₜ, box.Nₓ)
     ψ̃ = similar(ψ)
     E = zeros(box.Nₓ)
@@ -61,7 +62,7 @@ function Sim(λ, box::Box, ψ₀::Array{Complex{TT}, 1}, T̂; α = 0.0, αₚ = 
     end
     # Compute some parameters
     λ, T, Ω = params(λ = λ)
-    sim = Sim(λ, T, Ω, box, ψ₀, T̂, α, αₚ, ψ, ψ̃, E, PE, KE, N, P)
+    sim = Sim(λ, T, Ω, box, ψ₀, T̂, α, ϵ, αₚ, ψ, ψ̃, E, PE, KE, N, P)
    return sim
 end #init_sim
 
@@ -76,15 +77,19 @@ struct Operators{T, DispFunc, FFTPlan, InvFFTPlan}
 end # Simulation
 
 struct Ks
-    α :: Float64
-    ω :: Vector{Float64}
+    α::Float64
+    ϵ::Float64
+    ω::Vector{Float64}
 end
   
 @memoize function (K̂::Ks)(dx)
-    if K̂.α == 0
+    if K̂.α == 0 && K̂.ϵ == 0 # Cubic NLSE
         ifftshift(cis.(dx*K̂.ω.^2/2))
-    else
+    elseif K̂.α != 0 && K̂.ϵ == 0 # Hirota Equation
+        @info "Caching Hirota at dx = $dx"
         ifftshift(cis.(dx*(K̂.ω.^2/2 - K̂.α*K̂.ω.^3)))
+    elseif K̂.α == 0 && K̂.ϵ != 0 # Sasa-Satsuma Equation
+        ifftshift(cis.(dx*(K̂.ω.^2/2 + K̂.ϵ*K̂.ω.^3)))
     end
 end
 
@@ -98,11 +103,20 @@ function Operators(sim)
     t_algo = BS3()
     t_order = 2
     # Create the integrator for the Burger term
-    if sim.α > 0
+    if sim.α != 0 && sim.ϵ == 0
+        @info "Setting up Burger operator for Hirota equation"
         D = CenteredDifference(1, t_order, sim.box.dt, sim.box.Nₜ) 
         Q = PeriodicBC(Float64)
         function MB!(du, u,p,t)
             du .= 6*sim.α*D*Q*u.*abs2.(u)
+        end
+        prob = ODEProblem(MB!, sim.ψ[:, 1], (0, sim.box.dx))
+        B̂ = init(prob, t_algo; dt=sim.box.dx,save_everystep=false)  
+    elseif sim.α == 0 && sim.ϵ != 0
+        D = CenteredDifference(1, t_order, sim.box.dt, sim.box.Nₜ) 
+        Q = PeriodicBC(Float64)
+        function MB!(du, u,p,t)
+            du .= 6*sim.ϵ*D*Q*u.*abs2.(u) + 3*sim.ϵ*D*Q*abs2.(u).*u
         end
         prob = ODEProblem(MB!, sim.ψ[:, 1], (0, sim.box.dx))
         B̂ = init(prob, t_algo; dt=sim.box.dx,save_everystep=false)  
@@ -117,7 +131,7 @@ function Operators(sim)
     ψ₁ = similar(sim.ψ₀)
     ψ₂ = similar(sim.ψ₀)
     ψ₃ = similar(sim.ψ₀)
-    ops = Operators(Ks(sim.α, sim.box.ω), F̂, F̃̂, B̂, ψ₁, ψ₂, ψ₃)
+    ops = Operators(Ks(sim.α, sim.ϵ, sim.box.ω), F̂, F̃̂, B̂, ψ₁, ψ₂, ψ₃)
 
     return ops
 end
