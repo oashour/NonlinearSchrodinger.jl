@@ -15,7 +15,7 @@ function solve!(sim::Sim)
     # Find
     sim.ψ[:, 1] = sim.ψ₀
     # Check for pruning and calculate indices
-    ind_p = []
+    ind_p = zeros(Int64, 1)
     if sim.αₚ > 0 
         ind_p = [i for i in 2:(sim.box.Nₜ÷2+1) if (i-1)%sim.box.n_periods != 0]
         ind_p = sort([ind_p; sim.box.Nₜ.-ind_p.+2])
