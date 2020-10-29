@@ -37,6 +37,9 @@ function compute_IoM!(obj; normalize=false)
         obj.P .= imag.(sum(im * obj.box.ω.* ψ̃²,dims=1)[:]./obj.N)
         obj.E .= obj.KE .+ obj.PE
     else
+        # Why does the stuff from NumericalIntegration.jl not work?
+        #obj.N .= integrate(obj.box.t, ψ², SimpsonEvenFast())./obj.T
+        #obj.PE .= -0.5*integrate(obj.box.t, (ψ²).^2, SimpsonEvenFast())./obj.T
         obj.N .= sum(ψ², dims=1)[:]./obj.box.Nₜ
         obj.PE .= -0.5*sum(ψ².^2,dims=1)[:]./obj.box.Nₜ
         obj.KE .= 0.5*sum((obj.box.ω.^2 .* ψ̃²),dims=1)[:]
@@ -176,5 +179,5 @@ function ψ₀_periodic(coeff::Array, box::Box, Ω; phase=0)
     @info str
     println("==========================================")
 
-    return ψ₀
+    return ψ₀, A0
 end #psi0_periodic
