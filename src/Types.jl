@@ -75,29 +75,24 @@ struct Operators{T, DispFunc, FFTPlan, InvFFTPlan}
     ψ₃::T
 end # Simulation
 
+struct Ks
+    α :: Float64
+    ω :: Vector{Float64}
+end
+  
+@memoize function (K̂::Ks)(dx)
+    if K̂.α == 0
+        ifftshift(cis.(dx*K̂.ω.^2/2))
+    else
+        ifftshift(cis.(dx*(K̂.ω.^2/2 - K̂.α*K̂.ω.^3)))
+    end
+end
+
 function Operators(sim)
     # Generate FFT Plans to optimize performance
     @info "Generating FFT plans"
     F̂ = plan_fft!(@view sim.ψ[:, 1]) # 26 allocs
     F̃̂ = plan_ifft!(@view sim.ψ[:, 1]) # 34 allocs
-
-    # Cache the kinetic factor
-    function K̂(α)
-        fun = if α == 0 
-            @memoize function K_cubic(dx::Real)
-                @debug "Computing and caching K(dx = $dx) for cubic NLSE"
-                ifftshift(cis.(dx*sim.box.ω.^2/2))
-            end
-            K_cubic
-        elseif α > 0
-            @memoize function K_hirota(dx::Real)
-                @debug "Computing and caching K(dx = $dx) for Hirota Equation"
-                ifftshift(cis.(dx*(sim.box.ω.^2/2 - sim.α*sim.box.ω.^3)))
-            end
-            K_hirota
-        end
-        return fun
-    end
 
     # This stuff should be user controllable
     t_algo = BS3()
@@ -122,7 +117,7 @@ function Operators(sim)
     ψ₁ = similar(sim.ψ₀)
     ψ₂ = similar(sim.ψ₀)
     ψ₃ = similar(sim.ψ₀)
-    ops = Operators(K̂(sim.α), F̂, F̃̂, B̂, ψ₁, ψ₂, ψ₃)
+    ops = Operators(Ks(sim.α, sim.box.ω), F̂, F̃̂, B̂, ψ₁, ψ₂, ψ₃)
 
     return ops
 end
