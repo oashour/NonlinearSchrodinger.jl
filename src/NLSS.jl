@@ -18,6 +18,7 @@ export plot_ψ, plot_ψ̃, plot_IoM
 export params, print, save, load
 export solve!
 export ψ₀_periodic
+#export solve_dt!
 
 export Sim, Box, Calc
 export T1A!, T1B!, T2A!, T2B!
@@ -31,5 +32,6 @@ include("Types.jl")
 include("Simulation.jl")
 include("Utilities.jl")
 include("Plotter.jl")
+include("Darboux.jl")
 
 end #module
