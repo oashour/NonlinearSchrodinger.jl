@@ -4,6 +4,9 @@ function solve!(calc::Calc)
     if calc.seed == "0"
         ψₜ[:,:,1] .= zeros(calc.box.Nₜ, calc.box.Nₓ)
     end
+    if calc.seed == "1"
+        ψₜ[:,:,1] .= exp.(im*calc.box.x').*ones(calc.box.Nₜ, calc.box.Nₓ)
+    end
     calc_rs(calc, N, 1, ψₜ)
     calc.ψ .= ψₜ[:,:,N+1]
     calc.ψ̃ .= fftshift(fft(calc.ψ, 1),1)./calc.box.Nₜ
@@ -18,6 +21,13 @@ function calc_rs(c::Calc, n, p, ψₜ)
             x = c.box.x' .- c.xₛ[p]
             rf = exp.(+im.*(c.λ[p] .* t .+ c.λ[p]^2 .* x .- π/4))
             sf = exp.(-im.*(c.λ[p] .* t .+ c.λ[p]^2 .* x .- π/4))
+        elseif c.seed == "exp"
+            t = c.box.t .- c.tₛ[p]
+            x = c.box.x' .- c.xₛ[p]
+            A = +c.χ[p] .+ 0.5.*(c.Ω[p].*t .+ c.Ω[p]*c.λ[p].*x) .- π/4
+            B = -c.χ[p] .+ 0.5.*(c.Ω[p].*t .+ c.Ω[p]*c.λ[p].*x) .- π/4
+            rf = 2im.*exp.(-im.*c.box.x'./2) .* sin.(A)
+            sf = 2  .*exp.(+im.*c.box.x'./2) .* cos.(B)
         end
         if  p == 1
             ψₜ[:,:,n+1] .= ψₜ[:,:,1] .+ (2*(c.λ[n]' - c.λ[n]).*sf.*conj.(rf)) ./

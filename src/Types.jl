@@ -93,11 +93,20 @@ function Calc(λ::Array{Complex{TT}}, tₛ, xₛ, seed, box; m=0.0) where TT <: 
     Ω = similar(λ)
     T = similar(Ω)
     χ = similar(Ω)
-    if seed == "0" || seed == "exp" 
+    if seed == "0"
+        Ω = zeros(Complex{Float64}, length(λ))
+        @. χ = 0.5*acos(Ω/2)
+    elseif seed == "exp"
         @. Ω = 2*sqrt(1 + λ^2)
-        @. χ =   0.5*acos(Ω/2)
-        @. T = 2π/Ω
+        @. χ = 0.5*acos(Ω/2)
+    elseif seed == "dn"
+        @. Ω = 2*sqrt(1 + (λ - m/4/λ)^2)
+        @. χ = 0.5*acos(Ω/2)
+    elseif seed == "cn"
+        @. Ω = 2*sqrt(m)*sqrt(1 + 1/m*(λ - 1/4/λ)^2)
+        @. χ = 0.5*acos(Ω/2/sqrt(m))
     end
+    @. T = 2π/Ω
     #elseif strcmp(seed, 'dn(t;k)')
     #    kappa = sqrt(1+(l - k^2/4./l).^2);  % Half the principal wave number
     #    chi = 0.5*acos(kappa);
@@ -105,8 +114,6 @@ function Calc(λ::Array{Complex{TT}}, tₛ, xₛ, seed, box; m=0.0) where TT <: 
     #    kappa = k*sqrt(1+1/k^2*(l - 1/4./l).^2); 
     #    chi  = 0.5*acos(kappa/k); 
     #end
-    #@. Ω = 2*sqrt(1 - imag(λ)^2)
-    #@. T = 2π/Ω
 
     ψ = Array{Complex{TT}}(undef, box.Nₜ, box.Nₓ)
     ψ̃ = similar(ψ)
