@@ -185,8 +185,6 @@ function plot_ψ̃(sim; mode = "density", x_res=500, ω_res=512, skip = 1, n_lin
     # Compute sampling interval
     xₛ = Int(ceil(sim.box.Nₓ/x_res))
     ωₛ = Int(ceil(sim.box.Nₜ/ω_res))
-    n = Int.(round.(sim.box.ω/sim.Ω)) 
-    n = n[1:ωₛ:end]
     ω = sim.box.ω[1:ωₛ:end]
     x = sim.box.x[1:xₛ:end]
     # Plot

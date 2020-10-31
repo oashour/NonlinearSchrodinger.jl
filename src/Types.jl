@@ -66,21 +66,22 @@ function Sim(λ, box::Box, ψ₀::Array{Complex{TT}, 1}, T̂; α = 0.0, αₚ = 
 end #init_sim
 
 struct Calc{TT<:Real}
-    λ::Array{Complex{TT}, 1}
-    T::Array{Complex{TT}, 1}
-    Ω::Array{Complex{TT}, 1}
-    tₛ::Array{TT, 1}
-    xₛ::Array{TT, 1}
+    λ::Vector{Complex{TT}}
+    T::Vector{Complex{TT}}
+    Ω::Vector{Complex{TT}}
+    χ::Vector{Complex{TT}}
+    tₛ::Vector{TT}
+    xₛ::Vector{TT}
     seed::String # Should be an enum
     box::Box{TT}
     m::TT
-    ψ::Array{Complex{TT}, 2}
-    ψ̃::Array{Complex{TT}, 2}
-    E::Array{TT, 1}
-    PE::Array{TT, 1}
-    KE::Array{TT, 1}
-    N::Array{TT, 1}
-    P::Array{TT, 1}
+    ψ::Matrix{Complex{TT}}
+    ψ̃::Matrix{Complex{TT}}
+    E::Vector{TT}
+    PE::Vector{TT}
+    KE::Vector{TT}
+    N::Vector{TT}
+    P::Vector{TT}
 end # Simulation
 
 function Calc(λ::Array{Complex{TT}}, tₛ, xₛ, seed, box; m=0.0) where TT <: Real
@@ -91,8 +92,21 @@ function Calc(λ::Array{Complex{TT}}, tₛ, xₛ, seed, box; m=0.0) where TT <: 
     @assert m <= 1 && m >= 0
     Ω = similar(λ)
     T = similar(Ω)
-    @. Ω = 2*sqrt(1 - imag(λ)^2)
-    @. T = 2π/Ω
+    χ = similar(Ω)
+    if seed == "0" || seed == "exp" 
+        @. Ω = 2*sqrt(1 + λ^2)
+        @. χ =   0.5*acos(Ω/2)
+        @. T = 2π/Ω
+    end
+    #elseif strcmp(seed, 'dn(t;k)')
+    #    kappa = sqrt(1+(l - k^2/4./l).^2);  % Half the principal wave number
+    #    chi = 0.5*acos(kappa);
+    #elseif strcmp(seed, 'cn(t;k)')
+    #    kappa = k*sqrt(1+1/k^2*(l - 1/4./l).^2); 
+    #    chi  = 0.5*acos(kappa/k); 
+    #end
+    #@. Ω = 2*sqrt(1 - imag(λ)^2)
+    #@. T = 2π/Ω
 
     ψ = Array{Complex{TT}}(undef, box.Nₜ, box.Nₓ)
     ψ̃ = similar(ψ)
@@ -102,7 +116,7 @@ function Calc(λ::Array{Complex{TT}}, tₛ, xₛ, seed, box; m=0.0) where TT <: 
     N = similar(E)
     P = similar(E)
 
-    calc = Calc(λ, T, Ω, tₛ, xₛ, seed, box, m, ψ, ψ̃, E, PE, KE, N, P)
+    calc = Calc(λ, T, Ω, χ, tₛ, xₛ, seed, box, m, ψ, ψ̃, E, PE, KE, N, P)
 end #init_sim
 
 struct Operators{T, DispFunc, FFTPlan, InvFFTPlan}
