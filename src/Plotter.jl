@@ -158,7 +158,8 @@ function plot_ψ(sim; mode = "density", power=1, x_res=500, t_res=512)
         p = plot(pe1, pc, pe2, ps, layout = l, size=(600, 600))
     end
     # Adjust Attributes
-    xlims!((-sim.T/2*sim.box.n_periods, sim.T/2*sim.box.n_periods))
+    t₀ = abs(minimum(sim.box.t))
+    xlims!((-t₀, t₀))
     ylims!((minimum(sim.box.x), maximum(sim.box.x)))
 
     @info "Plotting ψ done!"
@@ -200,7 +201,8 @@ function plot_ψ̃(sim; mode = "density", x_res=500, ω_res=512, skip = 1, n_lin
                     xlabel = L"\omega",
                     ylabel = L"x",
                     margin = 4mm)
-        xlims!((-sim.box.Nₜ/2*sim.Ω/sim.box.n_periods, sim.box.Nₜ/2*sim.Ω/sim.box.n_periods))
+        ω₀ = abs(minimum(sim.box.ω))
+        xlims!((-ω₀, ω₀))
         ylims!((minimum(sim.box.x), maximum(sim.box.x)))
     elseif mode == "lines"
         start = sim.box.Nₜ÷2 + 1
