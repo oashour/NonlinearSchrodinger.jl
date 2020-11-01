@@ -158,8 +158,10 @@ function plot_ψ(sim; mode = "density", power=1, x_res=500, t_res=512)
         p = plot(pe1, pc, pe2, ps, layout = l, size=(600, 600))
     end
     # Adjust Attributes
-    xlims!((-sim.T/2*sim.box.n_periods, sim.T/2*sim.box.n_periods))
-    ylims!((minimum(sim.box.x), maximum(sim.box.x)))
+    t₀ = abs(minimum(sim.box.t))
+    xlims!((-t₀, t₀))
+    x₀ = abs(minimum(sim.box.x))
+    ylims!((-x₀, x₀))
 
     @info "Plotting ψ done!"
     return p
@@ -184,8 +186,6 @@ function plot_ψ̃(sim; mode = "density", x_res=500, ω_res=512, skip = 1, n_lin
     # Compute sampling interval
     xₛ = Int(ceil(sim.box.Nₓ/x_res))
     ωₛ = Int(ceil(sim.box.Nₜ/ω_res))
-    n = Int.(round.(sim.box.ω/sim.Ω)) 
-    n = n[1:ωₛ:end]
     ω = sim.box.ω[1:ωₛ:end]
     x = sim.box.x[1:xₛ:end]
     # Plot
@@ -200,8 +200,10 @@ function plot_ψ̃(sim; mode = "density", x_res=500, ω_res=512, skip = 1, n_lin
                     xlabel = L"\omega",
                     ylabel = L"x",
                     margin = 4mm)
-        xlims!((-sim.box.Nₜ/2*sim.Ω/sim.box.n_periods, sim.box.Nₜ/2*sim.Ω/sim.box.n_periods))
-        ylims!((minimum(sim.box.x), maximum(sim.box.x)))
+        ω₀ = abs(minimum(sim.box.ω))
+        xlims!((-ω₀, ω₀))
+        x₀ = abs(minimum(sim.box.x))
+        ylims!((-x₀, x₀))
     elseif mode == "lines"
         start = sim.box.Nₜ÷2 + 1
         ψ̃ = sim.ψ̃[start:skip:start+skip*n_lines-1, 1:xₛ:end]
@@ -214,7 +216,8 @@ function plot_ψ̃(sim; mode = "density", x_res=500, ω_res=512, skip = 1, n_lin
                     xlabel = L"x",
                     ylabel = L"\log|\tilde{\psi}|",
                     margin = 4mm)
-        xlims!((minimum(sim.box.x), maximum(sim.box.x)))
+        x₀ = abs(minimum(sim.box.x))
+        xlims!((-x₀, x₀))
     end
 
     @info "Plotting ψ̃ done!"

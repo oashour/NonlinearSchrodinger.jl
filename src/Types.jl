@@ -65,6 +65,67 @@ function Sim(λ, box::Box, ψ₀::Array{Complex{TT}, 1}, T̂; α = 0.0, αₚ = 
    return sim
 end #init_sim
 
+struct Calc{TT<:Real}
+    λ::Vector{Complex{TT}}
+    T::Vector{Complex{TT}}
+    Ω::Vector{Complex{TT}}
+    χ::Vector{Complex{TT}}
+    tₛ::Vector{TT}
+    xₛ::Vector{TT}
+    seed::String # Should be an enum
+    box::Box{TT}
+    m::TT
+    ψ::Matrix{Complex{TT}}
+    ψ̃::Matrix{Complex{TT}}
+    E::Vector{TT}
+    PE::Vector{TT}
+    KE::Vector{TT}
+    N::Vector{TT}
+    P::Vector{TT}
+end # Simulation
+
+function Calc(λ::Array{Complex{TT}}, tₛ, xₛ, seed, box; m=0.0) where TT <: Real
+    if ~(length(λ) == length(tₛ) == length(xₛ))
+        throw(ArgumentError("Length of shifts and eigenvalue array should be the same."))
+    end
+    # Elliptic modulus
+    @assert m <= 1 && m >= 0
+    Ω = similar(λ)
+    T = similar(Ω)
+    χ = similar(Ω)
+    if seed == "0"
+        Ω = zeros(Complex{Float64}, length(λ))
+        @. χ = 0.5*acos(Ω/2)
+    elseif seed == "exp"
+        @. Ω = 2*sqrt(1 + λ^2)
+        @. χ = 0.5*acos(Ω/2)
+    elseif seed == "dn"
+        @. Ω = 2*sqrt(1 + (λ - m/4/λ)^2)
+        @. χ = 0.5*acos(Ω/2)
+    elseif seed == "cn"
+        @. Ω = 2*sqrt(m)*sqrt(1 + 1/m*(λ - 1/4/λ)^2)
+        @. χ = 0.5*acos(Ω/2/sqrt(m))
+    end
+    @. T = 2π/Ω
+    #elseif strcmp(seed, 'dn(t;k)')
+    #    kappa = sqrt(1+(l - k^2/4./l).^2);  % Half the principal wave number
+    #    chi = 0.5*acos(kappa);
+    #elseif strcmp(seed, 'cn(t;k)')
+    #    kappa = k*sqrt(1+1/k^2*(l - 1/4./l).^2); 
+    #    chi  = 0.5*acos(kappa/k); 
+    #end
+
+    ψ = Array{Complex{TT}}(undef, box.Nₜ, box.Nₓ)
+    ψ̃ = similar(ψ)
+    E = zeros(box.Nₓ)
+    PE = similar(E)    
+    KE = similar(E)
+    N = similar(E)
+    P = similar(E)
+
+    calc = Calc(λ, T, Ω, χ, tₛ, xₛ, seed, box, m, ψ, ψ̃, E, PE, KE, N, P)
+end #init_sim
+
 struct Operators{T, DispFunc, FFTPlan, InvFFTPlan}
     K̂::DispFunc
     F̂::FFTPlan
