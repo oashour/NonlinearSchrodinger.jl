@@ -9,15 +9,25 @@ struct Box{TT<:Real}
     n_periods::Int64
 end 
 
-function Box(xᵣ::Pair, T; dx = 1e-3, Nₜ = 256, n_periods = 1)
+function Box(xᵣ::Pair, T; dx = 0.0, Nₓ = 0, Nₜ = 256, n_periods = 1)
     @info "Initializing simulation box with $n_periods period(s) and dx = $dx, Nₜ = $Nₜ."
     T = n_periods * T
     println("Longitudinal range is [$(xᵣ.first), $(xᵣ.second)], transverse range is [$(-T/2), $(T/2))")
     dt = T / Nₜ
     t = dt * collect((-Nₜ/2:Nₜ/2-1))
+    if dx == 0.0 && Nₓ == 0
+        throw(ArgumentError("You must specify either dx or Nₓ"))
+    elseif dx != 0.0 && Nₓ != 0
+        throw(ArgumentError("You must specify either dx or Nₓ, not both."))
+    elseif dx == 0.0 && Nₓ != 0
+        dx = (xᵣ.second - xᵣ.first)/Nₓ
+        x = collect(xᵣ.first:dx:xᵣ.second)
+        Nₓ = length(x)
+    elseif dx != 0.0 && Nₓ == 0
+        x = collect(xᵣ.first:dx:xᵣ.second)
+        Nₓ = length(x)
+    end
 
-    x = collect(xᵣ.first:dx:xᵣ.second)
-    Nₓ = length(x)
     ω = 2π/T * collect((-Nₜ/2:Nₜ/2-1))
 
     box = Box(t, ω, x, Nₜ, Nₓ, dt, dx, n_periods)
