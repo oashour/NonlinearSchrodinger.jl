@@ -36,8 +36,8 @@ function calc_rs(c::Calc, n, p, ψₜ)
             #t = c.box.t .- c.tₛ[p]
             x = c.box.x' .- c.xₛ[p]
             function dn_ab!(du,u,p,t)
-                du[1] .= +im*p[1].*u[1] .+ im.*u[2].*dn.(t,real(p[2]))
-                du[2] .= -im*p[1].*u[2] .+ im.*u[1].*dn.(t,real(p[2]))
+                du[1] = +im*p[1].*u[1] .+ im.*u[2].*dn.(t,real(p[2]))
+                du[2] = -im*p[1].*u[2] .+ im.*u[1].*dn.(t,real(p[2]))
             end
 
             function ab_dn_t0(x)
