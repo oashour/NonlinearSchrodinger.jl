@@ -40,17 +40,16 @@ function calc_rs(c::Calc, n, p, ψₜ)
                 du[2] = -im*p[1].*u[2] .+ im.*u[1].*dn.(t,real(p[2]))
             end
 
-            function a_dn_t0(x)
+            function ab_dn_t0(x)
                 A = +c.χ[p] .+ 0.5.*c.Ω[p]*c.λ[p].*(x - c.xₛ[p]) .- π/4
-                2*im*sin(A)
-            end
-            function b_dn_t0(x)
                 B = -c.χ[p] .+ 0.5.*c.Ω[p]*c.λ[p].*(x - c.xₛ[p]) .- π/4
-                2*cos(B)
+                return [2*im*sin(A); 2*cos(B)]
             end
+
+            # How do you get rid of this whole loop?
             tspan = (0.0,abs(minimum(c.box.t)))
             for i in eachindex(c.box.x)
-                u0 = [a_dn_t0(c.box.x[i]);b_dn_t0(c.box.x[i])]
+                u0 = ab_dn_t0(c.box.x[i])
                 prob = ODEProblem(dn_ab!, u0, tspan, [c.λ[p], c.m])
                 sol = solve(prob, Tsit5(), saveat=abs.(c.box.t[c.box.Nₜ÷2+1:-1:1]))
                 rtemp = sol[1, :].*exp.(+im*(c.box.x[i] - c.xₛ[p])/4*(c.m-2))
