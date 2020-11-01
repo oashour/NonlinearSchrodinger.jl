@@ -140,12 +140,21 @@ struct Ks
     α :: Float64
     ω :: Vector{Float64}
 end
-  
-@memoize function (K̂::Ks)(dx)
+
+@memoize function K_cubic(dx::Real, ω)
+    ifftshift(cis.(dx*ω.^2/2))
+end
+@memoize function K_hirota(dx::Real, ω, α)
+    ifftshift(cis.(dx*(ω.^2/2 .- α*ω.^3)))
+end
+
+function (K̂::Ks)(dx)
     if K̂.α == 0
-        ifftshift(cis.(dx*K̂.ω.^2/2))
+        #ifftshift(cis.(dx*K̂.ω.^2/2))
+        K_cubic(dx, K̂.ω)
     else
-        ifftshift(cis.(dx*(K̂.ω.^2/2 - K̂.α*K̂.ω.^3)))
+        #ifftshift(cis.(dx*(K̂.ω.^2/2 - K̂.α*K̂.ω.^3)))
+        K_hirota(dx, K̂.ω, K̂.α)
     end
 end
 
