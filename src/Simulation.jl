@@ -15,7 +15,7 @@ function solve!(sim::Sim)
     # Find
     sim.ψ[:, 1] = sim.ψ₀
     # Check for pruning and calculate indices
-    ind_p = []
+    ind_p = zeros(Int64, 1)
     if sim.αₚ > 0 
         ind_p = [i for i in 2:(sim.box.Nₜ÷2+1) if (i-1)%sim.box.n_periods != 0]
         ind_p = sort([ind_p; sim.box.Nₜ.-ind_p.+2])
@@ -30,6 +30,8 @@ function solve!(sim::Sim)
         soln_loop_A(sim, ops, ind_p)
     elseif sim.T̂ ∈ (T1B!, T2B!, T4B_TJ!, T6B_TJ!, T8B_TJ!, T4B_SF!, T6B_SF!, T8B_SF!, T4B_N!, T6B_N!, T8B_N!, T6B_OP!, T8B_OP!)
         soln_loop_B(sim, ops, ind_p)
+    else
+        throw(ArgumentError("Unknown algorithm $sim.T̂"))
     end
 
     @info "Computation Done!"

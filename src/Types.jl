@@ -164,24 +164,6 @@ function Operators(sim)
     F̂ = plan_fft!(@view sim.ψ[:, 1]) # 26 allocs
     F̃̂ = plan_ifft!(@view sim.ψ[:, 1]) # 34 allocs
 
-    # Cache the kinetic factor
-    function K̂(α)
-        fun = if α == 0 
-            @memoize function K_cubic(dx::Real)
-                @debug "Computing and caching K(dx = $dx) for cubic NLSE"
-                ifftshift(cis.(dx*sim.box.ω.^2/2))
-            end
-            K_cubic
-        elseif α > 0
-            @memoize function K_hirota(dx::Real)
-                @debug "Computing and caching K(dx = $dx) for Hirota Equation"
-                ifftshift(cis.(dx*(sim.box.ω.^2/2 - sim.α*sim.box.ω.^3)))
-            end
-            K_hirota
-        end
-        return fun
-    end
-
     # This stuff should be user controllable
     t_algo = BS3()
     t_order = 2
