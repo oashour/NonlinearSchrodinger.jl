@@ -48,16 +48,17 @@ function calc_rs(c::Calc, n, p, ψₜ)
 
             # How do you get rid of this whole loop?
             tspan = (0.0,abs(minimum(c.box.t)))
+            u0 = ab_dn_t0(c.box.x[1])
+            prob = ODEProblem(dn_ab!, u0, tspan, [c.λ[p], c.m])
+            integrator = init(prob, Tsit5(), saveat=abs.(c.box.t[c.box.Nₜ÷2+1:-1:1]))
             for i in eachindex(c.box.x)
                 u0 = ab_dn_t0(c.box.x[i])
-                prob = ODEProblem(dn_ab!, u0, tspan, [c.λ[p], c.m])
-                sol = solve(prob, Tsit5(), saveat=abs.(c.box.t[c.box.Nₜ÷2+1:-1:1]))
-                rtemp = sol[1, :].*exp.(+im*(c.box.x[i] - c.xₛ[p])/4*(c.m-2))
-                stemp = sol[2, :].*exp.(-im*(c.box.x[i] - c.xₛ[p])/4*(c.m-2))
-                rf[c.box.Nₜ÷2+1:-1:1, i] = rtemp
-                sf[c.box.Nₜ÷2+1:-1:1, i] = stemp
-                rf[c.box.Nₜ÷2+2:end, i] = rtemp[2:end-1] 
-                sf[c.box.Nₜ÷2+2:end, i] = stemp[2:end-1] 
+                reinit!(integrator, u0)
+                DiffEqBase.solve!(integrator)
+                rf[c.box.Nₜ÷2+1:-1:1, i] .= integrator.sol[1, :].*exp.(+im*(c.box.x[i] - c.xₛ[p])/4*(c.m-2))
+                sf[c.box.Nₜ÷2+1:-1:1, i] .= integrator.sol[2, :].*exp.(-im*(c.box.x[i] - c.xₛ[p])/4*(c.m-2))
+                rf[c.box.Nₜ÷2+2:end, i] .= rf[c.box.Nₜ÷2:-1:2, i]
+                sf[c.box.Nₜ÷2+2:end, i] .= sf[c.box.Nₜ÷2:-1:2, i] 
             end
         end
         if  p == 1
