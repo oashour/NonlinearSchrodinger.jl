@@ -1,11 +1,12 @@
 module NLSS
 
 using FFTW
-using DifferentialEquations, DiffEqOperators, NumericalIntegration
+using DifferentialEquations, DiffEqOperators
 using Memoization
 using Plots; gr()
 using Plots.PlotMeasures, LaTeXStrings  
 using JLD
+using Elliptic.Jacobi
 
 # Logging Stuff
 using Logging: global_logger
