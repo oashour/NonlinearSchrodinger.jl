@@ -150,10 +150,8 @@ end
 
 function (K̂::Ks)(dx)
     if K̂.α == 0
-        #ifftshift(cis.(dx*K̂.ω.^2/2))
         K_cubic(dx, K̂.ω)
     else
-        #ifftshift(cis.(dx*(K̂.ω.^2/2 - K̂.α*K̂.ω.^3)))
         K_hirota(dx, K̂.ω, K̂.α)
     end
 end
