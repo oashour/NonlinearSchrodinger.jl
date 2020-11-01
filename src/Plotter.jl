@@ -160,7 +160,8 @@ function plot_ψ(sim; mode = "density", power=1, x_res=500, t_res=512)
     # Adjust Attributes
     t₀ = abs(minimum(sim.box.t))
     xlims!((-t₀, t₀))
-    ylims!((minimum(sim.box.x), maximum(sim.box.x)))
+    x₀ = abs(minimum(sim.box.x))
+    ylims!((-x₀, x₀))
 
     @info "Plotting ψ done!"
     return p
@@ -201,7 +202,8 @@ function plot_ψ̃(sim; mode = "density", x_res=500, ω_res=512, skip = 1, n_lin
                     margin = 4mm)
         ω₀ = abs(minimum(sim.box.ω))
         xlims!((-ω₀, ω₀))
-        ylims!((minimum(sim.box.x), maximum(sim.box.x)))
+        x₀ = abs(minimum(sim.box.x))
+        ylims!((-x₀, x₀))
     elseif mode == "lines"
         start = sim.box.Nₜ÷2 + 1
         ψ̃ = sim.ψ̃[start:skip:start+skip*n_lines-1, 1:xₛ:end]
@@ -214,7 +216,8 @@ function plot_ψ̃(sim; mode = "density", x_res=500, ω_res=512, skip = 1, n_lin
                     xlabel = L"x",
                     ylabel = L"\log|\tilde{\psi}|",
                     margin = 4mm)
-        xlims!((minimum(sim.box.x), maximum(sim.box.x)))
+        x₀ = abs(minimum(sim.box.x))
+        xlims!((-x₀, x₀))
     end
 
     @info "Plotting ψ̃ done!"
