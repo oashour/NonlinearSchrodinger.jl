@@ -181,3 +181,15 @@ function ψ₀_periodic(coeff::Array, box::Box, Ω; phase=0)
 
     return ψ₀, A0
 end #psi0_periodic
+
+function ψ₀_DT(λ, tₛ, xₛ, X₀, box)
+    xᵣ = X₀=>X₀+1e-5
+    T = abs(box.t[1]*2)
+    Nₜ = box.Nₜ
+    box_dt = Box(xᵣ, T, Nₓ=1, Nₜ = box.Nₜ)
+
+    calc = Calc(λ, tₛ, xₛ, "exp", box_dt)
+    solve!(calc)
+    return calc.ψ[:, 1]
+
+end
