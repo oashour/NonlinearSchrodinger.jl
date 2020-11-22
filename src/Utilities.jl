@@ -181,3 +181,27 @@ function ψ₀_periodic(coeff::Array, box::Box, Ω; phase=0)
 
     return ψ₀, A0
 end #psi0_periodic
+
+function ψ₀_DT(λ, tₛ, xₛ, X₀, box)
+    xᵣ = X₀=>X₀+1e-5
+    T = abs(box.t[1]*2)
+    Nₜ = box.Nₜ
+    box_dt = Box(xᵣ, T, Nₓ=1, Nₜ = box.Nₜ)
+
+    calc = Calc(λ, tₛ, xₛ, "exp", box_dt)
+    solve!(calc)
+    return calc.ψ[:, 1]
+
+end
+
+function λ_maximal(λ₁, N)
+    ν₁ = imag(λ₁)
+    ν_min = sqrt(1 - 1/N^2)
+    if ν₁ <= ν_min
+        throw(ArgumentError("λ = $λ₁ not big enough for N = $N, need at least λ = $ν_min im"))
+    end
+    m = (1:N)
+    λ = sqrt.(m.^2 .* (ν₁^2 - 1) .+ 1)*im
+
+    return λ
+end
