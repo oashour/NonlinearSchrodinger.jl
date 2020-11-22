@@ -122,15 +122,12 @@ git-tree-sha1 = "215a9aa4a1f23fbd05b92769fdd62559488d70e9"
 uuid = "fa961155-64e5-5f13-b03f-caf6b980ea82"
 version = "0.4.1"
 
-<<<<<<< HEAD
 [[Cairo_jll]]
 deps = ["Artifacts", "Bzip2_jll", "Fontconfig_jll", "FreeType2_jll", "Glib_jll", "JLLWrappers", "LZO_jll", "Libdl", "Pixman_jll", "Pkg", "Xorg_libXext_jll", "Xorg_libXrender_jll", "Zlib_jll", "libpng_jll"]
 git-tree-sha1 = "e2f47f6d8337369411569fd45ae5753ca10394c6"
 uuid = "83423d85-b0ee-5818-9007-b63ccbeb887a"
 version = "1.16.0+6"
 
-=======
->>>>>>> ab816c948d31335f1ef12c1b659ad27190b754c0
 [[ChainRulesCore]]
 deps = ["LinearAlgebra", "MuladdMacro", "SparseArrays"]
 git-tree-sha1 = "007f084f0136c0e2d87d3ac53e9d8eab06cec27f"
@@ -303,15 +300,9 @@ uuid = "8ba89e20-285c-5b6f-9357-94700520ee1b"
 
 [[Distributions]]
 deps = ["FillArrays", "LinearAlgebra", "PDMats", "Printf", "QuadGK", "Random", "SparseArrays", "SpecialFunctions", "StaticArrays", "Statistics", "StatsBase", "StatsFuns"]
-<<<<<<< HEAD
 git-tree-sha1 = "6493eec6bfb1e578cff879b66844807e3625c83c"
 uuid = "31c24e10-a181-5473-b8eb-7969acd0382f"
 version = "0.24.4"
-=======
-git-tree-sha1 = "3d7de87478311db793bd265fe988be2a9c774c9b"
-uuid = "31c24e10-a181-5473-b8eb-7969acd0382f"
-version = "0.24.2"
->>>>>>> ab816c948d31335f1ef12c1b659ad27190b754c0
 
 [[DocStringExtensions]]
 deps = ["LibGit2", "Markdown", "Pkg", "Test"]
@@ -456,15 +447,12 @@ git-tree-sha1 = "b90b826782cb3ac5b7a7f41b3fd0113180257ed4"
 uuid = "28b8d3ca-fb5f-59d9-8090-bfdbd6d07a71"
 version = "0.53.0"
 
-<<<<<<< HEAD
 [[GR_jll]]
 deps = ["Bzip2_jll", "Cairo_jll", "FFMPEG_jll", "Fontconfig_jll", "GLFW_jll", "JpegTurbo_jll", "Libdl", "Libtiff_jll", "Pixman_jll", "Pkg", "Qhull_jll", "Qt_jll", "Zlib_jll", "libpng_jll"]
 git-tree-sha1 = "daaccb414719ae63625b9b5e0eb4b1ec5b194590"
 uuid = "d2c73de3-f751-5644-a686-071e5b155ba9"
 version = "0.52.0+0"
 
-=======
->>>>>>> ab816c948d31335f1ef12c1b659ad27190b754c0
 [[GenericSVD]]
 deps = ["LinearAlgebra"]
 git-tree-sha1 = "62909c3eda8a25b5673a367d1ad2392ebb265211"
@@ -583,15 +571,12 @@ git-tree-sha1 = "81690084b6198a2e1da36fcfda16eeca9f9f24e4"
 uuid = "682c06a0-de6a-54ab-a142-c8b1cf79cde6"
 version = "0.21.1"
 
-<<<<<<< HEAD
 [[JpegTurbo_jll]]
 deps = ["Artifacts", "JLLWrappers", "Libdl", "Pkg"]
 git-tree-sha1 = "9aff0587d9603ea0de2c6f6300d9f9492bbefbd3"
 uuid = "aacddb02-875f-59d6-b918-886e6ef4fbf8"
 version = "2.0.1+3"
 
-=======
->>>>>>> ab816c948d31335f1ef12c1b659ad27190b754c0
 [[LAME_jll]]
 deps = ["Artifacts", "JLLWrappers", "Libdl", "Pkg"]
 git-tree-sha1 = "df381151e871f41ee86cee4f5f6fd598b8a68826"
@@ -617,15 +602,9 @@ version = "1.3.0"
 
 [[Latexify]]
 deps = ["Formatting", "InteractiveUtils", "LaTeXStrings", "MacroTools", "Markdown", "Printf", "Requires"]
-<<<<<<< HEAD
 git-tree-sha1 = "8771ad2b1464aa6188899ca0c3e432341e35f96a"
 uuid = "23fbe1c1-3f47-55db-b15f-69d7ec21a316"
 version = "0.14.5"
-=======
-git-tree-sha1 = "73292a3259e0141521753065c1df0f91c7e4d5e6"
-uuid = "23fbe1c1-3f47-55db-b15f-69d7ec21a316"
-version = "0.14.2"
->>>>>>> ab816c948d31335f1ef12c1b659ad27190b754c0
 
 [[Lazy]]
 deps = ["MacroTools"]
@@ -817,15 +796,9 @@ uuid = "a63ad114-7e13-5084-954f-fe012c677804"
 
 [[ModelingToolkit]]
 deps = ["ArrayInterface", "DataStructures", "DiffEqBase", "DiffEqJump", "DiffRules", "Distributed", "DocStringExtensions", "IfElse", "LabelledArrays", "Latexify", "Libdl", "LightGraphs", "LinearAlgebra", "MacroTools", "NaNMath", "RecursiveArrayTools", "Requires", "RuntimeGeneratedFunctions", "SafeTestsets", "SparseArrays", "SpecialFunctions", "StaticArrays", "SymbolicUtils", "TreeViews", "UnPack", "Unitful"]
-<<<<<<< HEAD
 git-tree-sha1 = "b060f84cf2a38bd0337ba238290b74994c31bba9"
 uuid = "961ee093-0014-501f-94e3-6117800e7a78"
 version = "4.0.6"
-=======
-git-tree-sha1 = "77ebf555fb5bc7f00dca5ee65cd72c8afcc1cda2"
-uuid = "961ee093-0014-501f-94e3-6117800e7a78"
-version = "4.0.1"
->>>>>>> ab816c948d31335f1ef12c1b659ad27190b754c0
 
 [[MuladdMacro]]
 git-tree-sha1 = "c6190f9a7fc5d9d5915ab29f2134421b12d24a68"
@@ -871,11 +844,7 @@ version = "0.7.7"
 [[NaNMath]]
 git-tree-sha1 = "bfe47e760d60b82b66b61d2d44128b62e3a369fb"
 uuid = "77ba4419-2d1f-58cd-9bb1-8ffee604a2e3"
-<<<<<<< HEAD
 version = "0.3.5"
-=======
-version = "0.3.4"
->>>>>>> ab816c948d31335f1ef12c1b659ad27190b754c0
 
 [[NumericalIntegration]]
 deps = ["InteractiveUtils", "LinearAlgebra", "Logging", "Test"]
