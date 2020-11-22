@@ -9,7 +9,7 @@ See also: [`solve!`](@ref)
 """
 function T1A_H!(ψₒ, ψᵢ, dx, ops)
     # Nonlinear
-    @. ψₒ = cis(dx * (-1*abs2(ψᵢ)))*ψᵢ
+    @. ψₒ = cis(-dx * (-1*abs2(ψᵢ)))*ψᵢ
 
     # Dispersion
     ops.F̂*ψₒ
@@ -32,7 +32,7 @@ See also: [`solve!`](@ref)
 """
 function T2A_H!(ψₒ, ψᵢ, dx, ops)
     # Nonlinear
-    @. ψₒ = cis(dx/2 * (-1*abs2(ψᵢ)))*ψᵢ
+    @. ψₒ = cis(-dx/2 * (-1*abs2(ψᵢ)))*ψᵢ
 
     # Dispersion
     ops.F̂*ψₒ
@@ -50,5 +50,5 @@ function T2A_H!(ψₒ, ψᵢ, dx, ops)
     ops.F̃̂*ψₒ
 
     # Nonlinear
-    @. ψₒ = cis(dx/2 * (-1*abs2(ψₒ)))*ψₒ
+    @. ψₒ = cis(-dx/2 * (-1*abs2(ψₒ)))*ψₒ
 end 

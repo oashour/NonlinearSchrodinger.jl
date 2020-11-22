@@ -13,7 +13,7 @@ See also: [`solve!`](@ref)
 function T1A!(ψₒ, ψᵢ, dx, ops)
 
     # Nonlinear
-    @. ψₒ = cis(dx * (-1*abs2(ψᵢ)))*ψᵢ
+    @. ψₒ = cis(-dx * (-1*abs2(ψᵢ)))*ψᵢ
 
     # Dispersion
     ops.F̂*ψₒ
@@ -28,13 +28,13 @@ function T1B!(ψₒ, ψᵢ, dx, ops)
 
     # Nonlinear
     ops.F̃̂*ψₒ
-    @. ψₒ = cis(dx * (-1*abs2(ψₒ)))*ψₒ
+    @. ψₒ = cis(-dx * (-1*abs2(ψₒ)))*ψₒ
     ops.F̂*ψₒ
 end
 
 function T2A!(ψₒ, ψᵢ, dx, ops)
     # Nonlinear
-    @. ψₒ = cis(dx/2 * (-1*abs2(ψᵢ)))*ψᵢ
+    @. ψₒ = cis(-dx/2 * (-1*abs2(ψᵢ)))*ψᵢ
 
     # Dispersion
     ops.F̂*ψₒ
@@ -42,7 +42,7 @@ function T2A!(ψₒ, ψᵢ, dx, ops)
     ops.F̃̂*ψₒ
 
     # Nonlinear
-    @. ψₒ = cis(dx/2 * (-1*abs2(ψₒ)))*ψₒ
+    @. ψₒ = cis(-dx/2 * (-1*abs2(ψₒ)))*ψₒ
 end 
 
 function T2B!(ψₒ, ψᵢ, dx, ops)
@@ -52,7 +52,7 @@ function T2B!(ψₒ, ψᵢ, dx, ops)
 
     # Nonlinear
     ops.F̃̂*ψₒ
-    @. ψₒ = cis(dx * (-1*abs2(ψₒ)))*ψₒ
+    @. ψₒ = cis(-dx * (-1*abs2(ψₒ)))*ψₒ
     ops.F̂*ψₒ
 
     # Dispersion

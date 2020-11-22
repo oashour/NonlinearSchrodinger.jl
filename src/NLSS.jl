@@ -16,9 +16,11 @@ using ProgressLogging
 
 export compute_IoM!, compute_spectrum!
 export plot_ψ, plot_ψ̃, plot_IoM
-export params, print, save, load
+export print, save, load
 export solve!
-export ψ₀_periodic
+export ψ₀_periodic, ψ₀_DT
+export λ_maximal
+export params
 #export solve_dt!
 
 export Sim, Box, Calc
