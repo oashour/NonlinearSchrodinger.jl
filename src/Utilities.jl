@@ -193,3 +193,15 @@ function ψ₀_DT(λ, tₛ, xₛ, X₀, box)
     return calc.ψ[:, 1]
 
 end
+
+function λ_maximal(λ₁, N)
+    ν₁ = imag(λ₁)
+    ν_min = sqrt(1 - 1/N^2)
+    if ν₁ <= ν_min
+        throw(ArgumentError("λ = $λ₁ not big enough for N = $N, need at least λ = $ν_min im"))
+    end
+    m = (1:N)
+    λ = sqrt.(m.^2 .* (ν₁^2 - 1) .+ 1)*im
+
+    return λ
+end
