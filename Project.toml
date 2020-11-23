@@ -29,6 +29,7 @@ JLD = "0.10"
 LaTeXStrings = "1.2"
 PlotlyJS = "0.14"
 Plots = "1.6"
+ProgressLogging = "0.1"
 ProgressMeter = "1.4"
 julia = "1.5"
 
