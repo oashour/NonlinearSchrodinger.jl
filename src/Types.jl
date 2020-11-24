@@ -155,7 +155,7 @@ end
     ifftshift(cis.(-dx*ω.^2/2))
 end
 @memoize function K_hirota(dx::Real, ω, α)
-    ifftshift(cis.(-dx*(ω.^2/2 .- α*ω.^3)))
+    ifftshift(cis.(-dx*(ω.^2/2 .+ α*ω.^3)))
 end
 
 function (K̂::Ks)(dx)
