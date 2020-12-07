@@ -237,3 +237,16 @@ function λ_given_m(m; q = 2)
     return λ
 
 end
+
+function PHF(calc::Calc)
+    s = 2*sum(imag.(calc.λ))
+    if calc.seed == "exp" || calc.seed == "dn"
+        ψ₀₀ = 1
+    elseif calc.seed == "cn"
+        ψ₀₀ = sqrt(calc.m)
+    elseif calc.seed == "0"
+        ψ₀₀ = 0
+    end
+
+    peak = ψ₀₀ + s
+end

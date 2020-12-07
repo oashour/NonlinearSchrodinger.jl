@@ -22,6 +22,7 @@ export solve!
 export ψ₀_periodic, ψ₀_DT
 export λ_maximal, λ_given_m
 export params
+export PHF
 #export solve_dt!
 
 export Sim, Box, Calc
