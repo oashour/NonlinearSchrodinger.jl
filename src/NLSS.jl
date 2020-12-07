@@ -8,6 +8,7 @@ using Plots.PlotMeasures, LaTeXStrings
 using JLD
 using Elliptic.Jacobi
 
+
 # Logging Stuff
 using Logging: global_logger
 using TerminalLoggers: TerminalLogger
@@ -19,7 +20,7 @@ export plot_ψ, plot_ψ̃, plot_IoM
 export print, save, load
 export solve!
 export ψ₀_periodic, ψ₀_DT
-export λ_maximal
+export λ_maximal, λ_given_m
 export params
 #export solve_dt!
 

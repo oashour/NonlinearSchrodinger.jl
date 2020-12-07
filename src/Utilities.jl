@@ -1,3 +1,4 @@
+import Elliptic # Needs to be moved out
 """
     function compute_spectrum!(obj)
 
@@ -210,4 +211,12 @@ function λ_maximal(λ₁, N; m = 0)
     λ = sqrt.(G_n .+ sqrt.(G_n.^2 .- 64*m^2*ν₁^4))./(4*sqrt(2)*ν₁)*im
 
     return λ
+end
+
+function λ_given_m(m; q = 2)
+    F = π/(2*q*Elliptic.K(m))
+    λ = 0.5 * sqrt(2 - 2*F^2 - m + 2*sqrt((F^2-1)*(F^2-1+m)))*im
+
+    return λ
+
 end
