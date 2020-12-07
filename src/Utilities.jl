@@ -76,31 +76,48 @@ end
 
 Computes parameters
 """
-function params(; kwargs...)
+function params(;m=0, kwargs...)
     if length(kwargs) != 1
         throw(ArgumentError("You have either specified too few or too many parameters. You must specify one and only one of the following options: λ, Ω, T, a."))
     end
     param = Dict(kwargs)
-    if :a in keys(param)
-        λ = im * sqrt(2 * param[:a])
-        T = π/sqrt(1 - imag(λ)^2)
-        Ω = 2π/T
-        @info "Passed a = $(param[:a]), computed λ = $λ, T = $T and Ω = $Ω"
-    elseif :λ  in keys(param)
-        λ = param[:λ]
-        T = π/sqrt(1 - imag(λ)^2)
-        Ω = 2π/T
-        @info "Passed λ=$λ, computed T = $T and Ω = $Ω"
-    elseif :Ω in keys(param)
-        λ = im * sqrt((1 - (param[:Ω] / 2)^2))
-        T = π/sqrt(1 - imag(λ)^2)
-        Ω = param[:Ω]
-        @info "Passed Ω=$Ω, computed λ = $λ and T = $T"
-    elseif :T in keys(param)
-        λ = im * sqrt((1 - ((2*π/param[:T]) / 2)^2))
-        T = param[:T]
-        Ω = 2π/T
-        @info "Passed T = $T, computed λ = $λ and Ω = $Ω"
+    if m == 0
+        if :a in keys(param)
+            λ = im * sqrt(2 * param[:a])
+            T = π/sqrt(1 - imag(λ)^2)
+            Ω = 2π/T
+            @info "Passed a = $(param[:a]), computed λ = $λ, T = $T and Ω = $Ω"
+        elseif :λ  in keys(param)
+            λ = param[:λ]
+            T = π/sqrt(1 - imag(λ)^2)
+            Ω = 2π/T
+            @info "Passed λ=$λ, computed T = $T and Ω = $Ω"
+        elseif :Ω in keys(param)
+            λ = im * sqrt((1 - (param[:Ω] / 2)^2))
+            T = π/sqrt(1 - imag(λ)^2)
+            Ω = param[:Ω]
+            @info "Passed Ω=$Ω, computed λ = $λ and T = $T"
+        elseif :T in keys(param)
+            λ = im * sqrt((1 - ((2*π/param[:T]) / 2)^2))
+            T = param[:T]
+            Ω = 2π/T
+            @info "Passed T = $T, computed λ = $λ and Ω = $Ω"
+        end
+    elseif m > 0 && m <= 1
+        if :a in keys(param)
+            @error "Passing a not yet supported in m != 0 mode. Please pass λ"
+        elseif :λ  in keys(param)
+            λ = param[:λ]
+            Ω = real(2*sqrt(1 + (λ - m/4/λ)^2))
+            T = 2π/Ω
+            @info "Passed λ=$λ, computed T = $T and Ω = $Ω"
+        elseif :Ω in keys(param)
+            @error "Passing Ω not yet supported in m != 0 mode. Please pass λ"
+        elseif :T in keys(param)
+            @error "Passing T not yet supported in m != 0 mode. Please pass λ"
+        end
+    elseif m > 1 || m < 0
+        @error "Wrong range for m. m must be between 0 and 1"
     end
 
     return λ, T, Ω
