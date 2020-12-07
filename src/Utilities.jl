@@ -196,12 +196,18 @@ end
 
 function λ_maximal(λ₁, N; m = 0)
     ν₁ = imag(λ₁)
-    ν_min = sqrt(1 - 1/N^2)
+    #ν_min = sqrt(1 - 1/N^2)
+    mp = 1 - m
+    C_N = sqrt((N^2-1)*mp*(N^2 - mp))
+    H_N = N^2*(mp + 1) - 2*mp
+    ν_min = sqrt(2*C_N + H_N)/(2*N)
     if ν₁ <= ν_min
         throw(ArgumentError("λ = $λ₁ not big enough for N = $N, need at least λ = $ν_min im"))
     end
     n = (1:N)
-    λ = sqrt.(n.^2 .* (ν₁^2 - 1) .+ 1)*im
+    #λ = sqrt.(n.^2 .* (ν₁^2 - 1) .+ 1)*im
+    G_n = (m^2 .* n.^2) .+ 8*(m-2).*(n.^2 .- 1)*ν₁.^2 .+ 16 .* n.^2  .* ν₁^4
+    λ = sqrt.(G_n .+ sqrt.(G_n.^2 .- 64*m^2*ν₁^4))./(4*sqrt(2)*ν₁)*im
 
     return λ
 end
