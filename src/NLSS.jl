@@ -3,10 +3,12 @@ module NLSS
 using FFTW
 using DifferentialEquations, DiffEqOperators
 using Memoization
-using Plots; gr()
 using Plots.PlotMeasures, LaTeXStrings  
 using JLD
 using Elliptic.Jacobi
+using Images
+using DataFrames
+using Plots; gr()
 
 
 # Logging Stuff
