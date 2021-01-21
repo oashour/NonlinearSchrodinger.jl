@@ -117,13 +117,6 @@ function Calc(λ::Array{Complex{TT}}, tₛ, xₛ, seed, box; m=0.0) where TT <: 
         @. χ = 0.5*acos(Ω/2/sqrt(m))
     end
     @. T = 2π/Ω
-    #elseif strcmp(seed, 'dn(t;k)')
-    #    kappa = sqrt(1+(l - k^2/4./l).^2);  % Half the principal wave number
-    #    chi = 0.5*acos(kappa);
-    #elseif strcmp(seed, 'cn(t;k)')
-    #    kappa = k*sqrt(1+1/k^2*(l - 1/4./l).^2); 
-    #    chi  = 0.5*acos(kappa/k); 
-    #end
 
     ψ = Array{Complex{TT}}(undef, box.Nₜ, box.Nₓ)
     ψ̃ = similar(ψ)
