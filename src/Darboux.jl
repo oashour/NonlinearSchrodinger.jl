@@ -60,7 +60,8 @@ function calc_rs(c::Calc, n, p, ψₜ)
             tspan = (0.0,abs(minimum(c.box.t)))
             u0 = ab_dn_t0(c.box.x[1])
             prob = ODEProblem(dn_ab!, u0, tspan, [c.λ[p], c.m])
-            integrator = init(prob, Tsit5(), saveat=abs.(c.box.t[c.box.Nₜ÷2+1:-1:1]))
+            dt = c.box.t[2]-c.box.t[1]
+            integrator = init(prob, Tsit5(), saveat=abs.(c.box.t[c.box.Nₜ÷2+1:-1:1]), dt = dt, adaptive=false)
 
             # Loop over x and solve the ODE for each initial condition
             # Should do this using the ensemble interface in the future
@@ -71,8 +72,8 @@ function calc_rs(c::Calc, n, p, ψₜ)
                 # Solve
                 DiffEqBase.solve!(integrator)
                 # Save results
-                rf[c.box.Nₜ÷2+1:-1:1, i] .= integrator.sol[1, :].*exp.(+im*(c.box.x[i] - c.xₛ[p])/4*(c.m-2))
-                sf[c.box.Nₜ÷2+1:-1:1, i] .= integrator.sol[2, :].*exp.(-im*(c.box.x[i] - c.xₛ[p])/4*(c.m-2))
+                rf[c.box.Nₜ÷2+1:-1:1, i] .= integrator.sol[1, :].*exp.(+im*(c.box.x[i] - c.xₛ[p])./4*(c.m-2))
+                sf[c.box.Nₜ÷2+1:-1:1, i] .= integrator.sol[2, :].*exp.(-im*(c.box.x[i] - c.xₛ[p])./4*(c.m-2))
                 # Mirror x -> x
                 rf[c.box.Nₜ÷2+2:end, i] .= rf[c.box.Nₜ÷2:-1:2, i]
                 sf[c.box.Nₜ÷2+2:end, i] .= sf[c.box.Nₜ÷2:-1:2, i] 
@@ -101,7 +102,8 @@ function calc_rs(c::Calc, n, p, ψₜ)
             tspan = (0.0,abs(minimum(c.box.t)))
             u0 = ab_cn_t0(c.box.x[1])
             prob = ODEProblem(cn_ab!, u0, tspan, [c.λ[p], c.m])
-            integrator = init(prob, Tsit5(), saveat=abs.(c.box.t[c.box.Nₜ÷2+1:-1:1]))
+            dt = c.box.t[2] - c.box.t[1]
+            integrator = init(prob, Tsit5(), saveat=abs.(c.box.t[c.box.Nₜ÷2+1:-1:1]), dt=dt, adaptive=false)
 
             # Loop over x and solve the ODE for each initial condition
             # Should do this using the ensemble interface in the future
@@ -112,8 +114,8 @@ function calc_rs(c::Calc, n, p, ψₜ)
                 # Solve
                 DiffEqBase.solve!(integrator)
                 # Save results
-                rf[c.box.Nₜ÷2+1:-1:1, i] .= integrator.sol[1, :].*exp.(+im*(c.box.x[i] - c.xₛ[p])/4*(2*c.m-1))
-                sf[c.box.Nₜ÷2+1:-1:1, i] .= integrator.sol[2, :].*exp.(-im*(c.box.x[i] - c.xₛ[p])/4*(2*c.m-1))
+                rf[c.box.Nₜ÷2+1:-1:1, i] .= integrator.sol[1, :].*exp.(+im*(c.box.x[i] - c.xₛ[p])./4*(2*c.m-1))
+                sf[c.box.Nₜ÷2+1:-1:1, i] .= integrator.sol[2, :].*exp.(-im*(c.box.x[i] - c.xₛ[p])./4*(2*c.m-1))
                 # Mirror x -> x
                 rf[c.box.Nₜ÷2+2:end, i] .= rf[c.box.Nₜ÷2:-1:2, i]
                 sf[c.box.Nₜ÷2+2:end, i] .= sf[c.box.Nₜ÷2:-1:2, i] 

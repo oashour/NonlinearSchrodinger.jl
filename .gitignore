@@ -8,3 +8,4 @@ test.jld
 src/test.jl
 src/type_example.jl
 src/example_dt.jl
+src/minimal_dt.jl
