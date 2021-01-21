@@ -1,3 +1,7 @@
+import Elliptic # Needs to be moved out
+using Images 
+using DataFrames
+
 """
     function compute_spectrum!(obj)
 
@@ -75,31 +79,48 @@ end
 
 Computes parameters
 """
-function params(; kwargs...)
+function params(;m=0, kwargs...)
     if length(kwargs) != 1
         throw(ArgumentError("You have either specified too few or too many parameters. You must specify one and only one of the following options: λ, Ω, T, a."))
     end
     param = Dict(kwargs)
-    if :a in keys(param)
-        λ = im * sqrt(2 * param[:a])
-        T = π/sqrt(1 - imag(λ)^2)
-        Ω = 2π/T
-        @info "Passed a = $(param[:a]), computed λ = $λ, T = $T and Ω = $Ω"
-    elseif :λ  in keys(param)
-        λ = param[:λ]
-        T = π/sqrt(1 - imag(λ)^2)
-        Ω = 2π/T
-        @info "Passed λ=$λ, computed T = $T and Ω = $Ω"
-    elseif :Ω in keys(param)
-        λ = im * sqrt((1 - (param[:Ω] / 2)^2))
-        T = π/sqrt(1 - imag(λ)^2)
-        Ω = param[:Ω]
-        @info "Passed Ω=$Ω, computed λ = $λ and T = $T"
-    elseif :T in keys(param)
-        λ = im * sqrt((1 - ((2*π/param[:T]) / 2)^2))
-        T = param[:T]
-        Ω = 2π/T
-        @info "Passed T = $T, computed λ = $λ and Ω = $Ω"
+    if m == 0
+        if :a in keys(param)
+            λ = im * sqrt(2 * param[:a])
+            T = π/sqrt(1 - imag(λ)^2)
+            Ω = 2π/T
+            @info "Passed a = $(param[:a]), computed λ = $λ, T = $T and Ω = $Ω"
+        elseif :λ  in keys(param)
+            λ = param[:λ]
+            T = π/sqrt(1 - imag(λ)^2)
+            Ω = 2π/T
+            @info "Passed λ=$λ, computed T = $T and Ω = $Ω"
+        elseif :Ω in keys(param)
+            λ = im * sqrt((1 - (param[:Ω] / 2)^2))
+            T = π/sqrt(1 - imag(λ)^2)
+            Ω = param[:Ω]
+            @info "Passed Ω=$Ω, computed λ = $λ and T = $T"
+        elseif :T in keys(param)
+            λ = im * sqrt((1 - ((2*π/param[:T]) / 2)^2))
+            T = param[:T]
+            Ω = 2π/T
+            @info "Passed T = $T, computed λ = $λ and Ω = $Ω"
+        end
+    elseif m > 0 && m <= 1
+        if :a in keys(param)
+            @error "Passing a not yet supported in m != 0 mode. Please pass λ"
+        elseif :λ  in keys(param)
+            λ = param[:λ]
+            Ω = real(2*sqrt(1 + (λ - m/4/λ)^2))
+            T = 2π/Ω
+            @info "Passed λ=$λ, computed T = $T and Ω = $Ω"
+        elseif :Ω in keys(param)
+            @error "Passing Ω not yet supported in m != 0 mode. Please pass λ"
+        elseif :T in keys(param)
+            @error "Passing T not yet supported in m != 0 mode. Please pass λ"
+        end
+    elseif m > 1 || m < 0
+        @error "Wrong range for m. m must be between 0 and 1"
     end
 
     return λ, T, Ω
@@ -194,14 +215,52 @@ function ψ₀_DT(λ, tₛ, xₛ, X₀, box)
 
 end
 
-function λ_maximal(λ₁, N)
+function λ_maximal(λ₁, N; m = 0)
     ν₁ = imag(λ₁)
-    ν_min = sqrt(1 - 1/N^2)
+    #ν_min = sqrt(1 - 1/N^2)
+    mp = 1 - m
+    C_N = sqrt((N^2-1)*mp*(N^2 - mp))
+    H_N = N^2*(mp + 1) - 2*mp
+    ν_min = sqrt(2*C_N + H_N)/(2*N)
     if ν₁ <= ν_min
         throw(ArgumentError("λ = $λ₁ not big enough for N = $N, need at least λ = $ν_min im"))
     end
-    m = (1:N)
-    λ = sqrt.(m.^2 .* (ν₁^2 - 1) .+ 1)*im
+    n = (1:N)
+    #λ = sqrt.(n.^2 .* (ν₁^2 - 1) .+ 1)*im
+    G_n = (m^2 .* n.^2) .+ 8*(m-2).*(n.^2 .- 1)*ν₁.^2 .+ 16 .* n.^2  .* ν₁^4
+    λ = sqrt.(G_n .+ sqrt.(G_n.^2 .- 64*m^2*ν₁^4))./(4*sqrt(2)*ν₁)*im
 
     return λ
+end
+
+function λ_given_m(m; q = 2)
+    F = π/(2*q*Elliptic.K(m))
+    λ = 0.5 * sqrt(2 - 2*F^2 - m + 2*sqrt((F^2-1)*(F^2-1+m)))*im
+
+    return λ
+
+end
+
+function PHF(calc::Calc)
+    s = 2*sum(imag.(calc.λ))
+    if calc.seed == "exp" || calc.seed == "dn"
+        ψ₀₀ = 1
+    elseif calc.seed == "cn"
+        ψ₀₀ = sqrt(calc.m)
+    elseif calc.seed == "0"
+        ψ₀₀ = 0
+    end
+
+    peak = ψ₀₀ + s
+end
+
+function find_peaks(obj; min=1)
+    ind = findlocalmaxima(abs.(obj.ψ))
+    as_ints(a::AbstractArray{CartesianIndex{L}}) where L = reshape(reinterpret(Int, a), (L, size(a)...)) # from internet
+    t_peaks = obj.box.t[as_ints(ind)[1,:]]
+    x_peaks = obj.box.x[as_ints(ind)[2,:]]
+    ψ_peaks = abs.(obj.ψ)[ind]
+    df = DataFrame([t_peaks x_peaks ψ_peaks], ["t", "x", "ψ"])
+
+    return df[df[!,:ψ] .> min, :]
 end
