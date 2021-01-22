@@ -79,12 +79,12 @@ end
 
 Computes parameters
 """
-function params(;m=0, kwargs...)
+function params(;m=0.0, kwargs...)
     if length(kwargs) != 1
         throw(ArgumentError("You have either specified too few or too many parameters. You must specify one and only one of the following options: λ, Ω, T, a."))
     end
     param = Dict(kwargs)
-    if m == 0
+    if m ==0.0
         if :a in keys(param)
             λ = im * sqrt(2 * param[:a])
             T = π/sqrt(1 - imag(λ)^2)
