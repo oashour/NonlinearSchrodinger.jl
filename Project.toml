@@ -24,6 +24,7 @@ TerminalLoggers = "5d786b92-1e48-4d6f-9151-6b4477ca9bed"
 
 [compat]
 BenchmarkTools = "0.5"
+DataFrames = "0.22"
 DiffEqOperators = "4.14"
 Elliptic = "1.0"
 FFTW = "1.2"
