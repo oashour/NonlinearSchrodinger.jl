@@ -21,6 +21,7 @@ function T1A_H!(ψₒ, ψᵢ, dx, ops)
     step!(ops.B̂) 
     ψₒ .= ops.B̂.u
 end #T₁ʰ
+
 """
     T₂ʰ(ψ, ω, dx, F)
 

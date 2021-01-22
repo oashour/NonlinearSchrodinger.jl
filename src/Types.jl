@@ -45,6 +45,7 @@ struct Sim{TT<:Real, F}
     ψ₀::Array{Complex{TT}, 1}
     T̂::F
     α::TT
+    ϵ::TT
     αₚ::TT
     ψ::Array{Complex{TT}, 2}
     ψ̃::Array{Complex{TT}, 2}
@@ -55,7 +56,7 @@ struct Sim{TT<:Real, F}
     P::Array{TT, 1}
 end # Simulation
 
-function Sim(λ, box::Box, ψ₀::Array{Complex{TT}, 1}, T̂; α = 0.0, αₚ = 0.0) where TT <: Real
+function Sim(λ, box::Box, ψ₀::Array{Complex{TT}, 1}, T̂; α = 0.0, ϵ=0.0, αₚ = 0.0) where TT <: Real
     ψ = Array{Complex{TT}}(undef, box.Nₜ, box.Nₓ)
     ψ̃ = similar(ψ)
     E = zeros(box.Nₓ)
@@ -71,7 +72,7 @@ function Sim(λ, box::Box, ψ₀::Array{Complex{TT}, 1}, T̂; α = 0.0, αₚ = 
     end
     # Compute some parameters
     λ, T, Ω = params(λ = λ)
-    sim = Sim(λ, T, Ω, box, ψ₀, T̂, α, αₚ, ψ, ψ̃, E, PE, KE, N, P)
+    sim = Sim(λ, T, Ω, box, ψ₀, T̂, α, ϵ, αₚ, ψ, ψ̃, E, PE, KE, N, P)
    return sim
 end #init_sim
 
@@ -134,14 +135,16 @@ struct Operators{T, DispFunc, FFTPlan, InvFFTPlan}
     F̂::FFTPlan
     F̃̂::InvFFTPlan
     B̂::DiffEqBase.DEIntegrator
+    B̂B::DiffEqBase.DEIntegrator
     ψ₁::T
     ψ₂::T
     ψ₃::T
 end # Simulation
 
 struct Ks
-    α :: Float64
-    ω :: Vector{Float64}
+    α::Float64
+    ϵ::Float64
+    ω::Vector{Float64}
 end
 
 @memoize function K_cubic(dx::Real, ω)
@@ -150,12 +153,19 @@ end
 @memoize function K_hirota(dx::Real, ω, α)
     ifftshift(cis.(-dx*(ω.^2/2 .+ α*ω.^3)))
 end
+@memoize function K_SS(dx::Real, ω, ϵ)
+    ifftshift(cis.(-dx*(ω.^2/2 .- ϵ*ω.^3)))
+end
 
 function (K̂::Ks)(dx)
-    if K̂.α == 0
+    if K̂.α == 0 && K̂.ϵ == 0
         K_cubic(dx, K̂.ω)
-    else
+    elseif K̂.α != 0 && K̂.ϵ == 0
         K_hirota(dx, K̂.ω, K̂.α)
+    elseif K̂.α == 0 && K̂.ϵ != 0
+        K_SS(dx, K̂.ω, K̂.ϵ)
+    else
+        @error "Only ϵ or α can be nonzero at a time"
     end
 end
 
@@ -169,7 +179,7 @@ function Operators(sim)
     t_algo = BS3()
     t_order = 2
     # Create the integrator for the Burger term
-    if sim.α > 0
+    if sim.α != 0 && sim.ϵ == 0
         D = CenteredDifference(1, t_order, sim.box.dt, sim.box.Nₜ) 
         Q = PeriodicBC(Float64)
         function MB!(du, u,p,t)
@@ -177,18 +187,33 @@ function Operators(sim)
         end
         prob = ODEProblem(MB!, sim.ψ[:, 1], (0, sim.box.dx))
         B̂ = init(prob, t_algo; dt=sim.box.dx,save_everystep=false)  
+        B̂B = B̂
+    elseif sim.α == 0 && sim.ϵ != 0
+        D = CenteredDifference(1, t_order, sim.box.dt, sim.box.Nₜ) 
+        Q = PeriodicBC(Float64)
+        function MS1!(du, u,p,t)
+            du .= -6*sim.ϵ*D*Q*u.*abs2.(u)
+        end
+        prob = ODEProblem(MS1!, sim.ψ[:, 1], (0, sim.box.dx))
+        B̂ = init(prob, t_algo; dt=sim.box.dx,save_everystep=false)  
+        function MS2!(du, u,p,t)
+            du .= -3*sim.ϵ*D*Q*abs2.(u).*u
+        end
+        prob = ODEProblem(MS2!, sim.ψ[:, 1], (0, sim.box.dx))
+        B̂B = init(prob, t_algo; dt=sim.box.dx,save_everystep=false)  
     else
         function M0!(du, u,p,t)
             du .= 0*u 
         end
         prob = ODEProblem(M0!, sim.ψ[:, 1], (0, sim.box.dx))
         B̂ = init(prob, t_algo; dt=sim.box.dx,save_everystep=false)  
+        B̂B = B̂
     end
     
     ψ₁ = similar(sim.ψ₀)
     ψ₂ = similar(sim.ψ₀)
     ψ₃ = similar(sim.ψ₀)
-    ops = Operators(Ks(sim.α, sim.box.ω), F̂, F̃̂, B̂, ψ₁, ψ₂, ψ₃)
+    ops = Operators(Ks(sim.α, sim.ϵ, sim.box.ω), F̂, F̃̂, B̂, B̂B, ψ₁, ψ₂, ψ₃)
 
     return ops
 end
