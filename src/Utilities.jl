@@ -38,7 +38,8 @@ function compute_IoM!(obj; normalize=false)
         obj.N .= sum(ψ², dims=1)[:]./obj.box.Nₜ
         obj.PE .= -0.5*sum(ψ².^2,dims=1)[:]./(obj.N*obj.box.Nₜ)
         obj.KE .= 0.5*sum((obj.box.ω.^2 .* ψ̃²),dims=1)[:]./obj.N
-        obj.P .= 2*imag.(sum(im * obj.box.ω.* ψ̃²,dims=1)[:]./obj.N)
+        #obj.P .= 2*imag.(sum(im * obj.box.ω.* ψ̃²,dims=1)[:]./obj.N)
+        obj.P .= 2*sum(obj.box.ω.* ψ̃²,dims=1)[:]./obj.N
         obj.E .= obj.KE .+ obj.PE
     else
         # Why does the stuff from NumericalIntegration.jl not work?
@@ -47,7 +48,8 @@ function compute_IoM!(obj; normalize=false)
         obj.N .= sum(ψ², dims=1)[:]./obj.box.Nₜ
         obj.PE .= -0.5*sum(ψ².^2,dims=1)[:]./obj.box.Nₜ
         obj.KE .= 0.5*sum((obj.box.ω.^2 .* ψ̃²),dims=1)[:]
-        obj.P .= 2*imag.(sum(im * obj.box.ω.* ψ̃²,dims=1)[:])
+        #obj.P .= 2*imag.(sum(im * obj.box.ω.* ψ̃²,dims=1)[:])
+        obj.P .= 2*sum(obj.box.ω.* ψ̃²,dims=1)[:]
         obj.E .= obj.KE .+ obj.PE
     end
 
