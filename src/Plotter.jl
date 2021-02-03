@@ -11,7 +11,7 @@ function plot_IoM(obj; x_res = 500, mode = "merged")
     @info "Plotting IoM with a resolution of $x_res"
     xₛ = Int(ceil(obj.box.Nₓ/x_res))
     x = obj.box.x[1:xₛ:end]
-    p1 = plot(x, [obj.E[1:xₛ:end], obj.KE[1:xₛ:end], obj.PE[1:xₛ:end]], label = [L"E" L"T" L"V"])
+    p1 = plot(x, [obj.E[1:xₛ:end], obj.KE[1:xₛ:end], obj.PE[1:xₛ:end]], label = [L"E" L"K" L"V"])
     xlabel!(L"x")
     ylabel!(L"E")
     xlims!((minimum(obj.box.x), maximum(obj.box.x)))
@@ -77,7 +77,8 @@ function plot_ψ(sim; mode = "density", power=1, x_res=500, t_res=512)
                     colorbar_title=clabel,
                     margin = 4mm,
                     xlabel=L"t",
-                    ylabel=L"x")
+                    ylabel=L"x",
+                    c = :viridis)
     elseif mode == "surface"
         p = surface(t, x, abs.(ψ').^power, 
                     colorbar_title=clabel, 
@@ -198,7 +199,7 @@ function plot_ψ̃(sim; mode = "density", x_res=500, ω_res=512, skip = 1, n_lin
                     colorbar_title=L"\log|\tilde{\psi}|",
                     xlabel = L"\omega",
                     ylabel = L"x",
-                    margin = 4mm)
+                    margin = 4mm, c=:viridis)
         ω₀ = abs(minimum(sim.box.ω))
         xlims!((-ω₀, ω₀))
         ylims!((minimum(sim.box.x), maximum(sim.box.x)))
