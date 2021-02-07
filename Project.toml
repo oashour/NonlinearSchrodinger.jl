@@ -1,6 +1,6 @@
-name = "NLSS"
+name = "NonlinearSchrodinger"
 uuid = "b3fbeaf7-5746-403c-a6b7-06939dc82746"
-authors = ["Omar Ashour"]
+authors = ["Omar A. Ashour <ashour@berkeley.edu>"]
 version = "0.0.5"
 
 [deps]

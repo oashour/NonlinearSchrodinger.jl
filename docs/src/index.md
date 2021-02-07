@@ -1,5 +1,5 @@
 ```@meta
-CurrentModule = NLSS
+CurrentModule = NonlinearSchrodinger
 ```
 # NLSS
 
