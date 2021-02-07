@@ -1,7 +1,3 @@
-import Elliptic # Needs to be moved out
-using Images 
-using DataFrames
-
 """
     function compute_spectrum!(obj)
 
@@ -242,7 +238,7 @@ function find_peaks(obj; min=1)
     t_peaks = obj.box.t[as_ints(ind)[1,:]]
     x_peaks = obj.box.x[as_ints(ind)[2,:]]
     ψ_peaks = abs.(obj.ψ)[ind]
-    df = DataFrame([t_peaks x_peaks ψ_peaks], ["t", "x", "ψ"])
+    df = DataFrame([t_peaks x_peaks ψ_peaks], ["t", "x", "ψ"]) # Should be removed.
 
     return df[df[!,:ψ] .> min, :]
 end

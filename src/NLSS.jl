@@ -4,6 +4,7 @@ using FFTW
 using DifferentialEquations, DiffEqOperators
 using Memoization
 using Plots.PlotMeasures, LaTeXStrings  
+using Elliptic
 using Elliptic.Jacobi
 using Images
 using DataFrames
@@ -22,7 +23,7 @@ export solve!
 export ψ₀_periodic, ψ₀_DT
 export λ_maximal, λ_given_m
 export params
-export PHF
+export PHF, find_peaks
 #export solve_dt!
 
 export Sim, Box, Calc
