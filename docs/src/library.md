@@ -16,7 +16,7 @@ Pages = ["library.md"]
 
 ## Simulation
 ```@autodocs
-Modules = [NLSS.Simulation]
+Modules = [NonlinearSchrodinger.Simulation]
 Order   = [:type, :function]
 ```
 
@@ -27,12 +27,12 @@ Order   = [:type, :function]
 
 ## Plotter
 ```@autodocs
-Modules = [NLSS.Plotter]
+Modules = [NonlinearSchrodinger.Plotter]
 Order   = [:function, :type]
 ```
 
 ## Utilities
 ```@autodocs
-Modules = [NLSS.Utilities]
+Modules = [NonlinearSchrodinger.Utilities]
 Order   = [:type, :function]
 ```
