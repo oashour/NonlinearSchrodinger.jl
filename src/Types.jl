@@ -46,7 +46,7 @@ struct Sim{TT<:Real, F}
     T̂::F
     α::TT
     ϵ::TT
-    αₚ::TT
+    β::TT
     ψ::Array{Complex{TT}, 2}
     ψ̃::Array{Complex{TT}, 2}
     E::Array{TT, 1}
@@ -56,7 +56,7 @@ struct Sim{TT<:Real, F}
     P::Array{TT, 1}
 end # Simulation
 
-function Sim(λ, box::Box, ψ₀::Array{Complex{TT}, 1}, T̂; α = 0.0, ϵ=0.0, αₚ = 0.0) where TT <: Real
+function Sim(λ, box::Box, ψ₀::Array{Complex{TT}, 1}, T̂; α = 0.0, ϵ=0.0, β = 0.0) where TT <: Real
     ψ = Array{Complex{TT}}(undef, box.Nₜ, box.Nₓ)
     ψ̃ = similar(ψ)
     E = zeros(box.Nₓ)
@@ -64,15 +64,15 @@ function Sim(λ, box::Box, ψ₀::Array{Complex{TT}, 1}, T̂; α = 0.0, ϵ=0.0, 
     KE = similar(E)
     N = similar(E)
     P = similar(E)
-    if αₚ < 0.0 
+    if β < 0.0 
         throw(ArgumentError("αₚ < 0. Set αₚ = 0 to disable pruning or αₚ = Inf for fixed pruning. See documentation)"))
     end
-    if αₚ > 0.0 && box.n_periods == 1 
+    if β > 0.0 && box.n_periods == 1 
         throw(ArgumentError("Pruning is only applicable when n_periods > 1."))
     end
     # Compute some parameters
     λ, T, Ω = params(λ = λ)
-    sim = Sim(λ, T, Ω, box, ψ₀, T̂, α, ϵ, αₚ, ψ, ψ̃, E, PE, KE, N, P)
+    sim = Sim(λ, T, Ω, box, ψ₀, T̂, α, ϵ, β, ψ, ψ̃, E, PE, KE, N, P)
    return sim
 end #init_sim
 
