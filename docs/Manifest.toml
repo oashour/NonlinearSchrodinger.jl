@@ -727,7 +727,7 @@ git-tree-sha1 = "8e917fbe96da22628feae3f01b4f100e709ab746"
 uuid = "a975b10e-0019-58db-a62f-e48ff68538c9"
 version = "0.7.3"
 
-[[NLSS]]
+[[NonlinearSchrodinger]]
 deps = ["BenchmarkTools", "DiffEqOperators", "DifferentialEquations", "Elliptic", "FFTW", "JLD", "LaTeXStrings", "Logging", "Memoization", "NumericalIntegration", "PlotlyJS", "Plots", "ProgressLogging", "ProgressMeter", "TerminalLoggers"]
 path = ".."
 uuid = "b3fbeaf7-5746-403c-a6b7-06939dc82746"
