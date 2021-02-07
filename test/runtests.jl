@@ -1,7 +1,7 @@
-using NLSS
+using NonlinearSchrodinger
 using Test
 
-@testset "NLSS.jl" begin
+@testset "NonlinearSchrodinger.jl" begin
     #TODO: Implement tests
     m = 0.2
     λ = λ_given_m(m, q=6)

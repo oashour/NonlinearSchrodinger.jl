@@ -1,4 +1,4 @@
-module NLSS
+module NonlinearSchrodinger
 
 using FFTW
 using DifferentialEquations, DiffEqOperators
