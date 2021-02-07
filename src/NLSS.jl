@@ -4,7 +4,6 @@ using FFTW
 using DifferentialEquations, DiffEqOperators
 using Memoization
 using Plots.PlotMeasures, LaTeXStrings  
-using JLD
 using Elliptic.Jacobi
 using Images
 using DataFrames
@@ -15,11 +14,10 @@ using Plots; gr()
 using Logging: global_logger
 using TerminalLoggers: TerminalLogger
 global_logger(TerminalLogger())
-using ProgressLogging
 
 export compute_IoM!, compute_spectrum!
 export plot_ψ, plot_ψ̃, plot_IoM
-export print, save, load
+export print
 export solve!
 export ψ₀_periodic, ψ₀_DT
 export λ_maximal, λ_given_m

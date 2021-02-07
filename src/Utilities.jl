@@ -56,26 +56,6 @@ function compute_IoM!(obj; normalize=false)
     @info "Integrals of motion computed."
 end
 
-function save(obj, filename)
-    filename = string(filename, ".jld")
-    jldopen(filename, "w") do file
-        write(file, "result", obj)
-    end
-    @info "Saved to file $filename"
-    
-    return nothing
-end
-
-function load(filename)
-    filename = string(filename, ".jld")
-    obj = jldopen(filename, "r") do file
-        read(file, "result")
-    end
-    @info "Loaded from file $filename"
-
-    return obj
-end
-
 """
     function params(; kwargs...)
 
