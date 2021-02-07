@@ -13,26 +13,8 @@ Pages = ["library.md"]
 ```@index
 Pages = ["library.md"]
 ```
-
-## Simulation
+## Test
 ```@autodocs
-Modules = [NonlinearSchrodinger.Simulation]
-Order   = [:type, :function]
-```
-
-## Calculation
-
-```@docs
-```
-
-## Plotter
-```@autodocs
-Modules = [NonlinearSchrodinger.Plotter]
-Order   = [:function, :type]
-```
-
-## Utilities
-```@autodocs
-Modules = [NonlinearSchrodinger.Utilities]
-Order   = [:type, :function]
+Modules = [NonlinearSchrodinger]
+Pages   = ["Plotter.jl", "Simulation.jl"]
 ```
