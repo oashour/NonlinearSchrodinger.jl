@@ -1,11 +1,11 @@
-using NLSS
+using NonlinearSchrodinger
 using Documenter
 
 makedocs(;
-    modules=[NLSS],
+    modules=[NonlinearSchrodinger],
     authors="Omar Ashour",
-    repo="https://github.com/oashour/NLSS.jl/blob/{commit}{path}#L{line}",
-    sitename="NLSS.jl",
+    repo="https://github.com/oashour/NonlinearSchrodinger.jl/blob/{commit}{path}#L{line}",
+    sitename="NonlinearSchrodinger.jl",
     format=Documenter.HTML(;
         prettyurls=get(ENV, "CI", "false") == "true",
         canonical="http://oashour.github.io",
@@ -17,7 +17,7 @@ makedocs(;
 )
 
 deploydocs(;
-    repo="github.com/oashour/NLSS.jl",
+    repo="github.com/oashour/NonlinearSchrodinger.jl",
     branch = "gh-pages",
     devbranch = "master",
     devurl = "dev"
