@@ -10,6 +10,105 @@ using Test
     @test λ ≈ [0.9339432380535284im, 0.8929328208629054im, 0.819955288011106im]
     @test_throws ArgumentError λ_maximal(0.6im, 10, m=m)
 
+    @testset "Initial Conditions" begin
+        xᵣ = -10=>10
+        λ = 0.75im
+        λ, T, Ω = params(λ = λ)
+        box = Box(xᵣ, T, Nₓ=1, Nₜ = 100, n_periods = 3)
+        coeff = [(2.7 + 4.6im)*1e-2]
+        ψ₀, A₀ = ψ₀_periodic(coeff, box, Ω)
+        @test A₀ ≈ 0.9971509414326399
+    end
+
+    @testset "Darboux Transformations" begin
+        @testset "Soliton 1" begin
+            T = 20
+            xᵣ = -20=>20
+            seed = "0"
+            box = Box(xᵣ, T, Nₓ=1000, Nₜ = 1024, n_periods = 1)
+            λ = [0.85im]
+            xₛ = [0.0]
+            tₛ = [0.0]
+
+            calc = Calc(λ, tₛ, xₛ, seed, box) 
+            solve!(calc)
+            λ = 0.85im; 
+            ψ₀ = 2*imag(λ)./cosh.(2*imag(λ).*box.t)
+            @test abs.(calc.ψ[:, end]) ≈ abs.(ψ₀)
+        end
+        @testset "Soliton 3" begin
+            T = 20
+            xᵣ = -20=>20
+            seed = "0"
+            box = Box(xᵣ, T, Nₓ=1000, Nₜ = 1024, n_periods = 1)
+            λ = [-0.9 + 0.8im, 0.85im, 0.9 + 0.9im]
+            xₛ = [0.0, 0.0, 0.0]
+            tₛ = [0.0, 0.0, 0.0]
+
+            calc = Calc(λ, tₛ, xₛ, seed, box) 
+            solve!(calc)
+            λ = 0.85im; 
+            ψ₀ = 2*imag(λ)./cosh.(2*imag(λ).*box.t)
+            # Test around edges and exact peak to avoid weird behavior near peak from DT iteration
+            @test abs.(calc.ψ[1:250, end]) ≈ abs.(ψ₀[1:250]) atol=1e-3
+            @test abs.(calc.ψ[750:end, end]) ≈ abs.(ψ₀[750:end]) atol=1e-3
+            @test abs.(calc.ψ[513, end]) ≈ abs.(ψ₀[513]) atol=1e-2
+        end
+        @testset "AB 1" begin
+            T = 20
+            xᵣ = 0=>1e-3
+            seed = "exp"
+            box = Box(xᵣ, T, Nₓ=1, Nₜ = 1024, n_periods = 1)
+            λ = [0.9im]
+            xₛ = [0.0]
+            tₛ = [0.0]
+
+            calc = Calc(λ, tₛ, xₛ, seed, box) 
+            solve!(calc)
+
+            λ = 0.9im; 
+            a = imag(λ)^2/2
+            Ω = 2*sqrt(1 - 2*a)
+            ψ₀ = ((1 - 4*a) .+ (sqrt(2*a).*cos.(Ω*calc.box.t)))./
+                (sqrt(2*a).*cos.(Ω*calc.box.t) .- 1)
+
+            @test abs.(calc.ψ[:, 1]) ≈ abs.(ψ₀)
+        end
+        @testset "CN 1" begin
+            T = 20
+            xᵣ = -10=>10
+            box = Box(xᵣ, T, Nₓ=1, Nₜ = 1024, n_periods = 1)
+            λ = [0.7im]
+            xₛ = [0.0]
+            tₛ = [0.0]
+
+            seed = "cn"
+            calc = Calc(λ, tₛ, xₛ, seed, box, m = 0.5) 
+
+            solve!(calc)
+
+            # Test the solution is mirrored across the x=0 axis
+            @test abs.(calc.ψ[:,2]) ≈ abs.(calc.ψ[:,1])
+        end
+        @testset "DN 1" begin
+            T = 20
+            xᵣ = -10=>10
+            box = Box(xᵣ, T, Nₓ=1, Nₜ = 1024, n_periods = 1)
+            λ = [0.6im]
+            xₛ = [0.0]
+            tₛ = [0.0]
+
+            seed = "dn"
+            calc = Calc(λ, tₛ, xₛ, seed, box, m = 0.5) 
+
+            solve!(calc)
+
+            # Test the solution is mirrored across the x=0 axis
+            @test abs.(calc.ψ[:,2]) ≈ abs.(calc.ψ[:,1])
+        end
+        
+    end
+
     # Simulation Tests using Solitons (easiest way to check validity)
     @testset "Soliton Simulations" begin
         λ = 0.75im
