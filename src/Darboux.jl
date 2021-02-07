@@ -72,8 +72,8 @@ function calc_rs(c::Calc, n, p, ψₜ)
                 # Solve
                 DiffEqBase.solve!(integrator)
                 # Save results
-                rf[c.box.Nₜ÷2+1:-1:1, i] .= integrator.sol[1, :].*exp.(+im*(c.box.x[i] - c.xₛ[p])./4*(c.m-2))
-                sf[c.box.Nₜ÷2+1:-1:1, i] .= integrator.sol[2, :].*exp.(-im*(c.box.x[i] - c.xₛ[p])./4*(c.m-2))
+                rf[c.box.Nₜ÷2+1:-1:1, i] .= integrator.sol[1, :].*exp.(+im*(c.box.x[i])./4*(c.m-2))
+                sf[c.box.Nₜ÷2+1:-1:1, i] .= integrator.sol[2, :].*exp.(-im*(c.box.x[i])./4*(c.m-2))
                 # Mirror x -> x
                 rf[c.box.Nₜ÷2+2:end, i] .= rf[c.box.Nₜ÷2:-1:2, i]
                 sf[c.box.Nₜ÷2+2:end, i] .= sf[c.box.Nₜ÷2:-1:2, i] 
@@ -114,8 +114,8 @@ function calc_rs(c::Calc, n, p, ψₜ)
                 # Solve
                 DiffEqBase.solve!(integrator)
                 # Save results
-                rf[c.box.Nₜ÷2+1:-1:1, i] .= integrator.sol[1, :].*exp.(+im*(c.box.x[i] - c.xₛ[p])./4*(2*c.m-1))
-                sf[c.box.Nₜ÷2+1:-1:1, i] .= integrator.sol[2, :].*exp.(-im*(c.box.x[i] - c.xₛ[p])./4*(2*c.m-1))
+                rf[c.box.Nₜ÷2+1:-1:1, i] .= integrator.sol[1, :].*exp.(+im*(c.box.x[i])./4*(2*c.m-1))
+                sf[c.box.Nₜ÷2+1:-1:1, i] .= integrator.sol[2, :].*exp.(-im*(c.box.x[i])./4*(2*c.m-1))
                 # Mirror x -> x
                 rf[c.box.Nₜ÷2+2:end, i] .= rf[c.box.Nₜ÷2:-1:2, i]
                 sf[c.box.Nₜ÷2+2:end, i] .= sf[c.box.Nₜ÷2:-1:2, i] 
