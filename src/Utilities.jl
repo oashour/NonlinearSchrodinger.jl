@@ -231,14 +231,3 @@ function PHF(calc::Calc)
 
     peak = ψ₀₀ + s
 end
-
-function find_peaks(obj; min=1)
-    ind = findlocalmaxima(abs.(obj.ψ))
-    as_ints(a::AbstractArray{CartesianIndex{L}}) where L = reshape(reinterpret(Int, a), (L, size(a)...)) # from internet
-    t_peaks = obj.box.t[as_ints(ind)[1,:]]
-    x_peaks = obj.box.x[as_ints(ind)[2,:]]
-    ψ_peaks = abs.(obj.ψ)[ind]
-    df = DataFrame([t_peaks x_peaks ψ_peaks], ["t", "x", "ψ"]) # Should be removed.
-
-    return df[df[!,:ψ] .> min, :]
-end

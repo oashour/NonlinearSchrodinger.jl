@@ -6,8 +6,6 @@ using Memoization
 using LaTeXStrings  
 using Elliptic
 using Elliptic.Jacobi
-using Images
-using DataFrames
 using RecipesBase
 
 
