@@ -1,4 +1,4 @@
-![Logo](logo.svg?raw=true "NonlinearSchrodinger.jl Logo")
+![Logo](logo.png?raw=true "NonlinearSchrodinger.jl Logo")
 # NonlinearSchrodinger.jl
 
 [![Stable](https://img.shields.io/badge/docs-stable-blue.svg)](https://oashour.github.io/NonlinearSchrodinger.jl/stable)
