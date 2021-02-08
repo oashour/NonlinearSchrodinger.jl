@@ -20,6 +20,22 @@ using Test
         @test A₀ ≈ 0.9971509414326399
     end
 
+    @testset "params" begin
+        λ, T, Ω = params(a=3/8)
+        @test imag(λ) ≈ sqrt(3)/2
+        @test T ≈ 2*π
+        @test Ω ≈ 1
+        λ, T, Ω = params(λ = sqrt(3)/2*im)
+        @test T ≈ 2*π
+        @test Ω ≈ 1
+        λ, T, Ω = params(T = 2*pi) 
+        @test imag(λ) ≈ sqrt(3)/2
+        @test Ω ≈ 1
+        λ, T, Ω = params(Ω = 1) 
+        @test imag(λ) ≈ sqrt(3)/2
+        @test T ≈ 2*π
+    end
+
     @testset "Darboux Transformations" begin
         @testset "Soliton 1" begin
             T = 20
