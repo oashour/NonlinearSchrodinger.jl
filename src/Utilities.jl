@@ -104,34 +104,6 @@ function params(;m=0.0, kwargs...)
     return λ, T, Ω
 end #compute_parameters
 
-"""
-    function print(sim::Sim)
-
-Prints information about the `Sim` instance `sim`
-"""
-function print(sim::Sim)
-    println("Box Properties:")
-    println("------------------------------------------")
-    println("dx = $(sim.box.dx) (Nₓ = $(sim.box.Nₓ))")
-    println("Nₜ = $(sim.box.dx) (dt = $(sim.box.dt))")
-    println("Parameters:")
-    println("------------------------------------------")
-    println("λ = $(sim.λ)")
-    println("Ω = $(sim.Ω)")
-    println("T = $(sim.T)")
-    println("------------------------------------------")
-    # Should add information about ψ₀
-    if sim.α == 0
-        println("Equation: Cubic NLSE")
-    elseif sim.α > 0
-        println("Equation: Hirota Equation with α = $(sim.α)")
-    else
-        println("Unknown equation with α = $(sim.α)")
-    end
-    println("Algorithm: $(sim.T̂)")
-    println("------------------------------------------")
-end
-
 ###########################################################################
 # ψ₀
 ###########################################################################
@@ -176,7 +148,6 @@ function ψ₀_periodic(coeff::Array, box::Box, Ω; phase=0)
     end
 
     @info str
-    println("==========================================")
 
     return ψ₀, A0
 end #psi0_periodic
