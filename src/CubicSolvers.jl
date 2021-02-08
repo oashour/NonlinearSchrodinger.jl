@@ -1,15 +1,14 @@
-"""
-    T₁ˢ(ψ, ω, dx, F)
-
-Compute `ψ'`, i.e. `ψ` advanced a step `dx` forward using a symplectic second order
-integrator. `ψ'` is defined on an FFT grid with frequencies `ω` using an FFT plan
-`F`. Do not call this explicitly and use `solve!` instead.
-
-See also: [`solve!`](@ref)
-"""
 ####################################################################
 # Symplectic
 ####################################################################
+
+"""
+    T1A!(ψₒ, ψᵢ, dx, ops)
+
+Compute `ψₒ`, i.e. `ψᵢ` advanced a step `dx` forward using a symplectic first order integrator of type A. The structure `ops::Operators` contains the FFT plans and the kinetic energy operators.  
+
+See also: [`solve!`](@ref), [`Operators`](@ref)
+"""
 function T1A!(ψₒ, ψᵢ, dx, ops)
 
     # Nonlinear
@@ -21,6 +20,13 @@ function T1A!(ψₒ, ψᵢ, dx, ops)
     ops.F̃̂*ψₒ
 end
 
+"""
+    T1B!(ψₒ, ψᵢ, dx, ops)
+
+Compute `ψₒ`, i.e. `ψᵢ` advanced a step `dx` forward using a symplectic first order integrator of type B. The structure `ops::Operators` contains the FFT plans and the kinetic energy operators.  
+
+See also: [`solve!`](@ref), [`Operators`](@ref)
+"""
 function T1B!(ψₒ, ψᵢ, dx, ops)
 
     # Dispersion
@@ -32,6 +38,13 @@ function T1B!(ψₒ, ψᵢ, dx, ops)
     ops.F̂*ψₒ
 end
 
+"""
+    T2A!(ψₒ, ψᵢ, dx, ops)
+
+Compute `ψₒ`, i.e. `ψᵢ` advanced a step `dx` forward using a symplectic second order integrator of type A. The structure `ops::Operators` contains the FFT plans and the kinetic energy operators.  
+
+See also: [`solve!`](@ref), [`Operators`](@ref)
+"""
 function T2A!(ψₒ, ψᵢ, dx, ops)
     # Nonlinear
     @. ψₒ = cis(-dx/2 * (-1*abs2(ψᵢ)))*ψᵢ
@@ -45,6 +58,13 @@ function T2A!(ψₒ, ψᵢ, dx, ops)
     @. ψₒ = cis(-dx/2 * (-1*abs2(ψₒ)))*ψₒ
 end 
 
+"""
+    T2B!(ψₒ, ψᵢ, dx, ops)
+
+Compute `ψₒ`, i.e. `ψᵢ` advanced a step `dx` forward using a symplectic second order integrator of type B. The structure `ops::Operators` contains the FFT plans and the kinetic energy operators.  
+
+See also: [`solve!`](@ref), [`Operators`](@ref)
+"""
 function T2B!(ψₒ, ψᵢ, dx, ops)
 
     # Dispersion
@@ -58,9 +78,17 @@ function T2B!(ψₒ, ψᵢ, dx, ops)
     # Dispersion
     ψₒ .= ops.K̂(dx/2) .* ψₒ
 end
+
 ####################################################################
 # Triple Jump
 ####################################################################
+"""
+    T4A_TJ!(ψₒ, ψᵢ, dx, ops)
+
+Compute `ψₒ`, i.e. `ψᵢ` advanced a step `dx` forward using a symplectic Triple Jump Fourth order integrator of type A. The structure `ops::Operators` contains the FFT plans and the kinetic energy operators.  
+
+See also: [`solve!`](@ref), [`Operators`](@ref)
+"""
 function T4A_TJ!(ψₒ, ψᵢ, dx, ops)
     s = 2^(1 / 3)
     os = 1 / (2 - s)
@@ -72,6 +100,13 @@ function T4A_TJ!(ψₒ, ψᵢ, dx, ops)
     T2A!(ψₒ, ψₒ, ft*dx, ops)
 end
 
+"""
+    T4B_TJ!(ψₒ, ψᵢ, dx, ops)
+
+Compute `ψₒ`, i.e. `ψᵢ` advanced a step `dx` forward using a symplectic Triple Jump Fourth order integrator of type B. The structure `ops::Operators` contains the FFT plans and the kinetic energy operators.  
+
+See also: [`solve!`](@ref), [`Operators`](@ref)
+"""
 function T4B_TJ!(ψₒ, ψᵢ, dx, ops)
     s = 2^(1 / 3)
     os = 1 / (2 - s)
@@ -83,6 +118,13 @@ function T4B_TJ!(ψₒ, ψᵢ, dx, ops)
     T2B!(ψₒ, ψₒ, ft*dx, ops)
 end
 
+"""
+    T6A_TJ!(ψₒ, ψᵢ, dx, ops)
+
+Compute `ψₒ`, i.e. `ψᵢ` advanced a step `dx` forward using a symplectic Triple Jump Sixth order integrator of type A. The structure `ops::Operators` contains the FFT plans and the kinetic energy operators.  
+
+See also: [`solve!`](@ref), [`Operators`](@ref)
+"""
 function T6A_TJ!(ψₒ, ψᵢ, dx, ops)
     s = 2^(1 / 5)
     os = 1 / (2 - s)
@@ -94,6 +136,13 @@ function T6A_TJ!(ψₒ, ψᵢ, dx, ops)
     T4A_TJ!(ψₒ, ψₒ, ft*dx, ops)
 end
 
+"""
+    T6B_TJ!(ψₒ, ψᵢ, dx, ops)
+
+Compute `ψₒ`, i.e. `ψᵢ` advanced a step `dx` forward using a symplectic Triple Jump Sixth order integrator of type B. The structure `ops::Operators` contains the FFT plans and the kinetic energy operators.  
+
+See also: [`solve!`](@ref), [`Operators`](@ref)
+"""
 function T6B_TJ!(ψₒ, ψᵢ, dx, ops)
     s = 2^(1 / 5)
     os = 1 / (2 - s)
@@ -105,6 +154,13 @@ function T6B_TJ!(ψₒ, ψᵢ, dx, ops)
     T4B_TJ!(ψₒ, ψₒ, ft*dx, ops)
 end
 
+"""
+    T8A_TJ!(ψₒ, ψᵢ, dx, ops)
+
+Compute `ψₒ`, i.e. `ψᵢ` advanced a step `dx` forward using a symplectic Triple Jump Eighth order integrator of type A. The structure `ops::Operators` contains the FFT plans and the kinetic energy operators.  
+
+See also: [`solve!`](@ref), [`Operators`](@ref)
+"""
 function T8A_TJ!(ψₒ, ψᵢ, dx, ops)
     s = 2^(1 / 7)
     os = 1 / (2 - s)
@@ -116,6 +172,13 @@ function T8A_TJ!(ψₒ, ψᵢ, dx, ops)
     T6A_TJ!(ψₒ, ψₒ, ft*dx, ops)
 end 
 
+"""
+    T8A_TJ!(ψₒ, ψᵢ, dx, ops)
+
+Compute `ψₒ`, i.e. `ψᵢ` advanced a step `dx` forward using a symplectic Triple Jump Eighth order integrator of type B. The structure `ops::Operators` contains the FFT plans and the kinetic energy operators.  
+
+See also: [`solve!`](@ref), [`Operators`](@ref)
+"""
 function T8B_TJ!(ψₒ, ψᵢ, dx, ops)
     s = 2^(1 / 7)
     os = 1 / (2 - s)
@@ -130,6 +193,14 @@ end
 ####################################################################
 # Suzuki Fractal
 ####################################################################
+
+"""
+    T4A_SF!(ψₒ, ψᵢ, dx, ops)
+
+Compute `ψₒ`, i.e. `ψᵢ` advanced a step `dx` forward using a symplectic Suzuki's Fractal Fourth order integrator of type A. The structure `ops::Operators` contains the FFT plans and the kinetic energy operators.  
+
+See also: [`solve!`](@ref), [`Operators`](@ref)
+"""
 function T4A_SF!(ψₒ, ψᵢ, dx, ops)
     s = 4^(1/3)
     os = 1/(4 - s)
@@ -143,6 +214,13 @@ function T4A_SF!(ψₒ, ψᵢ, dx, ops)
     T2A!(ψₒ, ψₒ, ft*dx, ops)
 end
 
+"""
+    T4B_SF!(ψₒ, ψᵢ, dx, ops)
+
+Compute `ψₒ`, i.e. `ψᵢ` advanced a step `dx` forward using a symplectic Suzuki's Fractal Fourth order integrator of type B. The structure `ops::Operators` contains the FFT plans and the kinetic energy operators.  
+
+See also: [`solve!`](@ref), [`Operators`](@ref)
+"""
 function T4B_SF!(ψₒ, ψᵢ, dx, ops)
     s = 4^(1/3)
     os = 1/(4 - s)
@@ -156,6 +234,13 @@ function T4B_SF!(ψₒ, ψᵢ, dx, ops)
     T2B!(ψₒ, ψₒ, ft*dx, ops)
 end
 
+"""
+    T6A_SF!(ψₒ, ψᵢ, dx, ops)
+
+Compute `ψₒ`, i.e. `ψᵢ` advanced a step `dx` forward using a symplectic Suzuki's Fractal Sixth order integrator of type A. The structure `ops::Operators` contains the FFT plans and the kinetic energy operators.  
+
+See also: [`solve!`](@ref), [`Operators`](@ref)
+"""
 function T6A_SF!(ψₒ, ψᵢ, dx, ops)
     s = 4^(1/5)
     os = 1/(4 - s)
@@ -169,6 +254,13 @@ function T6A_SF!(ψₒ, ψᵢ, dx, ops)
     T4A_SF!(ψₒ, ψₒ, ft*dx, ops)
 end
 
+"""
+    T6B_SF!(ψₒ, ψᵢ, dx, ops)
+
+Compute `ψₒ`, i.e. `ψᵢ` advanced a step `dx` forward using a symplectic Suzuki's Fractal Sixth order integrator of type B. The structure `ops::Operators` contains the FFT plans and the kinetic energy operators.  
+
+See also: [`solve!`](@ref), [`Operators`](@ref)
+"""
 function T6B_SF!(ψₒ, ψᵢ, dx, ops)
     s = 4^(1/5)
     os = 1/(4 - s)
@@ -182,6 +274,13 @@ function T6B_SF!(ψₒ, ψᵢ, dx, ops)
     T4B_SF!(ψₒ, ψₒ, ft*dx, ops)
 end
 
+"""
+    T8A_SF!(ψₒ, ψᵢ, dx, ops)
+
+Compute `ψₒ`, i.e. `ψᵢ` advanced a step `dx` forward using a symplectic Suzuki's Fractal Eighth order integrator of type A. The structure `ops::Operators` contains the FFT plans and the kinetic energy operators.  
+
+See also: [`solve!`](@ref), [`Operators`](@ref)
+"""
 function T8A_SF!(ψₒ, ψᵢ, dx, ops)
     s = 4^(1/7)
     os = 1/(4 - s)
@@ -195,6 +294,13 @@ function T8A_SF!(ψₒ, ψᵢ, dx, ops)
     T6A_SF!(ψₒ, ψₒ, ft*dx, ops)
 end
 
+"""
+    T8B_SF!(ψₒ, ψᵢ, dx, ops)
+
+Compute `ψₒ`, i.e. `ψᵢ` advanced a step `dx` forward using a symplectic Suzuki's Fractal Eighth order integrator of type B. The structure `ops::Operators` contains the FFT plans and the kinetic energy operators.  
+
+See also: [`solve!`](@ref), [`Operators`](@ref)
+"""
 function T8B_SF!(ψₒ, ψᵢ, dx, ops)
     s = 4^(1/7)
     os = 1/(4 - s)
@@ -207,9 +313,17 @@ function T8B_SF!(ψₒ, ψᵢ, dx, ops)
     T6B_SF!(ψₒ, ψₒ, ft*dx, ops)
     T6B_SF!(ψₒ, ψₒ, ft*dx, ops)
 end
+
 ####################################################################
 # Multi-Product Nystrom
 ####################################################################
+"""
+    T4A_N!(ψₒ, ψᵢ, dx, ops)
+
+Compute `ψₒ`, i.e. `ψᵢ` advanced a step `dx` forward using a Chin-Nystrom Fourth order integrator of type A. The structure `ops::Operators` contains the FFT plans and the kinetic energy operators.  
+
+See also: [`solve!`](@ref), [`Operators`](@ref)
+"""
 function T4A_N!(ψₒ, ψᵢ, dx, ops)
     T2A!(ψₒ, ψᵢ, dx/2, ops)
     T2A!(ψₒ, ψₒ, dx/2, ops)
@@ -221,6 +335,13 @@ function T4A_N!(ψₒ, ψᵢ, dx, ops)
     ψₒ .+= ops.ψ₁
 end
 
+"""
+    T4B_N!(ψₒ, ψᵢ, dx, ops)
+
+Compute `ψₒ`, i.e. `ψᵢ` advanced a step `dx` forward using a Chin-Nystrom Fourth order integrator of type B. The structure `ops::Operators` contains the FFT plans and the kinetic energy operators.  
+
+See also: [`solve!`](@ref), [`Operators`](@ref)
+"""
 function T4B_N!(ψₒ, ψᵢ, dx, ops)
     T2B!(ψₒ, ψᵢ, dx/2, ops)
     T2B!(ψₒ, ψₒ, dx/2, ops)
@@ -232,6 +353,13 @@ function T4B_N!(ψₒ, ψᵢ, dx, ops)
     ψₒ .+= ops.ψ₁
 end
 
+"""
+    T6A_N!(ψₒ, ψᵢ, dx, ops)
+
+Compute `ψₒ`, i.e. `ψᵢ` advanced a step `dx` forward using a Chin-Nystrom Sixth order integrator of type A. The structure `ops::Operators` contains the FFT plans and the kinetic energy operators.  
+
+See also: [`solve!`](@ref), [`Operators`](@ref)
+"""
 function T6A_N!(ψₒ, ψᵢ, dx, ops)
     T2A!(ψₒ, ψᵢ, dx/3, ops)
     T2A!(ψₒ, ψₒ, dx/3, ops)
@@ -248,6 +376,13 @@ function T6A_N!(ψₒ, ψᵢ, dx, ops)
     ψₒ .+= ops.ψ₁ .+ ops.ψ₂
 end
 
+"""
+    T6B_N!(ψₒ, ψᵢ, dx, ops)
+
+Compute `ψₒ`, i.e. `ψᵢ` advanced a step `dx` forward using a Chin-Nystrom Sixth order integrator of type B. The structure `ops::Operators` contains the FFT plans and the kinetic energy operators.  
+
+See also: [`solve!`](@ref), [`Operators`](@ref)
+"""
 function T6B_N!(ψₒ, ψᵢ, dx, ops)
     T2B!(ψₒ, ψᵢ, dx/3, ops)
     T2B!(ψₒ, ψₒ, dx/3, ops)
@@ -264,6 +399,13 @@ function T6B_N!(ψₒ, ψᵢ, dx, ops)
     ψₒ .+= ops.ψ₁ .+ ops.ψ₂
 end
 
+"""
+    T8A_N!(ψₒ, ψᵢ, dx, ops)
+
+Compute `ψₒ`, i.e. `ψᵢ` advanced a step `dx` forward using a Chin-Nystrom Eighth order integrator of type A. The structure `ops::Operators` contains the FFT plans and the kinetic energy operators.  
+
+See also: [`solve!`](@ref), [`Operators`](@ref)
+"""
 function T8A_N!(ψₒ, ψᵢ, dx, ops)
     T2A!(ψₒ, ψᵢ, dx/4, ops)
     T2A!(ψₒ, ψₒ, dx/4, ops)
@@ -286,6 +428,13 @@ function T8A_N!(ψₒ, ψᵢ, dx, ops)
     ψₒ .+= ops.ψ₁ .+ ops.ψ₂ .+ ops.ψ₃
 end
 
+"""
+    T8B_N!(ψₒ, ψᵢ, dx, ops)
+
+Compute `ψₒ`, i.e. `ψᵢ` advanced a step `dx` forward using a Chin-Nystrom Eighth order integrator of type B. The structure `ops::Operators` contains the FFT plans and the kinetic energy operators.  
+
+See also: [`solve!`](@ref), [`Operators`](@ref)
+"""
 function T8B_N!(ψₒ, ψᵢ, dx, ops)
     T2B!(ψₒ, ψᵢ, dx/4, ops)
     T2B!(ψₒ, ψₒ, dx/4, ops)
@@ -311,6 +460,14 @@ end
 ####################################################################
 # Optimized
 ####################################################################
+
+"""
+    T6A_OP!(ψₒ, ψᵢ, dx, ops)
+
+Compute `ψₒ`, i.e. `ψᵢ` advanced a step `dx` forward using an Optimized Symplectic Sixth order integrator of type A. The structure `ops::Operators` contains the FFT plans and the kinetic energy operators.  
+
+See also: [`solve!`](@ref), [`Operators`](@ref)
+"""
 function T6A_OP!(ψₒ, ψᵢ, dx, ops)
     γ₁ = 0.392256805238773 
     γ₂ = γ₁
@@ -343,6 +500,13 @@ function T6A_OP!(ψₒ, ψᵢ, dx, ops)
     T2A!(ψₒ, ψₒ, γ₁₄*dx, ops)
 end
 
+"""
+    T6B_OP!(ψₒ, ψᵢ, dx, ops)
+
+Compute `ψₒ`, i.e. `ψᵢ` advanced a step `dx` forward using an Optimized Symplectic Sixth order integrator of type B. The structure `ops::Operators` contains the FFT plans and the kinetic energy operators.  
+
+See also: [`solve!`](@ref), [`Operators`](@ref)
+"""
 function T6B_OP!(ψₒ, ψᵢ, dx, ops)
     γ₁ = 0.392256805238773 
     γ₂ = γ₁
@@ -375,6 +539,13 @@ function T6B_OP!(ψₒ, ψᵢ, dx, ops)
     T2B!(ψₒ, ψₒ, γ₁₄*dx, ops)
 end
 
+"""
+    T8A_OP!(ψₒ, ψᵢ, dx, ops)
+
+Compute `ψₒ`, i.e. `ψᵢ` advanced a step `dx` forward using an Optimized Symplectic Eighth order integrator of type A. The structure `ops::Operators` contains the FFT plans and the kinetic energy operators.  
+
+See also: [`solve!`](@ref), [`Operators`](@ref)
+"""
 function T8A_OP!(ψₒ, ψᵢ, dx, ops)
     γ₁ = 0.7416703643506129534482278
     γ₂ = -0.409100825800031593997300
@@ -409,6 +580,13 @@ function T8A_OP!(ψₒ, ψᵢ, dx, ops)
     T2A!(ψₒ, ψₒ, γ₁₅*dx, ops)
 end
 
+"""
+    T8B_OP!(ψₒ, ψᵢ, dx, ops)
+
+Compute `ψₒ`, i.e. `ψᵢ` advanced a step `dx` forward using an Optimized Symplectic Eighth order integrator of type B. The structure `ops::Operators` contains the FFT plans and the kinetic energy operators.  
+
+See also: [`solve!`](@ref), [`Operators`](@ref)
+"""
 function T8B_OP!(ψₒ, ψᵢ, dx, ops)
     γ₁ = 0.7416703643506129534482278
     γ₂ = -0.409100825800031593997300
