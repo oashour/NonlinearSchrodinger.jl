@@ -3,7 +3,7 @@ module NonlinearSchrodinger
 using FFTW
 using DifferentialEquations, DiffEqOperators
 using Memoization
-using Plots.PlotMeasures, LaTeXStrings  
+using LaTeXStrings  
 using Elliptic
 using Elliptic.Jacobi
 using Images
