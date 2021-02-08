@@ -3,12 +3,12 @@ module NonlinearSchrodinger
 using FFTW
 using DifferentialEquations, DiffEqOperators
 using Memoization
-using Plots.PlotMeasures, LaTeXStrings  
+using LaTeXStrings  
 using Elliptic
 using Elliptic.Jacobi
 using Images
 using DataFrames
-using Plots; gr()
+using RecipesBase
 
 
 # Logging Stuff
@@ -26,6 +26,8 @@ export params
 export PHF, find_peaks
 #export solve_dt!
 
+export Density_ψ
+
 export Sim, Box, Calc
 export T1A!, T1B!, T2A!, T2B!
 export T4A_TJ!, T4B_TJ!, T6A_TJ!, T6B_TJ!, T8A_TJ!, T8B_TJ!
@@ -38,7 +40,8 @@ export T1A_SS!
 include("Types.jl")
 include("Simulation.jl")
 include("Utilities.jl")
-include("Plotter.jl")
+include("Recipes.jl")
 include("Darboux.jl")
+
 
 end #module
