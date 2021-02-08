@@ -23,31 +23,31 @@ end
 Computes the integrals of motion of `obj.ψ` and saves them in respective fields of `obj`.
 `obj` can be a `Sim` or `Calc` object
 
-See also: [`NLSS.Plotter.plot_CoM`](@ref)
+Result can be plotted using plot(obj, :IoM)
 """
-function compute_IoM!(obj; normalize=false)
+function compute_IoM!(obj)
     @info "Computing integrals of motions"
     ψ² = abs2.(obj.ψ)
     ψ̃² = abs2.(obj.ψ̃)
     # The norm is preserved extremely well so if the W.F. is normalized we do not worry about dividing the IoM by the norm to improve performance
-    if normalize
-        obj.N .= sum(ψ², dims=1)[:]./obj.box.Nₜ
-        obj.PE .= -0.5*sum(ψ².^2,dims=1)[:]./(obj.N*obj.box.Nₜ)
-        obj.KE .= 0.5*sum((obj.box.ω.^2 .* ψ̃²),dims=1)[:]./obj.N
+    #if normalize
+        #obj.N .= sum(ψ², dims=1)[:]./obj.box.Nₜ
+        #obj.PE .= -0.5*sum(ψ².^2,dims=1)[:]./(obj.N*obj.box.Nₜ)
+        #obj.KE .= 0.5*sum((obj.box.ω.^2 .* ψ̃²),dims=1)[:]./obj.N
         #obj.P .= 2*imag.(sum(im * obj.box.ω.* ψ̃²,dims=1)[:]./obj.N)
-        obj.P .= 2*sum(obj.box.ω.* ψ̃²,dims=1)[:]./obj.N
-        obj.E .= obj.KE .+ obj.PE
-    else
-        # Why does the stuff from NumericalIntegration.jl not work?
-        #obj.N .= integrate(obj.box.t, ψ², SimpsonEvenFast())./obj.T
-        #obj.PE .= -0.5*integrate(obj.box.t, (ψ²).^2, SimpsonEvenFast())./obj.T
-        obj.N .= sum(ψ², dims=1)[:]./obj.box.Nₜ
-        obj.PE .= -0.5*sum(ψ².^2,dims=1)[:]./obj.box.Nₜ
-        obj.KE .= 0.5*sum((obj.box.ω.^2 .* ψ̃²),dims=1)[:]
-        #obj.P .= 2*imag.(sum(im * obj.box.ω.* ψ̃²,dims=1)[:])
-        obj.P .= 2*sum(obj.box.ω.* ψ̃²,dims=1)[:]
-        obj.E .= obj.KE .+ obj.PE
-    end
+        #obj.P .= 2*sum(obj.box.ω.* ψ̃²,dims=1)[:]./obj.N
+        #obj.E .= obj.KE .+ obj.PE
+    #else
+    # Why does the stuff from NumericalIntegration.jl not work?
+    #obj.N .= integrate(obj.box.t, ψ², SimpsonEvenFast())./obj.T
+    #obj.PE .= -0.5*integrate(obj.box.t, (ψ²).^2, SimpsonEvenFast())./obj.T
+    obj.N .= sum(ψ², dims=1)[:]./obj.box.Nₜ
+    obj.PE .= -0.5*sum(ψ².^2,dims=1)[:]./obj.box.Nₜ
+    obj.KE .= 0.5*sum((obj.box.ω.^2 .* ψ̃²),dims=1)[:]
+    #obj.P .= 2*imag.(sum(im * obj.box.ω.* ψ̃²,dims=1)[:])
+    obj.P .= 2*sum(obj.box.ω.* ψ̃²,dims=1)[:]
+    obj.E .= obj.KE .+ obj.PE
+    #end
 
     @info "Integrals of motion computed."
 end
