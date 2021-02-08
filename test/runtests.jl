@@ -63,6 +63,9 @@ using Test
 
             calc = Calc(λ, tₛ, xₛ, seed, box) 
             solve!(calc)
+            peak = PHF(calc)
+            @test peak ≈ 5.1
+
             λ = 0.85im; 
             ψ₀ = 2*imag(λ)./cosh.(2*imag(λ).*box.t)
             # Test around edges and exact peak to avoid weird behavior near peak from DT iteration
@@ -81,6 +84,8 @@ using Test
 
             calc = Calc(λ, tₛ, xₛ, seed, box) 
             solve!(calc)
+            peak = PHF(calc)
+            @test peak ≈ 2.8
 
             λ = 0.9im; 
             a = imag(λ)^2/2
@@ -100,6 +105,8 @@ using Test
 
             seed = "cn"
             calc = Calc(λ, tₛ, xₛ, seed, box, m = 0.5) 
+            peak = PHF(calc)
+            @test peak ≈ 2.1071067811865474
 
             solve!(calc)
 
@@ -116,6 +123,8 @@ using Test
 
             seed = "dn"
             calc = Calc(λ, tₛ, xₛ, seed, box, m = 0.5) 
+            peak = PHF(calc)
+            @test peak ≈ 2.2
 
             solve!(calc)
 
