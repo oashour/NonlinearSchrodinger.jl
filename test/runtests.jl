@@ -159,4 +159,26 @@ using Test
             @test abs.(sim.ψ[:, end]) ≈ abs.(ψ₀) atol=1e-5
         end
     end
+    @testset "Soliton Simulations Hirota" begin
+        λ = 0.75im
+        T = 20
+        xᵣ = 0=>5
+        box = Box(xᵣ, T, dx=1e-3, Nₜ = 256, n_periods = 1)
+        ψ₀ = Array{Complex{Float64}}(undef, box.Nₜ)
+        ψf = Array{Complex{Float64}}(undef, box.Nₜ)
+        ψ₀ .= 2*imag(λ)./cosh.(2*imag(λ).*box.t)
+        xf = box.x[end]
+        α = 0.1
+        v = 4*α*imag(λ)^2
+        ψf .= 2*imag(λ)./cosh.(2*imag(λ).*(box.t .+ v*xf))
+
+        for algo ∈ (T1A_H!, T2A_H!)
+            sim = Sim(λ, box, ψ₀, algo, α = α)
+            @info "Testing Algorithm" algo
+            solve!(sim)
+            # Can't test around the peak due to a minor shift between them
+            @test abs.(sim.ψ[1:50, end]) ≈ abs.(ψ₀[1:50]) atol=5e-2
+            @test abs.(sim.ψ[175:end, end]) ≈ abs.(ψ₀[175:end]) atol=5e-2
+        end
+    end
 end
