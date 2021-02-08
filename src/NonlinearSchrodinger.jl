@@ -1,7 +1,7 @@
 module NonlinearSchrodinger
 
 using FFTW
-using DifferentialEquations, DiffEqOperators
+using OrdinaryDiffEq, DiffEqOperators
 using Memoization
 using LaTeXStrings  
 using Elliptic
@@ -17,7 +17,6 @@ using TerminalLoggers: TerminalLogger
 global_logger(TerminalLogger())
 
 export compute_IoM!, compute_spectrum!
-export plot_ψ, plot_ψ̃, plot_IoM
 export print
 export solve!
 export ψ₀_periodic, ψ₀_DT
