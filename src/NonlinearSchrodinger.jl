@@ -8,7 +8,6 @@ using Elliptic
 using Elliptic.Jacobi
 using Images
 using DataFrames
-using Plots; gr()
 using RecipesBase
 
 
