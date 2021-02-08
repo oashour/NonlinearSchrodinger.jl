@@ -41,7 +41,6 @@ include("Types.jl")
 include("Simulation.jl")
 include("Utilities.jl")
 include("Recipes.jl")
-include("Plotter.jl")
 include("Darboux.jl")
 
 
