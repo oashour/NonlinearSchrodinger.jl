@@ -1,4 +1,5 @@
 using NonlinearSchrodinger
+using RecipesBase
 using Test
 
 @testset "NonlinearSchrodinger.jl" begin
@@ -131,7 +132,6 @@ using Test
             # Test the solution is mirrored across the x=0 axis
             @test abs.(calc.ψ[:,2]) ≈ abs.(calc.ψ[:,1])
         end
-        
     end
 
     # Simulation Tests using Solitons (easiest way to check validity)
@@ -180,5 +180,48 @@ using Test
             @test abs.(sim.ψ[1:50, end]) ≈ abs.(ψ₀[1:50]) atol=5e-2
             @test abs.(sim.ψ[175:end, end]) ≈ abs.(ψ₀[175:end]) atol=5e-2
         end
+    end
+    @testset "Plot Recipes" begin
+        λ = 0.75im
+        T = 20
+        xᵣ = 0=>1
+        box = Box(xᵣ, T, dx=1e-3, Nₜ = 256, n_periods = 1)
+        ψ₀ = Array{Complex{Float64}}(undef, box.Nₜ)
+        ψ₀ .= 2*imag(λ)./cosh.(2*imag(λ).*box.t)
+        sim = Sim(λ, box, ψ₀, T1A!)
+        solve!(sim)
+        compute_IoM!(sim)
+        xₛ = Int(ceil(sim.box.Nₓ/500))
+        tₛ = Int(ceil(sim.box.Nₜ/500))
+        x_ax = sim.box.t[1:tₛ:end]
+        y_ax =  sim.box.x[1:xₛ:end] 
+        ω_ax = sim.box.ω[1:tₛ:end] 
+        ψ = sim.ψ[1:tₛ:end, 1:xₛ:end]
+        ψ̃ = sim.ψ̃[1:tₛ:end, 1:xₛ:end]
+
+        # Test plotting ψ
+        rec = RecipesBase.apply_recipe(Dict{Symbol, Any}(), sim, :ψ)
+        @test getfield(rec[1], 2)[1] == x_ax
+        @test getfield(rec[1], 2)[2] == y_ax
+        @test getfield(rec[1], 2)[3] == abs.(ψ')
+
+        # Test plotting ψ̃
+        rec = RecipesBase.apply_recipe(Dict{Symbol, Any}(), sim, :ψ̃)
+        @test getfield(rec[1], 2)[1] == y_ax
+        rec = RecipesBase.apply_recipe(Dict{Symbol, Any}(:seriestype => :heatmap), sim, :ψ̃)
+        @test getfield(rec[1], 2)[1] == ω_ax
+        @test getfield(rec[1], 2)[2] == y_ax
+        @test getfield(rec[1], 2)[3] == log.(abs.(ψ̃'))
+
+        # Test plotting IoM
+        rec = RecipesBase.apply_recipe(Dict{Symbol, Any}(), sim, :IoM)
+        @test getfield(rec[1], 2)[1] == y_ax
+        @test getfield(rec[2], 2)[1] == y_ax
+        @test getfield(rec[3], 2)[1] == y_ax
+        @test getfield(rec[4], 2)[1] == y_ax
+
+        # Test Error
+        @test_logs (:error, "Unknown Plotting Mode for NonlinearSchrodinger.jl Objects IoMM") RecipesBase.apply_recipe(Dict{Symbol, Any}(), sim, :IoMM)
+         
     end
 end

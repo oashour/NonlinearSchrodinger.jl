@@ -124,7 +124,7 @@
             x, δN
         end
     else
-        @error "Unknown Plotting Mode for NonlinearSchrodinger.jl Objects" mode
+        @error "Unknown Plotting Mode for NonlinearSchrodinger.jl Objects $mode"
     end
 
     return nothing
