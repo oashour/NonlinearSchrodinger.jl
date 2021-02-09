@@ -1,7 +1,20 @@
-@recipe function f(sim::T, mode=:ψ; x_res=500, t_res=500, n_lines=10, skip=1) where T <: Union{Calc, Sim}
+@recipe function f(sim::T, mode=:ψ) where T <: Union{Calc, Sim}
+    # Set Defaults
+    res_x --> 500
+    res_t --> 500
+    n_lines --> 10
+    skip --> 1
+
+    # Extract Values
+    res_x = plotattributes[:res_x]
+    res_t = plotattributes[:res_t]
+    skip = plotattributes[:skip]
+    n_lines = plotattributes[:n_lines]
+
     # Compute sampling interval
-    xₛ = Int(ceil(sim.box.Nₓ/x_res))
-    tₛ = Int(ceil(sim.box.Nₜ/t_res))
+    xₛ = Int(ceil(sim.box.Nₓ/res_x))
+    tₛ = Int(ceil(sim.box.Nₜ/res_t))
+
 
     if mode==:ψ
         # Downsample
@@ -31,7 +44,7 @@
             linewidth --> 1.5
             xguide --> L"x"
             yguide --> L"\log|\tilde{\psi}|"
-            margin --> 4mm
+            #margin --> 4mm
             legend --> :outertopright
             for i=1:size(ψ̃)[1]
                 @series begin
@@ -54,7 +67,6 @@
                 # return series data
                 x_ax, y_ax, log.(abs.(ψ̃'))
             end
-    
         end
     elseif mode==:IoM
         # Downscale
@@ -114,5 +126,6 @@
     else
         @error "Unknown Plotting Mode for NonlinearSchrodinger.jl Objects" mode
     end
+
     return nothing
 end
