@@ -1,3 +1,4 @@
+
 struct Box{TT<:Real}
     t::Array{TT, 1}
     ω::Array{TT, 1}
@@ -9,8 +10,13 @@ struct Box{TT<:Real}
     n_periods::Int64
 end 
 
+"""
+    function Box(xᵣ::Pair, T; dx, Nₓ, Nₜ, n_periods)
+    
+Create a `::Box` object with `Nₜ` transverse nodes, `Nₓ` longitudinal nodes (or `dx` grid spacing in the lontidunal direction, only one option can be specified), of size `[(xᵣ.first), (xᵣ.second)]` in the longitudinal direction and `[(-T*n_periods/2), (T*n_periods/2))`
+"""
 function Box(xᵣ::Pair, T; dx = 0.0, Nₓ = 0, Nₜ = 256, n_periods = 1)
-    @info "Initializing simulation box with $n_periods period(s) and dx = $dx, Nₜ = $Nₜ."
+    @info "Initializing Box with $n_periods period(s) and dx = $dx, Nₜ = $Nₜ."
     T = n_periods * T
     @info "Longitudinal range is [$(xᵣ.first), $(xᵣ.second)], transverse range is [$(-T/2), $(T/2))"
     dt = T / Nₜ
@@ -56,7 +62,14 @@ struct Sim{TT<:Real, F}
     P::Array{TT, 1}
 end # Simulation
 
-function Sim(λ, box::Box, ψ₀::Array{Complex{TT}, 1}, T̂; α = 0.0, ϵ=0.0, β = 0.0) where TT <: Real
+"""
+    function Sim(λ, box::Box, ψ₀::Array{Complex{TT}, 1}, T̂; α = 0.0, ϵ=0.0, β=0.0) where TT <: Rea
+    
+Create a `::Sim` object corresponding to eigenvalue `λ` (only used for breathers, ignored for arbitrary initial conditions), initial condition `ψ₀` and algorithm `T̂`. `α` is the Hirota equation parameter and `ϵ` is the Sasa-Satsuma equation parameter. `β` controls pruning.
+
+See also: [`Box`](@ref)
+"""
+function Sim(λ, box::Box, ψ₀::Array{Complex{TT}, 1}, T̂; α = 0.0, ϵ=0.0, β=0.0) where TT <: Real
     ψ = Array{Complex{TT}}(undef, box.Nₜ, box.Nₓ)
     ψ̃ = similar(ψ)
     E = zeros(box.Nₓ)
@@ -95,6 +108,21 @@ struct Calc{TT<:Real}
     P::Vector{TT}
 end # Simulation
 
+"""
+    function Calc(λ::Array{Complex{TT}}, tₛ, xₛ, seed, box; m=0.0) where TT <: Real 
+
+Create a `::Calc` object with eigenvalues `λ`, shifts `xₛ` and `tₛ` and seeding solution `seed`. `box::Box` is the Box object used for the calculation and `m` is the elliptic parameter for cnoidal solutions. `seed` can have the following values:
+
+`seed = "0"` ``\\implies \\psi_0 = 0``
+
+`seed = "exp"` ``\\implies \\psi_0 = e^{ix}``
+
+`seed = "dn"` ``\\implies \\psi_0 = dn(t, m)e^{ix(1-m/2)}``
+
+`seed = "cn"` ``\\implies \\psi_0 = \\sqrt{m}cn(t, m)e^{ix(m - 1/2)}``
+
+See also: [`Box`](@ref)
+"""
 function Calc(λ::Array{Complex{TT}}, tₛ, xₛ, seed, box; m=0.0) where TT <: Real
     if ~(length(λ) == length(tₛ) == length(xₛ))
         throw(ArgumentError("Length of shifts and eigenvalue array should be the same."))
@@ -169,6 +197,13 @@ function (K̂::Ks)(dx)
     end
 end
 
+"""
+    function Operators(sim)
+
+Construct appropriate operators for `sim::Sim`. These include the Fourier operator `F̂`, inverse Fourier operator `F̃̂`, dispersion operaotr `K̂`, and Hirota/Sasa-Satsuma operators `B̂` and `B̂B`. This object also includes some arrays for temporary operations in Nystrom integrators.
+
+See also: [`Sim`](@ref)
+"""
 function Operators(sim)
     # Generate FFT Plans to optimize performance
     @info "Generating FFT plans"

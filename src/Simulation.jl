@@ -3,11 +3,11 @@ include("HirotaSolvers.jl")
 include("SSSolvers.jl")
 
 """
-    solve!(sim::Simulation)
+    solve!(sim::Sim)
 
-Solves the `Simulation` object `sim` using the techniques its attributes specify.
+Solves the `Sim` object `sim`.
 
-See also: [`init_sim`](@ref), [`NLSS.Plotter.plot_ψ`](@ref)
+See also: [`Sim`](@ref)
 """
 function solve!(sim::Sim)
     # Set initial condition

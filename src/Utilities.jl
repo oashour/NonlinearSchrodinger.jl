@@ -2,9 +2,20 @@
     function compute_IoM!(obj)
 
 Computes the integrals of motion of `obj.ψ` and saves them in respective fields of `obj`.
-`obj` can be a `Sim` or `Calc` object
+`obj` can be a `::Sim` or `::Calc` object. The fields are:
 
-Result can be plotted using plot(obj, :IoM)
+````
+obj.KE  # Array containing the kinetic energy K(x)
+obj.PE  # Array containing the potential energy V(x)
+obj.E   # Array containing the energy H(x)
+obj.N   # Array containing the norm N(x)
+obj.P   # Array containing the momentum P(x)
+obj.dE  # Array containing the energy error δE(x)
+obj.dN  # Array containing the norm error δN(x)
+obj.dP  # Array containing the momentum error δP(x)
+````
+
+Result can be plotted using `plot(obj, :IoM)`
 """
 function compute_IoM!(obj)
     @info "Computing integrals of motions"
@@ -89,14 +100,20 @@ end #compute_parameters
 # ψ₀
 ###########################################################################
 """
-    function ψ₀_periodic(coeff, box::SimBox, params::SimParamseters; phase=0)
+    function ψ₀_periodic(coeff::Array, box::Box, Ω; phase=0)
 
-Computes an initial wavefunction for the `SimBox` `box`, with fundamental frequency `sim.Ω`
-and coefficients ``A_1...n`` = `coeff` and an overall phase `exp(i phase t)`, i.e. of the form:
+Computes an initial wavefunction for the `box::Box`, with fundamental frequency `Ω`
+and coefficients ``A_{1\\ldots n}`` = `coeff` and an overall phase ``e^{i \\phi t}`` where ``\\phi`` = `phase`. i.e. ``\\psi_0`` is of the form:
 
-**TODO**: insert latex form here
+``
+\\psi(x=0, t) = e^{i \\phi t} (A_0 + 2 \\sum_{1}^{n} A_m \\cos(m \\Omega t))
+``
 
-See also: [`init_sim`](@ref)
+where:
+
+``
+A_0 = \\sqrt{1 - 2 \\sum_{m=1}^n |A_m|^2}
+``
 """
 function ψ₀_periodic(coeff::Array, box::Box, Ω; phase=0)
     @info "Initializing periodic ψ₀"
