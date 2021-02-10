@@ -31,10 +31,10 @@ uuid = "ec485272-7323-5ecc-a04f-4719b315124d"
 version = "0.1.0"
 
 [[ArrayInterface]]
-deps = ["IfElse", "LinearAlgebra", "Requires", "SparseArrays"]
-git-tree-sha1 = "ee07ae00e3cc277dcfa5507ce25be522313ecc3e"
+deps = ["LinearAlgebra", "Requires", "SparseArrays"]
+git-tree-sha1 = "a2a1884863704e0414f6f164a1f6f4a2a62faf4e"
 uuid = "4fba245c-0d91-5ea0-9b3e-6abc04ee57a9"
-version = "3.1.1"
+version = "2.14.17"
 
 [[ArrayLayouts]]
 deps = ["Compat", "FillArrays", "LinearAlgebra", "SparseArrays"]
@@ -635,9 +635,9 @@ uuid = "56ddb016-857b-54e1-b83d-db4d58db5568"
 
 [[LoopVectorization]]
 deps = ["ArrayInterface", "DocStringExtensions", "IfElse", "LinearAlgebra", "OffsetArrays", "Requires", "SLEEFPirates", "ThreadingUtilities", "UnPack", "VectorizationBase"]
-git-tree-sha1 = "5684e4aafadaf668dce27f12d67df4888fa58181"
+git-tree-sha1 = "5f275de503982d59bd82eb1e4fbc273f55a72dee"
 uuid = "bdcacae8-1622-11e9-2a5c-532679323890"
-version = "0.11.2"
+version = "0.10.0"
 
 [[MKL_jll]]
 deps = ["IntelOpenMP_jll", "Libdl", "Pkg"]
@@ -954,9 +954,9 @@ uuid = "ea8e919c-243c-51af-8825-aaa63cd721ce"
 
 [[SLEEFPirates]]
 deps = ["IfElse", "Libdl", "VectorizationBase"]
-git-tree-sha1 = "ab6194c92dcf38036cd9513e4ab12cd76a613da1"
+git-tree-sha1 = "3d44bb7517298fd262915924fdc1645c61a6ef17"
 uuid = "476501e8-09a2-5ece-8869-fb82de89a1fa"
-version = "0.6.10"
+version = "0.6.8"
 
 [[SafeTestsets]]
 deps = ["Test"]
@@ -1088,9 +1088,9 @@ uuid = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
 
 [[ThreadingUtilities]]
 deps = ["VectorizationBase"]
-git-tree-sha1 = "e3032c97b183e6e2baf4d2cc4fe60c4292a4a707"
+git-tree-sha1 = "64a2be7c73951d7c402eb40a16055e5e6fdda468"
 uuid = "8290d209-cae3-49c0-8002-c8c24d57dab5"
-version = "0.2.5"
+version = "0.2.3"
 
 [[TimerOutputs]]
 deps = ["Printf"]
@@ -1135,9 +1135,9 @@ version = "1.5.0"
 
 [[VectorizationBase]]
 deps = ["ArrayInterface", "Hwloc", "IfElse", "Libdl", "LinearAlgebra"]
-git-tree-sha1 = "fff40362e3170e934afb15b9447e06812c6322e4"
+git-tree-sha1 = "9f27ddc74f04319574749bb0a5b3f231a5e7db16"
 uuid = "3d5dd08c-fd9d-11e8-17fa-ed2836048c2f"
-version = "0.18.8"
+version = "0.16.2"
 
 [[VertexSafeGraphs]]
 deps = ["LightGraphs"]
