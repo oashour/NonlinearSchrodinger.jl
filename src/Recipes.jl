@@ -26,6 +26,15 @@
         yguide --> L"x"
         colorbar_title --> L"|\psi|"
         seriescolor --> :viridis
+        fontfamily --> "Computer Modern"
+        tick_direction --> :out
+        s = get(plotattributes, :seriestype, :auto)
+        if s == :surface
+            zguide --> L"|\psi|"
+            colorbar --> false
+            camera --> (35, 75)
+            grid --> false
+        end
         @series begin
             # return series data
             x_ax, y_ax, abs.(ψ)'
@@ -44,6 +53,8 @@
             linewidth --> 1.5
             xguide --> L"x"
             yguide --> L"\log|\tilde{\psi}|"
+            fontfamily --> "Computer Modern"
+            tick_direction --> :out
             #margin --> 4mm
             legend --> :outertopright
             for i=1:size(ψ̃)[1]
@@ -62,6 +73,8 @@
             yguide --> L"x"
             colorbar_title --> L"\log|\tilde{\psi}|"
             seriescolor --> :viridis
+            fontfamily --> "Computer Modern"
+            tick_direction --> :out
             @series begin
                 seriestype := s
                 # return series data
@@ -79,6 +92,8 @@
         δN = sim.N[1:xₛ:end] .- sim.N[1]
 
         layout --> (2, 2)
+        fontfamily --> "Computer Modern"
+        tick_direction --> :out
         @series begin
             linewidth --> 1.5
             subplot := 1
