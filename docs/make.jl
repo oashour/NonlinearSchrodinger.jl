@@ -13,6 +13,10 @@ makedocs(;
     ),
     pages=[
         "Home" => "index.md",
+        "Integrators" => "man/integrators.md",
+        "Examples" => "man/examples.md",
+        "Visualization" => "man/visualization.md",
+        "Library" => "library.md",
     ],
 )
 
