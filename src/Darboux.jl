@@ -15,7 +15,7 @@ function solve!(calc::Calc)
     calc.ψ̃ .= fftshift(fft(calc.ψ, 1),1)./calc.box.Nₜ
 end
 
-function calc_rs(c::Calc, n, p, ψₜ)
+@memoize function calc_rs(c::Calc, n, p, ψₜ)
 
     @info "Calculating Lax pair generating functions rₙₚ(x,t) and sₙₚ(x,t) for (n,p) = ($n,$p)"
     # Base case
