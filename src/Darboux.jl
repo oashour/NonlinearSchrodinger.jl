@@ -13,6 +13,8 @@ function solve!(calc::Calc)
     calc_rs(calc, N, 1, ψₜ)
     calc.ψ .= ψₜ[:,:,N+1]
     calc.ψ̃ .= fftshift(fft(calc.ψ, 1),1)./calc.box.Nₜ
+
+    return nothing
 end
 
 @memoize function calc_rs(c::Calc, n, p, ψₜ)
