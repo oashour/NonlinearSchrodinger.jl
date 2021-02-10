@@ -99,6 +99,7 @@ struct Calc{TT<:Real}
     seed::String # Should be an enum
     box::Box{TT}
     m::TT
+    α::TT
     ψ::Matrix{Complex{TT}}
     ψ̃::Matrix{Complex{TT}}
     E::Vector{TT}
@@ -123,7 +124,7 @@ Create a `::Calc` object with eigenvalues `λ`, shifts `xₛ` and `tₛ` and see
 
 See also: [`Box`](@ref)
 """
-function Calc(λ::Array{Complex{TT}}, tₛ, xₛ, seed, box; m=0.0) where TT <: Real
+function Calc(λ::Array{Complex{TT}}, tₛ, xₛ, seed, box; m=0.0, α=0.0) where TT <: Real
     if ~(length(λ) == length(tₛ) == length(xₛ))
         throw(ArgumentError("Length of shifts and eigenvalue array should be the same."))
     end
@@ -155,7 +156,7 @@ function Calc(λ::Array{Complex{TT}}, tₛ, xₛ, seed, box; m=0.0) where TT <: 
     N = similar(E)
     P = similar(E)
 
-    calc = Calc(λ, T, Ω, χ, tₛ, xₛ, seed, box, m, ψ, ψ̃, E, PE, KE, N, P)
+    calc = Calc(λ, T, Ω, χ, tₛ, xₛ, seed, box, m, α, ψ, ψ̃, E, PE, KE, N, P)
 end #init_sim
 
 struct Operators{T, DispFunc, FFTPlan, InvFFTPlan}

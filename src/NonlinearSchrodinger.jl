@@ -39,7 +39,6 @@ include("Simulation.jl")
 include("Utilities.jl")
 include("Recipes.jl")
 include("Darboux.jl")
-include("DarbouxHirota.jl")
 
 
 end #module
