@@ -1,23 +1,4 @@
 """
-    function compute_spectrum!(obj)
-
-Computes the normalized spectrum of `obj.ψ` with the center frequency shifted to the center
-and saves it in `obj.ψ̃`. `obj` can be a `Sim` or `Calc` object
-
-See also: [`NLSS.Plotter.plot_ψ̃`](@ref)
-"""
-function compute_spectrum!(obj)
-    @info "Computing spectrum"
-
-    FFTW.set_num_threads(4)
-    F̂ = plan_fft(obj.ψ, 1) # 26 allocs
-    obj.ψ̃ .= fftshift(F̂*obj.ψ, 1)/obj.box.Nₜ
-    FFTW.set_num_threads(1) # set it back to 1, not useful in smaller FFTs
-
-    @info "Spectrum computed"
-end
-
-"""
     function compute_IoM!(obj)
 
 Computes the integrals of motion of `obj.ψ` and saves them in respective fields of `obj`.
