@@ -27,15 +27,23 @@ end
             t = c.box.t .- c.tₛ[p]
             x = c.box.x' .- c.xₛ[p]
             # Compute r and s directly
-            rf = exp.(+im.*(c.λ[p] .* t .+ c.λ[p]^2 * (1 - 4*c.α*c.λ[p]) .* x .- π/4))
-            sf = exp.(-im.*(c.λ[p] .* t .+ c.λ[p]^2 * (1 - 4*c.α*c.λ[p]) .* x .- π/4))
+            α = c.f[:α]
+            γ = c.f[:γ]
+            δ = c.f[:δ]
+            d = (1 - 4*α*c.λ[p] - 8*γ*c.λ[p]^2 + 16*δ*c.λ[p]^3)
+            rf = exp.(+im.*(c.λ[p] .* t .+ c.λ[p]^2 * d .* x .- π/4))
+            sf = exp.(-im.*(c.λ[p] .* t .+ c.λ[p]^2 * d .* x .- π/4))
         elseif c.seed == "exp"
             # Set up x and t in the proper way
             t = c.box.t .- c.tₛ[p]
             x = c.box.x' .- c.xₛ[p]
             # Compute r and s directly
-            A = +c.χ[p].+0.5.*(c.Ω[p].*t .+ c.Ω[p]*(c.λ[p] + 2*c.α*(1-2*c.λ[p]^2)).*x) .- π/4
-            B = -c.χ[p].+0.5.*(c.Ω[p].*t .+ c.Ω[p]*(c.λ[p] + 2*c.α*(1-2*c.λ[p]^2)).*x) .- π/4
+            α = c.f[:α]
+            γ = c.f[:γ]
+            δ = c.f[:δ]
+            d = 2*(α+3*δ) + (1+4*γ)*c.λ[p] - 4*(α+2*δ)*c.λ[p]^2 - 8*γ*c.λ[p]^3 + 16*δ*c.λ[p]^4
+            A = +c.χ[p].+0.5.*(c.Ω[p].*t .+ c.Ω[p]*d.*x) .- π/4
+            B = -c.χ[p].+0.5.*(c.Ω[p].*t .+ c.Ω[p]*d.*x) .- π/4
             rf = 2im.*exp.(-im.*c.box.x'./2) .* sin.(A)
             sf = 2  .*exp.(+im.*c.box.x'./2) .* cos.(B)
         elseif c.seed == "dn"

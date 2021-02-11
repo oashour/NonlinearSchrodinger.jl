@@ -99,7 +99,7 @@ struct Calc{TT<:Real}
     seed::String # Should be an enum
     box::Box{TT}
     m::TT
-    α::TT
+    f::Dict{Symbol,TT}
     ψ::Matrix{Complex{TT}}
     ψ̃::Matrix{Complex{TT}}
     E::Vector{TT}
@@ -124,7 +124,7 @@ Create a `::Calc` object with eigenvalues `λ`, shifts `xₛ` and `tₛ` and see
 
 See also: [`Box`](@ref)
 """
-function Calc(λ::Array{Complex{TT}}, tₛ, xₛ, seed, box; m=0.0, α=0.0) where TT <: Real
+function Calc(λ::Array{Complex{TT}}, tₛ, xₛ, seed, box; m=0.0, f = Dict(:α=>0.0, :γ=>0.0,:δ=> 0.0)) where TT <: Real
     if ~(length(λ) == length(tₛ) == length(xₛ))
         throw(ArgumentError("Length of shifts and eigenvalue array should be the same."))
     end
@@ -156,7 +156,17 @@ function Calc(λ::Array{Complex{TT}}, tₛ, xₛ, seed, box; m=0.0, α=0.0) wher
     N = similar(E)
     P = similar(E)
 
-    calc = Calc(λ, T, Ω, χ, tₛ, xₛ, seed, box, m, α, ψ, ψ̃, E, PE, KE, N, P)
+    if !haskey(f, :α)
+        push!(f, :α => 0.0)
+    end
+    if !haskey(f, :γ)
+        push!(f, :γ => 0.0)
+    end
+    if !haskey(f, :δ)
+        push!(f, :δ => 0.0)
+    end
+
+    calc = Calc(λ, T, Ω, χ, tₛ, xₛ, seed, box, m, f, ψ, ψ̃, E, PE, KE, N, P)
 end #init_sim
 
 struct Operators{T, DispFunc, FFTPlan, InvFFTPlan}

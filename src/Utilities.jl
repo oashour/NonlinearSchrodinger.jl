@@ -188,6 +188,27 @@ function λ_given_m(m; q = 2)
 
 end
 
+function λ_given_f(f, ν)
+    α = f[:α]
+    γ = f[:γ]
+    δ = f[:δ]
+    @info "Computing real part of eigenvalue for breather to soliton conversion"
+    @info "Got α = $α, γ = $γ, δ = $δ"
+    poly = reverse([64*δ, -24*γ, -8*(α+2*δ+8*δ*ν^2), γ*(4 + 8*ν^2)+1])
+    r = roots(poly)
+
+    if imag(r[1]) == 0
+        @info "Computed v = $(real(r[1]))"
+        return real(r[1]) + ν*im
+    elseif imag(r[2]) == 0
+        @info "Computed v = $(real(r[2]))"
+        return real(r[2]) + ν*im
+    elseif imag(r[3]) == 0
+        @info "Computed v = $(real(r[3]))"
+        return real(r[3]) + ν*im
+    end
+end
+
 function PHF(calc::Calc)
     s = 2*sum(imag.(calc.λ))
     if calc.seed == "exp" || calc.seed == "dn"
@@ -200,3 +221,4 @@ function PHF(calc::Calc)
 
     peak = ψ₀₀ + s
 end
+
