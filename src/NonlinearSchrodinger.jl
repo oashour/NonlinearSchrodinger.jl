@@ -8,12 +8,6 @@ using Elliptic
 using Elliptic.Jacobi
 using RecipesBase
 
-
-# Logging Stuff
-using Logging: global_logger
-using TerminalLoggers: TerminalLogger
-global_logger(TerminalLogger())
-
 export compute_IoM!, compute_spectrum!
 export print
 export solve!
