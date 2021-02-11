@@ -740,7 +740,7 @@ uuid = "46757867-2c16-5918-afeb-47bfcb05e46a"
 version = "0.2.0"
 
 [[NonlinearSchrodinger]]
-deps = ["DiffEqOperators", "Elliptic", "FFTW", "LaTeXStrings", "Logging", "Memoization", "OrdinaryDiffEq", "RecipesBase", "TerminalLoggers"]
+deps = ["DiffEqOperators", "Elliptic", "FFTW", "LaTeXStrings", "Logging", "Memoization", "OrdinaryDiffEq", "RecipesBase"]
 path = ".."
 uuid = "b3fbeaf7-5746-403c-a6b7-06939dc82746"
 version = "0.0.7"
