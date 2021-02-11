@@ -47,7 +47,7 @@ end
             rf = 2im.*exp.(-im.*c.box.x'./2) .* sin.(A)
             sf = 2  .*exp.(+im.*c.box.x'./2) .* cos.(B)
         elseif c.seed == "dn"
-            if f[:α] != 0.0 || f[:γ] !=0 || f[:δ] != 0
+            if c.f[:α] != 0.0 || c.f[:γ] !=0 || c.f[:δ] != 0
                 @error "Computing DT with dn seed for extended NLS isnot currently supported"
             end
             # Allocate empty arrays to hold lax pair generating functions
@@ -92,7 +92,7 @@ end
                 sf[c.box.Nₜ÷2+2:end, i] .= sf[c.box.Nₜ÷2:-1:2, i] 
             end
         elseif c.seed == "cn"
-            if f[:α] != 0.0 || f[:γ] !=0 || f[:δ] != 0
+            if c.f[:α] != 0.0 || c.f[:γ] !=0 || c.f[:δ] != 0
                 @error "Computing DT with cn seed for extended NLS isnot currently supported"
             end
             # Allocate empty arrays to hold lax pair generating functions
