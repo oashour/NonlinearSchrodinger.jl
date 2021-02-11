@@ -27,18 +27,29 @@ end
             t = c.box.t .- c.tₛ[p]
             x = c.box.x' .- c.xₛ[p]
             # Compute r and s directly
-            rf = exp.(+im.*(c.λ[p] .* t .+ c.λ[p]^2 .* x .- π/4))
-            sf = exp.(-im.*(c.λ[p] .* t .+ c.λ[p]^2 .* x .- π/4))
+            α = c.f[:α]
+            γ = c.f[:γ]
+            δ = c.f[:δ]
+            d = (1 - 4*α*c.λ[p] - 8*γ*c.λ[p]^2 + 16*δ*c.λ[p]^3)
+            rf = exp.(+im.*(c.λ[p] .* t .+ c.λ[p]^2 * d .* x .- π/4))
+            sf = exp.(-im.*(c.λ[p] .* t .+ c.λ[p]^2 * d .* x .- π/4))
         elseif c.seed == "exp"
             # Set up x and t in the proper way
             t = c.box.t .- c.tₛ[p]
             x = c.box.x' .- c.xₛ[p]
             # Compute r and s directly
-            A = +c.χ[p] .+ 0.5.*(c.Ω[p].*t .+ c.Ω[p]*c.λ[p].*x) .- π/4
-            B = -c.χ[p] .+ 0.5.*(c.Ω[p].*t .+ c.Ω[p]*c.λ[p].*x) .- π/4
+            α = c.f[:α]
+            γ = c.f[:γ]
+            δ = c.f[:δ]
+            d = 2*(α+3*δ) + (1+4*γ)*c.λ[p] - 4*(α+2*δ)*c.λ[p]^2 - 8*γ*c.λ[p]^3 + 16*δ*c.λ[p]^4
+            A = +c.χ[p].+0.5.*(c.Ω[p].*t .+ c.Ω[p]*d.*x) .- π/4
+            B = -c.χ[p].+0.5.*(c.Ω[p].*t .+ c.Ω[p]*d.*x) .- π/4
             rf = 2im.*exp.(-im.*c.box.x'./2) .* sin.(A)
             sf = 2  .*exp.(+im.*c.box.x'./2) .* cos.(B)
         elseif c.seed == "dn"
+            if c.f[:α] != 0.0 || c.f[:γ] !=0 || c.f[:δ] != 0
+                @error "Computing DT with dn seed for extended NLS isnot currently supported"
+            end
             # Allocate empty arrays to hold lax pair generating functions
             rf = Array{Complex{Float64}}(undef, c.box.Nₜ, c.box.Nₓ)
             sf = Array{Complex{Float64}}(undef, c.box.Nₜ, c.box.Nₓ)
@@ -81,6 +92,9 @@ end
                 sf[c.box.Nₜ÷2+2:end, i] .= sf[c.box.Nₜ÷2:-1:2, i] 
             end
         elseif c.seed == "cn"
+            if c.f[:α] != 0.0 || c.f[:γ] !=0 || c.f[:δ] != 0
+                @error "Computing DT with cn seed for extended NLS isnot currently supported"
+            end
             # Allocate empty arrays to hold lax pair generating functions
             rf = Array{Complex{Float64}}(undef, c.box.Nₜ, c.box.Nₓ)
             sf = Array{Complex{Float64}}(undef, c.box.Nₜ, c.box.Nₓ)
