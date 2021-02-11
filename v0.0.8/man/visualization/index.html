@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/><title>Visualization · NonlinearSchrodinger.jl</title><link rel="canonical" href="http://oashour.github.io/man/visualization/"/><link href="https://fonts.googleapis.com/css?family=Lato|Roboto+Mono" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.0/css/fontawesome.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.0/css/solid.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.0/css/brands.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.11.1/katex.min.css" rel="stylesheet" type="text/css"/><script>documenterBaseURL="../.."</script><script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.6/require.min.js" data-main="../../assets/documenter.js"></script><script src="../../siteinfo.js"></script><script src="../../../versions.js"></script><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../../assets/themes/documenter-dark.css" data-theme-name="documenter-dark" data-theme-primary-dark/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../../assets/themes/documenter-light.css" data-theme-name="documenter-light" data-theme-primary/><script src="../../assets/themeswap.js"></script></head><body><div id="documenter"><nav class="docs-sidebar"><div class="docs-package-name"><span class="docs-autofit">NonlinearSchrodinger.jl</span></div><form class="docs-search" action="../../search/"><input class="docs-search-query" id="documenter-search-query" name="q" type="text" placeholder="Search docs"/></form><ul class="docs-menu"><li><a class="tocitem" href="../../">Home</a></li><li><a class="tocitem" href="../integrators/">Integrators</a></li><li><a class="tocitem" href="../examples/">Examples</a></li><li class="is-active"><a class="tocitem" href>Visualization</a><ul class="internal"><li><a class="tocitem" href="#Recipes"><span>Recipes</span></a></li><li><a class="tocitem" href="#Visualizing-Recursion"><span>Visualizing Recursion</span></a></li></ul></li><li><a class="tocitem" href="../../library/">Library</a></li></ul><div class="docs-version-selector field has-addons"><div class="control"><span class="docs-label button is-static is-size-7">Version</span></div><div class="docs-selector control is-expanded"><div class="select is-fullwidth is-size-7"><select id="documenter-version-selector"></select></div></div></div></nav><div class="docs-main"><header class="docs-navbar"><nav class="breadcrumb"><ul class="is-hidden-mobile"><li class="is-active"><a href>Visualization</a></li></ul><ul class="is-hidden-tablet"><li class="is-active"><a href>Visualization</a></li></ul></nav><div class="docs-right"><a class="docs-edit-link" href="https://github.com/oashour/NonlinearSchrodinger.jl/blob/master/docs/src/man/visualization.md#L" title="Edit on GitHub"><span class="docs-icon fab"></span><span class="docs-label is-hidden-touch">Edit on GitHub</span></a><a class="docs-settings-button fas fa-cog" id="documenter-settings-button" href="#" title="Settings"></a><a class="docs-sidebar-button fa fa-bars is-hidden-desktop" id="documenter-sidebar-button" href="#"></a></div></header><article class="content" id="documenter-page"><h1 id="Visualization"><a class="docs-heading-anchor" href="#Visualization">Visualization</a><a id="Visualization-1"></a><a class="docs-heading-anchor-permalink" href="#Visualization" title="Permalink"></a></h1><h2 id="Recipes"><a class="docs-heading-anchor" href="#Recipes">Recipes</a><a id="Recipes-1"></a><a class="docs-heading-anchor-permalink" href="#Recipes" title="Permalink"></a></h2><p><code>NonlinearSchrodinger.jl</code> provides recipes for <code>Plots.jl</code> to make plotting easy. You can simply call any plotting function on a <code>::Sim</code> or <code>::Calc</code> object, as shown in the <a href="../examples/#Examples">Examples</a> page.</p><h2 id="Visualizing-Recursion"><a class="docs-heading-anchor" href="#Visualizing-Recursion">Visualizing Recursion</a><a id="Visualizing-Recursion-1"></a><a class="docs-heading-anchor-permalink" href="#Visualizing-Recursion" title="Permalink"></a></h2><p>We can visualize the DT recursion as follows. We acknowledge the major assistance provided by Simon Schoelly (<a href="https://github.com/simonschoelly">@simonschoelly</a>) in writing this code.</p><pre><code class="language-julia">using LightGraphs, MetaGraphs, Plots, GraphRecipes, LaTeXStrings
+default(size=(1000,1000))
+
+function gen_rec_graph(N, pal)
+
+    function DT_recurse(n, p, g, N, pal)
+        if !haskey(g[:name], (n, p)) # if there is not already a node with name (n, p)
+            # add a new vertex and set it&#39;s name to (n, p)
+            # the most recent added vertex always has the index nv(g)
+            add_vertex!(g)
+            set_prop!(g, nv(g), :name, (n, p))
+            set_prop!(g, nv(g), :size, N)
+            set_prop!(g, nv(g), :col, pal[N])
+        end
+        if n != 1
+            # recurse as usual
+            DT_recurse(n-1, 1, g, N-1, pal)
+            DT_recurse(n-1, p+1, g, N-1, pal)
+
+            # at this point, the vertices with the names (n, p), (n-1, 1) and (n-1, p+1) already exist
+            # so we look them up by their name
+            v1 = g[(n, p), :name]
+            v2 = g[(n-1, 1), :name]
+            v3 = g[(n-1, p+1), :name]
+
+            # add edges (n, p) -&gt; (n-1, 1)  and (n, p) -&gt; (n-1, p+1)
+            add_edge!(g, v1, v2)
+            add_edge!(g, v1, v3)
+        end
+        return nothing
+    end
+
+    g = MetaDiGraph() # empty graph
+    set_indexing_prop!(g, :name) # allows one to look up nodes by the attribute :name
+
+    DT_recurse(N, 1, g, N, pal)
+
+    return g
+end
+
+N = 4
+pal = palette(:heat, Int(floor(1.5*N)))
+g = gen_rec_graph(N, pal)
+
+p = graphplot(g, names = [latexstring(get_prop(g, v, :name)) for v in vertices(g)],
+              arrow=:arrow,
+              nodeshape=:circle,
+              curvature_scalar=0.0,
+              nodeweights=[get_prop(g, v, :size) for v in vertices(g)],
+              markercolor=[get_prop(g, v, :col) for v in vertices(g)],
+              fontsize=14,
+              markersize=0.04,
+              linewidth=2,
+              method=:tree,
+              curves=false)</code></pre><pre class="documenter-example-output">/home/runner/.julia/packages/GR/RlE5Y/src/../deps/gr/bin/gksqt: error while loading shared libraries: libQt5Widgets.so.5: cannot open shared object file: No such file or directory
+connect: Connection refused
+GKS: can&#39;t connect to GKS socket application
+
+GKS: Open failed in routine OPEN_WS
+GKS: GKS not in proper state. GKS must be either in the state WSOP or WSAC in routine ACTIVATE_WS</pre><p><img src="../recurse_4.svg" alt/></p><p>Note that the placement of the nodes is a little random, you might have to issue the plot command a few times to get a satisfactory result wheret he nodes don&#39;t overlap.</p></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="../examples/">« Examples</a><a class="docs-footer-nextpage" href="../../library/">Library »</a><div class="flexbox-break"></div><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> on <span class="colophon-date" title="Thursday 11 February 2021 06:58">Thursday 11 February 2021</span>. Using Julia version 1.5.3.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
