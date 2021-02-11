@@ -7,18 +7,13 @@ using LaTeXStrings
 using Elliptic
 using Elliptic.Jacobi
 using RecipesBase
-
-
-# Logging Stuff
-using Logging: global_logger
-using TerminalLoggers: TerminalLogger
-global_logger(TerminalLogger())
+using PolynomialRoots
 
 export compute_IoM!, compute_spectrum!
 export print
 export solve!
 export ψ₀_periodic, ψ₀_DT
-export λ_maximal, λ_given_m
+export λ_maximal, λ_given_m, λ_given_f
 export params
 export PHF, find_peaks
 #export solve_dt!
