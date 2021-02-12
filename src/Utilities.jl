@@ -150,16 +150,16 @@ function ψ₀_periodic(coeff::Array, box::Box, Ω; phase=0)
     return ψ₀, A0
 end #psi0_periodic
 
-function ψ₀_DT(λ, tₛ, xₛ, X₀, box)
+function ψ₀_DT(λ, tₛ, xₛ, X₀, box; seed="exp", f = Dict(:α=> 0.0, :γ => 0.0, :δ=>0.0))
     xᵣ = X₀=>X₀+1e-5
     T = abs(box.t[1]*2)
     Nₜ = box.Nₜ
     box_dt = Box(xᵣ, T, Nₓ=1, Nₜ = box.Nₜ)
 
-    calc = Calc(λ, tₛ, xₛ, "exp", box_dt)
+    calc = Calc(λ, tₛ, xₛ, seed, box_dt, f = f)
     solve!(calc)
-    return calc.ψ[:, 1]
 
+    return calc.ψ[:, 1]
 end
 
 function λ_maximal(λ₁, N; m = 0)
@@ -176,16 +176,11 @@ function λ_maximal(λ₁, N; m = 0)
     #λ = sqrt.(n.^2 .* (ν₁^2 - 1) .+ 1)*im
     G_n = (m^2 .* n.^2) .+ 8*(m-2).*(n.^2 .- 1)*ν₁.^2 .+ 16 .* n.^2  .* ν₁^4
     λ = sqrt.(G_n .+ sqrt.(G_n.^2 .- 64*m^2*ν₁^4))./(4*sqrt(2)*ν₁)*im
-
-    return λ
 end
 
 function λ_given_m(m; q = 2)
     F = π/(2*q*Elliptic.K(m))
     λ = 0.5 * sqrt(2 - 2*F^2 - m + 2*sqrt((F^2-1)*(F^2-1+m)))*im
-
-    return λ
-
 end
 
 function λ_given_f(f, ν)
@@ -218,7 +213,6 @@ function PHF(calc::Calc)
     elseif calc.seed == "0"
         ψ₀₀ = 0
     end
-
     peak = ψ₀₀ + s
 end
 

@@ -223,7 +223,7 @@ function Operators(sim)
     F̃̂ = plan_ifft!(@view sim.ψ[:, 1]) # 34 allocs
 
     # This stuff should be user controllable
-    t_algo = BS3()
+    t_algo = Tsit5()
     t_order = 2
     # Create the integrator for the Burger term
     if sim.α != 0 && sim.ϵ == 0
@@ -233,7 +233,7 @@ function Operators(sim)
             du .= 6*sim.α*D*Q*u.*abs2.(u)
         end
         prob = ODEProblem(MB!, sim.ψ[:, 1], (0, sim.box.dx))
-        B̂ = init(prob, t_algo; dt=sim.box.dx,save_everystep=false)  
+        B̂ = init(prob, t_algo; dt=sim.box.dx,save_everystep=false, adaptive=false)  
         B̂B = B̂
     elseif sim.α == 0 && sim.ϵ != 0
         D = CenteredDifference(1, t_order, sim.box.dt, sim.box.Nₜ) 
@@ -242,18 +242,18 @@ function Operators(sim)
             du .= -6*sim.ϵ*D*Q*u.*abs2.(u)
         end
         prob = ODEProblem(MS1!, sim.ψ[:, 1], (0, sim.box.dx))
-        B̂ = init(prob, t_algo; dt=sim.box.dx,save_everystep=false)  
+        B̂ = init(prob, t_algo; dt=sim.box.dx,save_everystep=false, adaptive=false)  
         function MS2!(du, u,p,t)
             du .= -3*sim.ϵ*D*Q*abs2.(u).*u
         end
         prob = ODEProblem(MS2!, sim.ψ[:, 1], (0, sim.box.dx))
-        B̂B = init(prob, t_algo; dt=sim.box.dx,save_everystep=false)  
+        B̂B = init(prob, t_algo; dt=sim.box.dx,save_everystep=false, adaptive=false)  
     else
         function M0!(du, u,p,t)
             du .= 0*u 
         end
         prob = ODEProblem(M0!, sim.ψ[:, 1], (0, sim.box.dx))
-        B̂ = init(prob, t_algo; dt=sim.box.dx,save_everystep=false)  
+        B̂ = init(prob, t_algo; dt=sim.box.dx,save_everystep=false, adaptive=false)  
         B̂B = B̂
     end
     
