@@ -32,4 +32,7 @@ T6A_OP!
 T6B_OP!
 T8A_OP!
 T8B_OP!
+T1A_H!
+T2A_H!
+T1A_SS!
 ```

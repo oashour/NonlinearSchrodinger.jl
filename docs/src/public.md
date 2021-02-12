@@ -1,19 +1,18 @@
-# Library Documentation
-
-Documentation for `NonlinearSchrodinger.jl`'s library.
+Documentation for `NonlinearSchrodinger.jl`'s public API.
 
 ## Contents
 ```@contents
-Pages = ["library.md"]
+Pages = ["public.md"]
 ```
 
 ## Index
 ```@index
-Pages = ["library.md"]
+Pages = ["public.md"]
 ```
 
-## Functions
+## API
 ```@autodocs
 Modules = [NonlinearSchrodinger]
+Private = false
 Pages = ["Darboux.jl", "Simulation.jl", "Types.jl", "Utilities.jl"]
 ```

@@ -1,4 +1,3 @@
-
 struct Box{TT<:Real}
     t::Array{TT, 1}
     ω::Array{TT, 1}
@@ -121,6 +120,8 @@ Create a `::Calc` object with eigenvalues `λ`, shifts `xₛ` and `tₛ` and see
 `seed = "dn"` ``\\implies \\psi_0 = dn(t, m)e^{ix(1-m/2)}``
 
 `seed = "cn"` ``\\implies \\psi_0 = \\sqrt{m}cn(t, m)e^{ix(m - 1/2)}``
+
+`f::Dict{Symbol, Float64}` is a dictionary of extended NLSE parameters.
 
 See also: [`Box`](@ref)
 """

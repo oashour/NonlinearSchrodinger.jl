@@ -56,7 +56,7 @@ savefig("example2.svg") # hide
 ```
 ![](example2.svg)
 
-## Exampole 3: Nonlinear Talbot Carpet (Pruning)
+## Example 3: Nonlinear Talbot Carpet (Pruning)
 ```@setup 3
 using NonlinearSchrodinger
 using Plots
@@ -158,7 +158,7 @@ savefig("example6.svg") #hide
 ```
 ![](example6.svg)
 
-## Example 7: First Order Breather mMtched to a ``dn`` Background
+## Example 7: First Order Breather matched to a ``dn`` Background
 ```@setup 7
 using NonlinearSchrodinger
 using Plots

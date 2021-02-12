@@ -5,7 +5,7 @@ include("SSSolvers.jl")
 """
     solve!(sim::Sim)
 
-Solves the `Sim` object `sim`.
+Solves the object `sim::Sim`.
 
 See also: [`Sim`](@ref)
 """
@@ -35,6 +35,13 @@ function solve!(sim::Sim)
     @info "Computation Done!"
 end #solve
 
+"""
+    soln_loop_A(sim, ops, ind_p))
+
+Propagate in `x` for integrators of type `A` (i.e. starting with nonlinear step, thus in real space).
+
+See also: [`Sim`](@ref), [`solve!`](@ref)
+"""
 function soln_loop_A(sim, ops, ind_p)
     for i = 1:sim.box.Nₓ-1
         @views sim.T̂(sim.ψ[:, i+1], sim.ψ[:, i], sim.box.dx, ops)
@@ -51,6 +58,13 @@ function soln_loop_A(sim, ops, ind_p)
     sim.ψ̃ .= fftshift(fft(sim.ψ, 1), 1)./sim.box.Nₜ
 end
 
+"""
+    soln_loop_B(sim, ops, ind_p))
+
+Propagate in `x` for integrators of type `B` (i.e. starting with dispersion step, thus in frequency space).
+
+See also: [`Sim`](@ref), [`solve!`](@ref)
+"""
 function soln_loop_B(sim, ops, ind_p)
     F̃̂ = plan_ifft(@view sim.ψ[:, 1]) 
     F̂ = plan_fft(@view sim.ψ[:, 1])

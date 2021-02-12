@@ -13,10 +13,12 @@ makedocs(;
     ),
     pages=[
         "Home" => "index.md",
-        "Integrators" => "man/integrators.md",
         "Examples" => "man/examples.md",
         "Visualization" => "man/visualization.md",
-        "Library" => "library.md",
+        "Library" => [
+            "Public API" => "public.md",
+            "Internals" =>  "private.md",
+            "Integrators" => "man/integrators.md"]
     ],
 )
 

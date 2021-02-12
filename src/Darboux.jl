@@ -1,3 +1,10 @@
+"""
+    solve!(calc::Calc)
+
+Solves the object `sim::Calc`.
+
+See also: [`Calc`](@ref)
+"""
 function solve!(calc::Calc)
     N = length(calc.λ)
     ψₜ = Array{Complex{Float64}}(undef, calc.box.Nₜ, calc.box.Nₓ, N+1)
@@ -17,8 +24,14 @@ function solve!(calc::Calc)
     return nothing
 end
 
-@memoize function calc_rs(c::Calc, n, p, ψₜ)
+"""
+    calc_rs(c:Calc, n, p, ψₜ)
 
+Calculate the lax pair generating functions recursively. See the paper for more details.
+
+See also: [`solve!`](@ref), [`Calc`](@ref)
+"""
+@memoize function calc_rs(c::Calc, n, p, ψₜ)
     @info "Calculating Lax pair generating functions rₙₚ(x,t) and sₙₚ(x,t) for (n,p) = ($n,$p)"
     # Base case
     if n == 1

@@ -69,4 +69,4 @@ savefig("recurse_4.svg") #hide
 
 ![](recurse_4.svg)
 
-Note that the placement of the nodes is a little random, you might have to issue the plot command a few times to get a satisfactory result wheret he nodes don't overlap.
+Note that the placement of the nodes is a little random, you might have to issue the plot command a few times to get a satisfactory result where the nodes don't overlap.

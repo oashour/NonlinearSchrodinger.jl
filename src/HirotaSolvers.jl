@@ -1,11 +1,9 @@
 """
-    T₁ʰ(ψ, ω, dx, F)
+    T1A_H!(ψₒ, ψᵢ, dx, ops)
 
-Compute `ψ'`, i.e. `ψ` advanced a step `dx` forward using a symplectic second order
-integrator. `ψ'` is defined on an FFT grid with frequencies `ω` using an FFT plan
-`F`. Do not call this explicitly and use `solve!` instead.
+Compute `ψₒ`, i.e. `ψᵢ` advanced a step `dx` forward using a symplectic first order integrator of type A for the Hirota equation. The structure `ops::Operators` contains the FFT plans and the kinetic energy operators.  
 
-See also: [`solve!`](@ref)
+See also: [`solve!`](@ref), [`Operators`](@ref)
 """
 function T1A_H!(ψₒ, ψᵢ, dx, ops)
     # Nonlinear
@@ -23,13 +21,11 @@ function T1A_H!(ψₒ, ψᵢ, dx, ops)
 end #T₁ʰ
 
 """
-    T₂ʰ(ψ, ω, dx, F)
+    T2A_H!(ψₒ, ψᵢ, dx, ops)
 
-Compute `ψ'`, i.e. `ψ` advanced a step `dx` forward using a symplectic second order
-integrator. `ψ'` is defined on an FFT grid with frequencies `ω` using an FFT plan
-`F`. Do not call this explicitly and use `solve!` instead.
+Compute `ψₒ`, i.e. `ψᵢ` advanced a step `dx` forward using a symplectic second order integrator of type A for the Hirota equation. The structure `ops::Operators` contains the FFT plans and the kinetic energy operators.  
 
-See also: [`solve!`](@ref)
+See also: [`solve!`](@ref), [`Operators`](@ref)
 """
 function T2A_H!(ψₒ, ψᵢ, dx, ops)
     # Nonlinear
@@ -37,17 +33,17 @@ function T2A_H!(ψₒ, ψᵢ, dx, ops)
 
     # Dispersion
     ops.F̂*ψₒ
-    ψₒ .= ops.K̂(dx/2) .* ψₒ # 3 allocs
+    ψₒ .= ops.K̂(dx/2) .* ψₒ 
     ops.F̃̂*ψₒ
 
     # Burger
-    set_u!(ops.B̂, ψₒ) # 0 allocs 
-    step!(ops.B̂) # 3-4 allocs
-    ψₒ .= ops.B̂.u # 2 allocs
+    set_u!(ops.B̂, ψₒ) 
+    step!(ops.B̂) 
+    ψₒ .= ops.B̂.u 
 
     # Dispersion
     ops.F̂*ψₒ
-    ψₒ .= ops.K̂(dx/2) .* ψₒ # 3 allocs
+    ψₒ .= ops.K̂(dx/2) .* ψₒ 
     ops.F̃̂*ψₒ
 
     # Nonlinear

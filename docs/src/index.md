@@ -1,22 +1,23 @@
 ```@meta
 CurrentModule = NonlinearSchrodinger
 ```
-# NLSS
+# NonlinearSchrodinger
 
-*A suite of tools generator for the Nonlinear Schrodinger hierarchy.*
+*A suite of tools for Nonlinear Schrodinger Equations*
 
-A package for studying the nonlinear Schrodinger hierarchy's numerical and analytical solutions. This documentation is a work in progress and is very sparse at the moment.
+`NonlinearSchrodinger.jl` is a suite of tools for solving Nonlinear Schrodinger equations via higher-order algorithms and Darboux transformations.
 
 ## Package Features
-The current features are currently available or are a work in progress:
+The following features are currently available:
 
-- Solve the cubic nonlinear Schrodinger equation numerically using a variety of symplectic and Nystrom algorithms.
-- Compute the integrals of motion (energy, momentum, and particle number)
-- Compute the Darboux Transformation to study complicated analytical solutions
+- Solving the cubic Nonlinear Schrodinger equation using a plethora of algortithms of order up to 8 (the number of algorithms available is always increasing!). Symplectic and Nystrom integrators are available.
+- Solving the Hirota and Sasa-Satsuma equations using a combined split-step-finite-difference approach using a few different integrators. 
+- Computing the integrals of motion (energy, momentum, and particle number) and their errors.
+- Computing the Darboux Transformation to study complicated analytical solutions. We currently support the breather and soliton seeds for extended nonlinear Schrodinger equations of order up to 5 (including cubic NLS, Hirota, LPD, Quintic, and arbitrary combinations thereof). We also support the `cn` and `dn` seeds for the cubic NLS.
+- Easy [Visualization](@ref) through `Plots.jl` recipes.
+- Very simple API that allows one to compute very complicated solutions via only a few lines of code. Some examples can be found on the [Examples](@ref) page.
 
-Some examples can be found on the [Examples](@ref) page. For visualization of the solutions, see the [Visualization](@ref) page.
 
-See the [Index](@ref main-index) for the complete list of documented functions and types.
 ```@contents
 Pages = [
     "man/theory.md",
@@ -27,11 +28,11 @@ Depth = 1
 ## Library Outline
 
 ```@contents
-Pages = ["library.md"]
+Pages = ["public.md"]
 ```
 
 ### [Index](@id main-index)
 
 ```@index
-Pages = ["library.md"]
+Pages = ["public.md"]
 ```
