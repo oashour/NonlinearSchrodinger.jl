@@ -4,7 +4,7 @@
 Computes the integrals of motion of `obj.ψ` and saves them in respective fields of `obj`.
 `obj` can be a `::Sim` or `::Calc` object. The fields are:
 
-````
+```
 obj.KE  # Array containing the kinetic energy K(x)
 obj.PE  # Array containing the potential energy V(x)
 obj.E   # Array containing the energy H(x)
@@ -13,7 +13,7 @@ obj.P   # Array containing the momentum P(x)
 obj.dE  # Array containing the energy error δE(x)
 obj.dN  # Array containing the norm error δN(x)
 obj.dP  # Array containing the momentum error δP(x)
-````
+```
 
 Result can be plotted using `plot(obj, :IoM)`
 """
@@ -47,7 +47,7 @@ end
 """
     function params(; kwargs...)
 
-Computes parameters
+Computes parameters `λ, T, Ω` given either of `λ, T, Ω, a` and possibly `m` for dnoidal seed. Used only for `exp` and `dn` seeds.
 """
 function params(;m=0.0, kwargs...)
     if length(kwargs) != 1
@@ -150,6 +150,13 @@ function ψ₀_periodic(coeff::Array, box::Box, Ω; phase=0)
     return ψ₀, A0
 end #psi0_periodic
 
+"""
+    ψ₀_DT(λ, tₛ, xₛ, X₀, box; seed="exp", f = Dict(:α=> 0.0, :γ => 0.0, :δ=>0.0))
+
+Computes an initial condition using the DT characterized by `λ, xₛ, tₛ` and `seed` at x = `X₀` for the extended equation characterized by a dictionary of parameters `f` (currently only `α`) is supported. `box::Box` is the simulation box.
+
+See also: [`Calc`](@ref), [`Sim`](@ref)
+"""
 function ψ₀_DT(λ, tₛ, xₛ, X₀, box; seed="exp", f = Dict(:α=> 0.0, :γ => 0.0, :δ=>0.0))
     xᵣ = X₀=>X₀+1e-5
     T = abs(box.t[1]*2)
@@ -162,6 +169,13 @@ function ψ₀_DT(λ, tₛ, xₛ, X₀, box; seed="exp", f = Dict(:α=> 0.0, :γ
     return calc.ψ[:, 1]
 end
 
+"""
+    λ_maximal(λ₁, N; m = 0)
+
+Computed a maximal intensity set of `λ` of order `N` given `λ₁` and possibly `m` for dnoidal bakcground.
+
+See also: [`λ_given_m`](@ref)
+"""
 function λ_maximal(λ₁, N; m = 0)
     ν₁ = imag(λ₁)
     #ν_min = sqrt(1 - 1/N^2)
@@ -178,11 +192,23 @@ function λ_maximal(λ₁, N; m = 0)
     λ = sqrt.(G_n .+ sqrt.(G_n.^2 .- 64*m^2*ν₁^4))./(4*sqrt(2)*ν₁)*im
 end
 
+"""
+    λ_given_m(m; q = 2)
+
+Computed a `λ` that is matched to the dnoidal background given by `m` with an integer `q`. See paper for more details.
+
+See also: [`λ_maximal`](@ref)
+"""
 function λ_given_m(m; q = 2)
     F = π/(2*q*Elliptic.K(m))
     λ = 0.5 * sqrt(2 - 2*F^2 - m + 2*sqrt((F^2-1)*(F^2-1+m)))*im
 end
 
+"""
+    λ_given_f(f, ν)
+
+Computes `λ = v + i ν` such that `v` results in breather to soliton conversion for the extended NLS characterized by the dictionary of parameters `f`.
+"""
 function λ_given_f(f, ν)
     α = f[:α]
     γ = f[:γ]
@@ -204,6 +230,11 @@ function λ_given_f(f, ν)
     end
 end
 
+"""
+    PHF(calc::Calc)
+
+Computed the peak height formula for any `calc::Calc` objecti irrespective of seed.
+"""
 function PHF(calc::Calc)
     s = 2*sum(imag.(calc.λ))
     if calc.seed == "exp" || calc.seed == "dn"

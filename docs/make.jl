@@ -13,7 +13,12 @@ makedocs(;
     ),
     pages=[
         "Home" => "index.md",
-        "Examples" => "man/examples.md",
+        "Theory" => [
+            "Simulations" => "man/simulations.md",
+            "Darboux Transformations" =>  "man/dt.md"],
+        "Examples" => [
+            "Simulation Examples" => "man/sim_examples.md",
+            "DT Examples" =>  "man/dt_examples.md"],
         "Visualization" => "man/visualization.md",
         "Library" => [
             "Public API" => "public.md",

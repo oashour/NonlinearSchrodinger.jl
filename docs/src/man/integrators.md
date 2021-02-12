@@ -1,5 +1,5 @@
 # Integrators
-This page shows the availabe integrators.
+This page shows the availabe integrators. Integrators prefixed with `_H` are used for the Hirota equation, and those with `_SS` are for the Sasa-Satsuma equation. Note that both these equations are not fully tested and should be used with utmost care due to the periodic boundary conditions.
 
 ```@index
 Pages = ["integrators.md"]

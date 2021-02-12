@@ -15,20 +15,21 @@ The following features are currently available:
 - Computing the integrals of motion (energy, momentum, and particle number) and their errors.
 - Computing the Darboux Transformation to study complicated analytical solutions. We currently support the breather and soliton seeds for extended nonlinear Schrodinger equations of order up to 5 (including cubic NLS, Hirota, LPD, Quintic, and arbitrary combinations thereof). We also support the `cn` and `dn` seeds for the cubic NLS.
 - Easy [Visualization](@ref) through `Plots.jl` recipes.
-- Very simple API that allows one to compute very complicated solutions via only a few lines of code. Some examples can be found on the [Examples](@ref) page.
+- Very simple API that allows one to compute very complicated solutions via only a few lines of code.
 
 
+## Examples
 ```@contents
 Pages = [
-    "man/theory.md",
+    "man/dt_examples.md",
 ]
-Depth = 1
+Depth = 2
 ```
-
-## Library Outline
-
 ```@contents
-Pages = ["public.md"]
+Pages = [
+    "man/sim_examples.md",
+]
+Depth = 2
 ```
 
 ### [Index](@id main-index)

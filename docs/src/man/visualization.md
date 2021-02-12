@@ -1,7 +1,7 @@
 # Visualization
 
 ## Recipes
-`NonlinearSchrodinger.jl` provides recipes for `Plots.jl` to make plotting easy. You can simply call any plotting function on a `::Sim` or `::Calc` object, as shown in the [Examples](@ref) page.
+`NonlinearSchrodinger.jl` provides recipes for `Plots.jl` to make plotting easy. You can simply call any plotting function on a `::Sim` or `::Calc` object, as shown in the examples pages.
 
 ## Visualizing Recursion
 
