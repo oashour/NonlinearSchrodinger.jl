@@ -462,27 +462,27 @@ end
 ####################################################################
 
 """
-    T6A_OP!(ψₒ, ψᵢ, dx, ops)
+    T6A_Ss14!(ψₒ, ψᵢ, dx, ops)
 
-Compute `ψₒ`, i.e. `ψᵢ` advanced a step `dx` forward using an Optimized Symplectic Sixth order integrator of type A. The structure `ops::Operators` contains the FFT plans and the kinetic energy operators.  
+Compute `ψₒ`, i.e. `ψᵢ` advanced a step `dx` forward using Suzuki's s14 Symplectic Sixth order integrator of type A. The structure `ops::Operators` contains the FFT plans and the kinetic energy operators.  
 
 See also: [`solve!`](@ref), [`Operators`](@ref)
 """
-function T6A_OP!(ψₒ, ψᵢ, dx, ops)
+function T6A_Ss14!(ψₒ, ψᵢ, dx, ops)
     γ₁ = 0.392256805238773 
     γ₂ = γ₁
-    γ₃ = 0.1177866066796810
-    γ₄ = γ₃
-    γ₅ = -0.5888399920894384
-    γ₆ = γ₅
-    γ₇ = 0.6575931603419684 
-    γ₈ = γ₇
-    γ₉ = γ₅
-    γ₁₀ = γ₅
-    γ₁₁ = γ₃
-    γ₁₂ = γ₃
     γ₁₃ = γ₁
     γ₁₄ = γ₁
+    γ₃ = 0.1177866066796810
+    γ₄ = γ₃
+    γ₁₁ = γ₃
+    γ₁₂ = γ₃
+    γ₅ = -0.5888399920894384
+    γ₆ = γ₅
+    γ₉ = γ₅
+    γ₁₀ = γ₅
+    γ₇ = 0.6575931603419684 
+    γ₈ = γ₇
 
     T2A!(ψₒ, ψᵢ, γ₁*dx, ops)
     T2A!(ψₒ, ψₒ, γ₂*dx, ops)
@@ -501,27 +501,27 @@ function T6A_OP!(ψₒ, ψᵢ, dx, ops)
 end
 
 """
-    T6B_OP!(ψₒ, ψᵢ, dx, ops)
+    T6B_Ss14!(ψₒ, ψᵢ, dx, ops)
 
-Compute `ψₒ`, i.e. `ψᵢ` advanced a step `dx` forward using an Optimized Symplectic Sixth order integrator of type B. The structure `ops::Operators` contains the FFT plans and the kinetic energy operators.  
+Compute `ψₒ`, i.e. `ψᵢ` advanced a step `dx` forward using Suzuki's s14 Symplectic Sixth order integrator of type B. The structure `ops::Operators` contains the FFT plans and the kinetic energy operators.  
 
 See also: [`solve!`](@ref), [`Operators`](@ref)
 """
-function T6B_OP!(ψₒ, ψᵢ, dx, ops)
+function T6B_Ss14!(ψₒ, ψᵢ, dx, ops)
     γ₁ = 0.392256805238773 
     γ₂ = γ₁
-    γ₃ = 0.1177866066796810
-    γ₄ = γ₃
-    γ₅ = -0.5888399920894384
-    γ₆ = γ₅
-    γ₇ = 0.6575931603419684 
-    γ₈ = γ₇
-    γ₉ = γ₅
-    γ₁₀ = γ₅
-    γ₁₁ = γ₃
-    γ₁₂ = γ₃
     γ₁₃ = γ₁
     γ₁₄ = γ₁
+    γ₃ = 0.1177866066796810
+    γ₄ = γ₃
+    γ₁₁ = γ₃
+    γ₁₂ = γ₃
+    γ₅ = -0.5888399920894384
+    γ₆ = γ₅
+    γ₉ = γ₅
+    γ₁₀ = γ₅
+    γ₇ = 0.6575931603419684 
+    γ₈ = γ₇
 
     T2B!(ψₒ, ψᵢ, γ₁*dx, ops)
     T2B!(ψₒ, ψₒ, γ₂*dx, ops)
