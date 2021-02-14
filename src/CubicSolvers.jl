@@ -540,13 +540,13 @@ function T6B_Ss14!(ψₒ, ψᵢ, dx, ops)
 end
 
 """
-    T8A_OP!(ψₒ, ψᵢ, dx, ops)
+    T8A_Ss15!(ψₒ, ψᵢ, dx, ops)
 
-Compute `ψₒ`, i.e. `ψᵢ` advanced a step `dx` forward using an Optimized Symplectic Eighth order integrator of type A. The structure `ops::Operators` contains the FFT plans and the kinetic energy operators.  
+Compute `ψₒ`, i.e. `ψᵢ` advanced a step `dx` forward using Suzuki's s15 Symplectic Eighth order integrator of type A. The structure `ops::Operators` contains the FFT plans and the kinetic energy operators.  
 
 See also: [`solve!`](@ref), [`Operators`](@ref)
 """
-function T8A_OP!(ψₒ, ψᵢ, dx, ops)
+function T8A_Ss15!(ψₒ, ψᵢ, dx, ops)
     γ₁ = 0.7416703643506129534482278
     γ₂ = -0.409100825800031593997300
     γ₃ = 0.1907547102962383799538763
@@ -581,13 +581,13 @@ function T8A_OP!(ψₒ, ψᵢ, dx, ops)
 end
 
 """
-    T8B_OP!(ψₒ, ψᵢ, dx, ops)
+    T8B_Ss15!(ψₒ, ψᵢ, dx, ops)
 
-Compute `ψₒ`, i.e. `ψᵢ` advanced a step `dx` forward using an Optimized Symplectic Eighth order integrator of type B. The structure `ops::Operators` contains the FFT plans and the kinetic energy operators.  
+Compute `ψₒ`, i.e. `ψᵢ` advanced a step `dx` forward using Suzuki's s15 Symplectic Eighth order integrator of type B. The structure `ops::Operators` contains the FFT plans and the kinetic energy operators.  
 
 See also: [`solve!`](@ref), [`Operators`](@ref)
 """
-function T8B_OP!(ψₒ, ψᵢ, dx, ops)
+function T8B_Ss15!(ψₒ, ψᵢ, dx, ops)
     γ₁ = 0.7416703643506129534482278
     γ₂ = -0.409100825800031593997300
     γ₃ = 0.1907547102962383799538763
