@@ -511,6 +511,64 @@ function T6B_Ys7!(ψₒ, ψᵢ, dx, ops)
 end
 
 """
+    T6A_KLs9!(ψₒ, ψᵢ, dx, ops)
+
+Compute `ψₒ`, i.e. `ψᵢ` advanced a step `dx` forward using Kahan & Li's s9 Symplectic Sixth order integrator of type A. The structure `ops::Operators` contains the FFT plans and the kinetic energy operators.  
+
+See also: [`solve!`](@ref), [`Operators`](@ref)
+"""
+function T6A_KLs9!(ψₒ, ψᵢ, dx, ops)
+    γ₁ = 0.39216144400731413927925056
+    γ₂ = 0.33259913678935943859974864
+    γ₃ = -0.70624617255763935980996482
+    γ₄ =  0.08221359629355080023149045
+    γ₅ = 0.79854399093482996339895035
+    γ₉ = γ₁
+    γ₈ = γ₂
+    γ₇ = γ₃
+    γ₆ = γ₄
+
+    T2A!(ψₒ, ψᵢ, γ₁*dx, ops)
+    T2A!(ψₒ, ψₒ, γ₂*dx, ops)
+    T2A!(ψₒ, ψₒ, γ₃*dx, ops)
+    T2A!(ψₒ, ψₒ, γ₄*dx, ops)
+    T2A!(ψₒ, ψₒ, γ₅*dx, ops)
+    T2A!(ψₒ, ψₒ, γ₆*dx, ops)
+    T2A!(ψₒ, ψₒ, γ₇*dx, ops)
+    T2A!(ψₒ, ψₒ, γ₈*dx, ops)
+    T2A!(ψₒ, ψₒ, γ₉*dx, ops)
+end
+
+"""
+    T6B_KLs9!(ψₒ, ψᵢ, dx, ops)
+
+Compute `ψₒ`, i.e. `ψᵢ` advanced a step `dx` forward using Kahan & Li's s9 Symplectic Sixth order integrator of type B. The structure `ops::Operators` contains the FFT plans and the kinetic energy operators.  
+
+See also: [`solve!`](@ref), [`Operators`](@ref)
+"""
+function T6B_KLs9!(ψₒ, ψᵢ, dx, ops)
+    γ₁ = 0.39216144400731413927925056
+    γ₂ = 0.33259913678935943859974864
+    γ₃ = -0.70624617255763935980996482
+    γ₄ =  0.08221359629355080023149045
+    γ₅ = 0.79854399093482996339895035
+    γ₉ = γ₁
+    γ₈ = γ₂
+    γ₇ = γ₃
+    γ₆ = γ₄
+
+    T2B!(ψₒ, ψᵢ, γ₁*dx, ops)
+    T2B!(ψₒ, ψₒ, γ₂*dx, ops)
+    T2B!(ψₒ, ψₒ, γ₃*dx, ops)
+    T2B!(ψₒ, ψₒ, γ₄*dx, ops)
+    T2B!(ψₒ, ψₒ, γ₅*dx, ops)
+    T2B!(ψₒ, ψₒ, γ₆*dx, ops)
+    T2B!(ψₒ, ψₒ, γ₇*dx, ops)
+    T2B!(ψₒ, ψₒ, γ₈*dx, ops)
+    T2B!(ψₒ, ψₒ, γ₉*dx, ops)
+end
+
+"""
     T6A_Ss14!(ψₒ, ψᵢ, dx, ops)
 
 Compute `ψₒ`, i.e. `ψᵢ` advanced a step `dx` forward using Suzuki's s14 Symplectic Sixth order integrator of type A. The structure `ops::Operators` contains the FFT plans and the kinetic energy operators.  
