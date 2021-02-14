@@ -460,6 +460,55 @@ end
 ####################################################################
 # Optimized
 ####################################################################
+"""
+    T6A_Ys7!(ψₒ, ψᵢ, dx, ops)
+
+Compute `ψₒ`, i.e. `ψᵢ` advanced a step `dx` forward using Yoshida's s7 Symplectic Sixth order integrator of type A. The structure `ops::Operators` contains the FFT plans and the kinetic energy operators.  
+
+See also: [`solve!`](@ref), [`Operators`](@ref)
+"""
+function T6A_Ys7!(ψₒ, ψᵢ, dx, ops)
+    γ₁ = 0.78451361047755726381949763
+    γ₂ = 0.23557321335935813368479318
+    γ₃ = -1.17767998417887100694641568
+    γ₄ = 1.31518632068391121888424973
+    γ₇ = γ₁
+    γ₆ = γ₂
+    γ₅ = γ₃
+
+    T2A!(ψₒ, ψᵢ, γ₁*dx, ops)
+    T2A!(ψₒ, ψₒ, γ₂*dx, ops)
+    T2A!(ψₒ, ψₒ, γ₃*dx, ops)
+    T2A!(ψₒ, ψₒ, γ₄*dx, ops)
+    T2A!(ψₒ, ψₒ, γ₅*dx, ops)
+    T2A!(ψₒ, ψₒ, γ₆*dx, ops)
+    T2A!(ψₒ, ψₒ, γ₇*dx, ops)
+end
+
+"""
+    T6B_Ys7!(ψₒ, ψᵢ, dx, ops)
+
+Compute `ψₒ`, i.e. `ψᵢ` advanced a step `dx` forward using Yoshida's s7 Symplectic Sixth order integrator of type B. The structure `ops::Operators` contains the FFT plans and the kinetic energy operators.  
+
+See also: [`solve!`](@ref), [`Operators`](@ref)
+"""
+function T6B_Ys7!(ψₒ, ψᵢ, dx, ops)
+    γ₁ = 0.78451361047755726381949763
+    γ₂ = 0.23557321335935813368479318
+    γ₃ = -1.17767998417887100694641568
+    γ₄ = 1.31518632068391121888424973
+    γ₇ = γ₁
+    γ₆ = γ₂
+    γ₅ = γ₃
+
+    T2B!(ψₒ, ψᵢ, γ₁*dx, ops)
+    T2B!(ψₒ, ψₒ, γ₂*dx, ops)
+    T2B!(ψₒ, ψₒ, γ₃*dx, ops)
+    T2B!(ψₒ, ψₒ, γ₄*dx, ops)
+    T2B!(ψₒ, ψₒ, γ₅*dx, ops)
+    T2B!(ψₒ, ψₒ, γ₆*dx, ops)
+    T2B!(ψₒ, ψₒ, γ₇*dx, ops)
+end
 
 """
     T6A_Ss14!(ψₒ, ψᵢ, dx, ops)

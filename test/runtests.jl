@@ -150,9 +150,9 @@ using Test
             @test abs.(sim.ψ[:, end]) ≈ abs.(ψ₀) atol=1e-2
         end
         for algo ∈ (T2A!, T4A_TJ!, T6A_TJ!, T8A_TJ!, T4A_SF!, T4A_SF!, T6A_SF!, T8A_SF!, 
-                T4A_CMP!, T6A_CMP!, T8A_CMP!, T6A_Ss14!, T8A_Ss15!,
+                T4A_CMP!, T6A_CMP!, T8A_CMP!, T6A_Ss14!, T6A_Ys7!, T8A_Ss15!,
                 T2B!, T4B_TJ!, T6B_TJ!, T8B_TJ!, T4B_SF!, T4B_SF!, T6B_SF!, T8B_SF!,
-                T4B_CMP!, T6B_CMP!, T8B_CMP!, T6B_Ss14!, T8B_Ss15!)
+                T4B_CMP!, T6B_CMP!, T8B_CMP!, T6B_Ss14!, T6B_Ys7!, T8B_Ss15!)
             sim = Sim(λ, box, ψ₀, algo)
             @info "Testing Algorithm" algo
             solve!(sim)
