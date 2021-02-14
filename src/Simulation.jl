@@ -24,9 +24,9 @@ function solve!(sim::Sim)
 
     @info "Starting evolution"
     # Define these tuples as global consts
-    if sim.T̂ ∈ (T1A!, T2A!, T4A_TJ!, T6A_TJ!, T8A_TJ!, T4A_SF!, T4A_SF!, T6A_SF!, T8A_SF!, T4A_CMP!, T6A_CMP!, T8A_CMP!, T6A_Ss14!, T6A_Ys7!, T6A_KLs9!, T8A_Ss15!, T1A_H!, T2A_H!, T1A_SS!)
+    if sim.T̂ ∈ (T1A!, T2A!, T4A_TJ!, T6A_TJ!, T8A_TJ!, T4A_SF!, T4A_SF!, T6A_SF!, T8A_SF!, T4A_CMP!, T6A_CMP!, T8A_CMP!, T6A_Ss14!, T6A_Ys7!, T6A_KLs9!, T8A_Ss15!, T8A_KLs17!, T1A_H!, T2A_H!, T1A_SS!)
         soln_loop_A(sim, ops, ind_p)
-    elseif sim.T̂ ∈ (T1B!, T2B!, T4B_TJ!, T6B_TJ!, T8B_TJ!, T4B_SF!, T6B_SF!, T8B_SF!, T4B_CMP!, T6B_CMP!, T8B_CMP!, T6B_Ss14!, T6B_Ys7!, T6B_KLs9!, T8B_Ss15!)
+    elseif sim.T̂ ∈ (T1B!, T2B!, T4B_TJ!, T6B_TJ!, T8B_TJ!, T4B_SF!, T6B_SF!, T8B_SF!, T4B_CMP!, T6B_CMP!, T8B_CMP!, T6B_Ss14!, T6B_Ys7!, T6B_KLs9!, T8B_Ss15!, T8B_KLs17!)
         soln_loop_B(sim, ops, ind_p)
     else
         throw(ArgumentError("Unknown algorithm $(sim.T̂)"))

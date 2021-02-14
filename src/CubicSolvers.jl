@@ -727,3 +727,93 @@ function T8B_Ss15!(ψₒ, ψᵢ, dx, ops)
     T2B!(ψₒ, ψₒ, γ₁₄*dx, ops)
     T2B!(ψₒ, ψₒ, γ₁₅*dx, ops)
 end
+
+"""
+    T8A_KLs17!(ψₒ, ψᵢ, dx, ops)
+
+Compute `ψₒ`, i.e. `ψᵢ` advanced a step `dx` forward using Kahan & Li's s17 Symplectic Eighth order integrator of type A. The structure `ops::Operators` contains the FFT plans and the kinetic energy operators.  
+
+See also: [`solve!`](@ref), [`Operators`](@ref)
+"""
+function T8A_KLs17!(ψₒ, ψᵢ, dx, ops)
+    γ₁ = 0.13020248308889008087881763
+    γ₂ = 0.56116298177510838456196441 
+    γ₃ =  -0.38947496264484728640807860 
+    γ₄ = 0.15884190655515560089621075 
+    γ₅ = -0.39590389413323757733623154 
+    γ₆ = 0.18453964097831570709183254
+    γ₇ = 0.25837438768632204729397911
+    γ₈ = 0.29501172360931029887096624 
+    γ₉ = -0.60550853383003451169892108
+    γ₁₇ = γ₁
+    γ₁₆ = γ₂
+    γ₁₅ = γ₃
+    γ₁₄ = γ₄
+    γ₁₃ = γ₅
+    γ₁₂ = γ₆
+    γ₁₁ = γ₇
+    γ₁₀ = γ₈
+
+    T2A!(ψₒ, ψᵢ, γ₁*dx, ops)
+    T2A!(ψₒ, ψₒ, γ₂*dx, ops)
+    T2A!(ψₒ, ψₒ, γ₃*dx, ops)
+    T2A!(ψₒ, ψₒ, γ₄*dx, ops)
+    T2A!(ψₒ, ψₒ, γ₅*dx, ops)
+    T2A!(ψₒ, ψₒ, γ₆*dx, ops)
+    T2A!(ψₒ, ψₒ, γ₇*dx, ops)
+    T2A!(ψₒ, ψₒ, γ₈*dx, ops)
+    T2A!(ψₒ, ψₒ, γ₉*dx, ops)
+    T2A!(ψₒ, ψₒ, γ₁₀*dx, ops)
+    T2A!(ψₒ, ψₒ, γ₁₁*dx, ops)
+    T2A!(ψₒ, ψₒ, γ₁₂*dx, ops)
+    T2A!(ψₒ, ψₒ, γ₁₃*dx, ops)
+    T2A!(ψₒ, ψₒ, γ₁₄*dx, ops)
+    T2A!(ψₒ, ψₒ, γ₁₅*dx, ops)
+    T2A!(ψₒ, ψₒ, γ₁₆*dx, ops)
+    T2A!(ψₒ, ψₒ, γ₁₇*dx, ops)
+end
+
+"""
+    T8B_KLs17!(ψₒ, ψᵢ, dx, ops)
+
+Compute `ψₒ`, i.e. `ψᵢ` advanced a step `dx` forward using Kahan & Li's s17 Symplectic Eighth order integrator of type B. The structure `ops::Operators` contains the FFT plans and the kinetic energy operators.  
+
+See also: [`solve!`](@ref), [`Operators`](@ref)
+"""
+function T8B_KLs17!(ψₒ, ψᵢ, dx, ops)
+    γ₁ = 0.13020248308889008087881763
+    γ₂ = 0.56116298177510838456196441 
+    γ₃ =  -0.38947496264484728640807860 
+    γ₄ = 0.15884190655515560089621075 
+    γ₅ = -0.39590389413323757733623154 
+    γ₆ = 0.18453964097831570709183254
+    γ₇ = 0.25837438768632204729397911
+    γ₈ = 0.29501172360931029887096624 
+    γ₉ = -0.60550853383003451169892108
+    γ₁₇ = γ₁
+    γ₁₆ = γ₂
+    γ₁₅ = γ₃
+    γ₁₄ = γ₄
+    γ₁₃ = γ₅
+    γ₁₂ = γ₆
+    γ₁₁ = γ₇
+    γ₁₀ = γ₈
+
+    T2B!(ψₒ, ψᵢ, γ₁*dx, ops)
+    T2B!(ψₒ, ψₒ, γ₂*dx, ops)
+    T2B!(ψₒ, ψₒ, γ₃*dx, ops)
+    T2B!(ψₒ, ψₒ, γ₄*dx, ops)
+    T2B!(ψₒ, ψₒ, γ₅*dx, ops)
+    T2B!(ψₒ, ψₒ, γ₆*dx, ops)
+    T2B!(ψₒ, ψₒ, γ₇*dx, ops)
+    T2B!(ψₒ, ψₒ, γ₈*dx, ops)
+    T2B!(ψₒ, ψₒ, γ₉*dx, ops)
+    T2B!(ψₒ, ψₒ, γ₁₀*dx, ops)
+    T2B!(ψₒ, ψₒ, γ₁₁*dx, ops)
+    T2B!(ψₒ, ψₒ, γ₁₂*dx, ops)
+    T2B!(ψₒ, ψₒ, γ₁₃*dx, ops)
+    T2B!(ψₒ, ψₒ, γ₁₄*dx, ops)
+    T2B!(ψₒ, ψₒ, γ₁₅*dx, ops)
+    T2B!(ψₒ, ψₒ, γ₁₆*dx, ops)
+    T2B!(ψₒ, ψₒ, γ₁₇*dx, ops)
+end
