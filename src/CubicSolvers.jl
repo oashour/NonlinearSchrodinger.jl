@@ -318,13 +318,13 @@ end
 # Multi-Product Nystrom
 ####################################################################
 """
-    T4A_N!(ψₒ, ψᵢ, dx, ops)
+    T4A_CMP!(ψₒ, ψᵢ, dx, ops)
 
-Compute `ψₒ`, i.e. `ψᵢ` advanced a step `dx` forward using a Chin-Nystrom Fourth order integrator of type A. The structure `ops::Operators` contains the FFT plans and the kinetic energy operators.  
+Compute `ψₒ`, i.e. `ψᵢ` advanced a step `dx` forward using a Chin Multi-Product Fourth order integrator of type A. The structure `ops::Operators` contains the FFT plans and the kinetic energy operators.  
 
 See also: [`solve!`](@ref), [`Operators`](@ref)
 """
-function T4A_N!(ψₒ, ψᵢ, dx, ops)
+function T4A_CMP!(ψₒ, ψᵢ, dx, ops)
     T2A!(ψₒ, ψᵢ, dx/2, ops)
     T2A!(ψₒ, ψₒ, dx/2, ops)
     ψₒ .*= -1/3
@@ -336,13 +336,13 @@ function T4A_N!(ψₒ, ψᵢ, dx, ops)
 end
 
 """
-    T4B_N!(ψₒ, ψᵢ, dx, ops)
+    T4B_CMP!(ψₒ, ψᵢ, dx, ops)
 
-Compute `ψₒ`, i.e. `ψᵢ` advanced a step `dx` forward using a Chin-Nystrom Fourth order integrator of type B. The structure `ops::Operators` contains the FFT plans and the kinetic energy operators.  
+Compute `ψₒ`, i.e. `ψᵢ` advanced a step `dx` forward using a Chin Multi-Product Fourth order integrator of type B. The structure `ops::Operators` contains the FFT plans and the kinetic energy operators.  
 
 See also: [`solve!`](@ref), [`Operators`](@ref)
 """
-function T4B_N!(ψₒ, ψᵢ, dx, ops)
+function T4B_CMP!(ψₒ, ψᵢ, dx, ops)
     T2B!(ψₒ, ψᵢ, dx/2, ops)
     T2B!(ψₒ, ψₒ, dx/2, ops)
     ψₒ .*= -1/3
@@ -354,13 +354,13 @@ function T4B_N!(ψₒ, ψᵢ, dx, ops)
 end
 
 """
-    T6A_N!(ψₒ, ψᵢ, dx, ops)
+    T6A_CMP!(ψₒ, ψᵢ, dx, ops)
 
-Compute `ψₒ`, i.e. `ψᵢ` advanced a step `dx` forward using a Chin-Nystrom Sixth order integrator of type A. The structure `ops::Operators` contains the FFT plans and the kinetic energy operators.  
+Compute `ψₒ`, i.e. `ψᵢ` advanced a step `dx` forward using a Chin Multi-Product Sixth order integrator of type A. The structure `ops::Operators` contains the FFT plans and the kinetic energy operators.  
 
 See also: [`solve!`](@ref), [`Operators`](@ref)
 """
-function T6A_N!(ψₒ, ψᵢ, dx, ops)
+function T6A_CMP!(ψₒ, ψᵢ, dx, ops)
     T2A!(ψₒ, ψᵢ, dx/3, ops)
     T2A!(ψₒ, ψₒ, dx/3, ops)
     T2A!(ψₒ, ψₒ, dx/3, ops)
@@ -377,13 +377,13 @@ function T6A_N!(ψₒ, ψᵢ, dx, ops)
 end
 
 """
-    T6B_N!(ψₒ, ψᵢ, dx, ops)
+    T6B_CMP!(ψₒ, ψᵢ, dx, ops)
 
-Compute `ψₒ`, i.e. `ψᵢ` advanced a step `dx` forward using a Chin-Nystrom Sixth order integrator of type B. The structure `ops::Operators` contains the FFT plans and the kinetic energy operators.  
+Compute `ψₒ`, i.e. `ψᵢ` advanced a step `dx` forward using a Chin Multi-Product Sixth order integrator of type B. The structure `ops::Operators` contains the FFT plans and the kinetic energy operators.  
 
 See also: [`solve!`](@ref), [`Operators`](@ref)
 """
-function T6B_N!(ψₒ, ψᵢ, dx, ops)
+function T6B_CMP!(ψₒ, ψᵢ, dx, ops)
     T2B!(ψₒ, ψᵢ, dx/3, ops)
     T2B!(ψₒ, ψₒ, dx/3, ops)
     T2B!(ψₒ, ψₒ, dx/3, ops)
@@ -400,13 +400,13 @@ function T6B_N!(ψₒ, ψᵢ, dx, ops)
 end
 
 """
-    T8A_N!(ψₒ, ψᵢ, dx, ops)
+    T8A_CMP!(ψₒ, ψᵢ, dx, ops)
 
-Compute `ψₒ`, i.e. `ψᵢ` advanced a step `dx` forward using a Chin-Nystrom Eighth order integrator of type A. The structure `ops::Operators` contains the FFT plans and the kinetic energy operators.  
+Compute `ψₒ`, i.e. `ψᵢ` advanced a step `dx` forward using a Chin Multi-Product Eighth order integrator of type A. The structure `ops::Operators` contains the FFT plans and the kinetic energy operators.  
 
 See also: [`solve!`](@ref), [`Operators`](@ref)
 """
-function T8A_N!(ψₒ, ψᵢ, dx, ops)
+function T8A_CMP!(ψₒ, ψᵢ, dx, ops)
     T2A!(ψₒ, ψᵢ, dx/4, ops)
     T2A!(ψₒ, ψₒ, dx/4, ops)
     T2A!(ψₒ, ψₒ, dx/4, ops)
@@ -429,13 +429,13 @@ function T8A_N!(ψₒ, ψᵢ, dx, ops)
 end
 
 """
-    T8B_N!(ψₒ, ψᵢ, dx, ops)
+    T8B_CMP!(ψₒ, ψᵢ, dx, ops)
 
-Compute `ψₒ`, i.e. `ψᵢ` advanced a step `dx` forward using a Chin-Nystrom Eighth order integrator of type B. The structure `ops::Operators` contains the FFT plans and the kinetic energy operators.  
+Compute `ψₒ`, i.e. `ψᵢ` advanced a step `dx` forward using a Chin Multi-Product Eighth order integrator of type B. The structure `ops::Operators` contains the FFT plans and the kinetic energy operators.  
 
 See also: [`solve!`](@ref), [`Operators`](@ref)
 """
-function T8B_N!(ψₒ, ψᵢ, dx, ops)
+function T8B_CMP!(ψₒ, ψᵢ, dx, ops)
     T2B!(ψₒ, ψᵢ, dx/4, ops)
     T2B!(ψₒ, ψₒ, dx/4, ops)
     T2B!(ψₒ, ψₒ, dx/4, ops)
