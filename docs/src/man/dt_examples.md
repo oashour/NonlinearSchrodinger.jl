@@ -20,9 +20,9 @@ calc = Calc(λ, tₛ, xₛ, seed, box)
 
 solve!(calc)
 heatmap(calc) 
-savefig("example1.svg") #hide
+savefig("example1_dt.svg") #hide
 ```
-![](example1.svg)
+![](example1_dt.svg)
 
 ## Example 2: Fifth Order Maximal Intensity Breather
 ```@setup 2
@@ -46,9 +46,9 @@ calc = Calc(λ, tₛ, xₛ, seed, box)
 
 solve!(calc)
 surface(calc) 
-savefig("example2.svg") #hide
+savefig("example2_dt.svg") #hide
 ```
-![](example2.svg)
+![](example2_dt.svg)
 
 ## Example 3: 3 Soliton Collision on a ``cn`` background
 ```@setup 3
@@ -71,9 +71,9 @@ calc = Calc(λ, tₛ, xₛ, seed, box, m = 0.5)
 
 solve!(calc)
 surface(calc) 
-savefig("example3.svg") #hide
+savefig("example3_dt.svg") #hide
 ```
-![](example3.svg)
+![](example3_dt.svg)
 
 ## Example 4: First Order Breather matched to a ``dn`` Background
 ```@setup 4 
@@ -98,6 +98,6 @@ calc = Calc(λ, tₛ, xₛ, seed, box, m=m)
 
 solve!(calc)
 heatmap(calc) 
-savefig("example4.svg") #hide
+savefig("example4_dt.svg") #hide
 ```
-![](example4.svg)
+![](example4_dt.svg)
