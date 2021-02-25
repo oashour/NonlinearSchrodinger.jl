@@ -327,10 +327,10 @@ See also: [`solve!`](@ref), [`Operators`](@ref)
 function T4A_CMP!(ψₒ, ψᵢ, dx, ops)
     T2A!(ψₒ, ψᵢ, dx/2, ops)
     T2A!(ψₒ, ψₒ, dx/2, ops)
-    ψₒ .*= -1/3
+    ψₒ .*= 4/3
 
     T2A!(ops.ψ₁, ψᵢ, dx,ops)
-    ops.ψ₁ .*= 4/3
+    ops.ψ₁ .*= -1/3
 
     ψₒ .+= ops.ψ₁
 end
@@ -345,10 +345,10 @@ See also: [`solve!`](@ref), [`Operators`](@ref)
 function T4B_CMP!(ψₒ, ψᵢ, dx, ops)
     T2B!(ψₒ, ψᵢ, dx/2, ops)
     T2B!(ψₒ, ψₒ, dx/2, ops)
-    ψₒ .*= -1/3
+    ψₒ .*= 4/3
 
     T2B!(ops.ψ₁, ψᵢ, dx,ops)
-    ops.ψ₁ .*= 4/3
+    ops.ψ₁ .*= -1/3
 
     ψₒ .+= ops.ψ₁
 end
