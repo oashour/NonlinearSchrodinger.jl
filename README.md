@@ -45,8 +45,8 @@ heatmap(calc)
 
 ## Supporting and Citing
 
-The paper will soon be made available on arXiv and submitted for publication.
+The paper can be found [here](paper.pdf). It is currently stuck in moderation hell on the arXiv due to a subject classification issue, but an arXiv link will be available soon for citations.
 
-# Logo
+## Logo
 
 The logo is formed by 3 Akhmediev breathers with a = 3/8, an homage to my first paper in the field.
