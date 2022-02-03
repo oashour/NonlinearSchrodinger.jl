@@ -79,16 +79,26 @@ function soln_loop_B(sim, ops, ind_p)
     F̃̂ = plan_ifft(@view sim.ψ[:, 1]) 
     F̂ = plan_fft(@view sim.ψ[:, 1])
     sim.ψ̃[:, 1] .= F̂*view(sim.ψ, :, 1)
+    ψ̃_temp1 = sim.ψ̃[:,1] # Input
+    ψ̃_temp2 = zeros(Complex{Float64},size(ψ̃_temp1)) # Output
+    s = 1
     for i = 1:sim.box.Nₓ-1
-        @views sim.T̂(sim.ψ̃[:, i+1], sim.ψ̃[:, i], sim.box.dx, ops)
+        @views sim.T̂(ψ̃_temp2, ψ̃_temp1, sim.box.dx, ops)
         # Pruning
         if sim.β > 0 
             for j in ind_p
-                sim.ψ̃[j, i+1] *= exp(-sim.β*abs(sim.ψ̃[j, i+1]))
+                ψ̃_temp2[j] *= exp(-sim.β*abs(ψ̃_temp2[j]))
             end
         end 
         # Compute the actual ψ
-        #sim.ψ[:, i+1] .= F̃̂*view(sim.ψ̃, :, i+1)
+        # sim.ψ[:, i+1] .= F̃̂*view(sim.ψ̃, :, i+1)
+        ψ̃_temp1 = ψ̃_temp2 # Save for next step
+        # Save for posterity if requested
+        if sim.box.x[i+1] ∈ sim.save_at# || i == Nₓ
+            s += 1
+            sim.ψ̃[:,s] = ψ̃_temp1
+        end
+    ψ̃_temp2 = zeros(Complex{Float64},size(ψ̃_temp1)) # Zero out
     end
     # Shift the FT
     @info "Computing Spectrum"
