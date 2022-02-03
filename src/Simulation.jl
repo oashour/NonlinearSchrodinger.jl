@@ -44,11 +44,11 @@ See also: [`Sim`](@ref), [`solve!`](@ref)
 """
 function soln_loop_A(sim, ops, ind_p)
     ψ_temp1 = sim.ψ[:,1] # Input
-    ψ_temp2 = similar(ψ_temp1) # Output
+    ψ_temp2 = zeros(Complex{Float64},size(ψ_temp1)) # Output
     s = 1
     for i = 1:sim.box.Nₓ-1
         @views sim.T̂(ψ_temp2, ψ_temp1, sim.box.dx, ops)
-        # Pruning # Broken temporarily
+        # Pruning
         if sim.β > 0 
             ops.F̂*ψ_temp2
             for j in ind_p
@@ -58,10 +58,11 @@ function soln_loop_A(sim, ops, ind_p)
         end # if
         ψ_temp1 = ψ_temp2 # Save for next step
         # Save for posterity if requested
-        if sim.box.x[i] ∈ sim.save_at# || i == Nₓ
-            sim.ψ[:,s] = ψ_temp1
+        if sim.box.x[i+1] ∈ sim.save_at# || i == Nₓ
             s += 1
+            sim.ψ[:,s] = ψ_temp1
         end
+    ψ_temp2 = zeros(Complex{Float64},size(ψ_temp1)) # Zero out
     end # for
     @info "Computing Spectrum"
     sim.ψ̃ .= fftshift(fft(sim.ψ, 1), 1)./sim.box.Nₜ
