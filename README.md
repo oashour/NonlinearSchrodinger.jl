@@ -3,7 +3,6 @@
 
 [![Stable](https://img.shields.io/badge/docs-stable-blue.svg)](https://oashour.github.io/NonlinearSchrodinger.jl/stable)
 [![Dev](https://img.shields.io/badge/docs-dev-blue.svg)](https://oashour.github.io/NonlinearSchrodinger.jl/dev)
-[![Build Status](https://travis-ci.com/oashour/NonlinearSchrodinger.jl.svg?branch=master)](https://travis-ci.com/oashour/NonlinearSchrodinger.jl)
 [![CI](https://github.com/oashour/NonlinearSchrodinger.jl/workflows/CI/badge.svg)](https://github.com/oashour/NonlinearSchrodinger.jl/actions)
 [![Coverage](https://codecov.io/gh/oashour/NonlinearSchrodinger.jl/branch/master/graph/badge.svg)](https://codecov.io/gh/oashour/NonlinearSchrodinger.jl)
 [![arXiv](https://img.shields.io/badge/arXiv-2103.14469-b31b1b.svg?style=plastic?logo=arxiv)](https://arxiv.org/abs/2103.14469)
