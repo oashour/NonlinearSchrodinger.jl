@@ -59,6 +59,7 @@ struct Sim{TT<:Real, F}
     KE::Array{TT, 1}
     N::Array{TT, 1}
     P::Array{TT, 1}
+    save_at::Array{TT, 1}
 end # Simulation
 
 """
@@ -68,10 +69,16 @@ Create a `::Sim` object corresponding to eigenvalue `λ` (only used for breather
 
 See also: [`Box`](@ref)
 """
-function Sim(λ, box::Box, ψ₀::Array{Complex{TT}, 1}, T̂; α = 0.0, ϵ=0.0, β=0.0) where TT <: Real
-    ψ = Array{Complex{TT}}(undef, box.Nₜ, box.Nₓ)
+function Sim(λ, box::Box, ψ₀::Array{Complex{TT}, 1}, T̂; α = 0.0, ϵ=0.0, β=0.0, save_interval=:auto) where TT <: Real
+    if save_interval==:auto
+        save_at = box.x
+    else
+        si = save_interval*box.dx
+        save_at = collect(range(box.x[1],step=si,stop=box.x[end]))
+    end
+    ψ = Array{Complex{TT}}(undef, box.Nₜ, length(save_at))
     ψ̃ = similar(ψ)
-    E = zeros(box.Nₓ)
+    E = zeros(length(save_at))
     PE = similar(E)    
     KE = similar(E)
     N = similar(E)
@@ -84,7 +91,7 @@ function Sim(λ, box::Box, ψ₀::Array{Complex{TT}, 1}, T̂; α = 0.0, ϵ=0.0, 
     end
     # Compute some parameters
     λ, T, Ω = params(λ = λ)
-    sim = Sim(λ, T, Ω, box, ψ₀, T̂, α, ϵ, β, ψ, ψ̃, E, PE, KE, N, P)
+    sim = Sim(λ, T, Ω, box, ψ₀, T̂, α, ϵ, β, ψ, ψ̃, E, PE, KE, N, P, save_at)
    return sim
 end #init_sim
 

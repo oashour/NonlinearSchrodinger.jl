@@ -12,14 +12,14 @@
     n_lines = plotattributes[:n_lines]
 
     # Compute sampling interval
-    xₛ = Int(ceil(sim.box.Nₓ/res_x))
+    xₛ = Int(ceil(length(sim.save_at)/res_x))
     tₛ = Int(ceil(sim.box.Nₜ/res_t))
 
 
     if mode==:ψ
         # Downsample
         x_ax = sim.box.t[1:tₛ:end]
-        y_ax =  sim.box.x[1:xₛ:end] 
+        y_ax =  sim.save_at[1:xₛ:end] 
         ψ = sim.ψ[1:tₛ:end, 1:xₛ:end]
 
         xguide --> L"t"
@@ -43,7 +43,7 @@
         s = get(plotattributes, :seriestype, :auto)
         if s == :auto
             # Downsample
-            y_ax =  sim.box.x[1:xₛ:end] 
+            y_ax =  sim.save_at[1:xₛ:end] 
             #ψ̃ = sim.ψ̃[1:tₛ:end, 1:xₛ:end]
             # Extract Lines
             start = sim.box.Nₜ÷2 + 1
@@ -66,7 +66,7 @@
         else
             # Downsample
             x_ax = sim.box.ω[1:tₛ:end]
-            y_ax =  sim.box.x[1:xₛ:end] 
+            y_ax =  sim.save_at[1:xₛ:end] 
             ψ̃ = sim.ψ̃[1:tₛ:end, 1:xₛ:end]
 
             xguide --> L"\omega"
@@ -83,7 +83,7 @@
         end
     elseif mode==:IoM
         # Downscale
-        x = sim.box.x[1:xₛ:end]
+        x = sim.save_at[1:xₛ:end]
         E = sim.E[1:xₛ:end]
         KE = sim.KE[1:xₛ:end]
         PE = sim.PE[1:xₛ:end]
