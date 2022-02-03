@@ -6,6 +6,7 @@
 [![Build Status](https://travis-ci.com/oashour/NonlinearSchrodinger.jl.svg?branch=master)](https://travis-ci.com/oashour/NonlinearSchrodinger.jl)
 [![CI](https://github.com/oashour/NonlinearSchrodinger.jl/workflows/CI/badge.svg)](https://github.com/oashour/NonlinearSchrodinger.jl/actions)
 [![Coverage](https://codecov.io/gh/oashour/NonlinearSchrodinger.jl/branch/master/graph/badge.svg)](https://codecov.io/gh/oashour/NonlinearSchrodinger.jl)
+![arXiv](https://img.shields.io/badge/arXiv-2103.14469-b31b1b.svg?style=for-the-badge)](https://arxiv.org/abs/2103.14469)
 
 NonlinearSchrodinger.jl is a suite of tools for studying Nonlinear Schrodinger equations. The purpose of this package is to encourage the use of open source software in studying these equations as most works in this field rely on closed-source codes. This allows for reproducability, lowers the barrier for new researchers, and alleviates the need to reinvent the wheel.
 
