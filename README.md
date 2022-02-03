@@ -45,7 +45,7 @@ heatmap(calc)
 
 ## Supporting and Citing
 
-The paper can be found [here](paper.pdf). It is currently stuck in moderation hell on the arXiv due to a subject classification issue, but an arXiv link will be available soon for citations.
+The paper can be found [here](https://arxiv.org/abs/2103.14469). It is currently under review.
 
 ## Logo
 
