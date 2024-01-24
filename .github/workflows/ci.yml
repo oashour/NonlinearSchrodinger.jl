@@ -1,7 +1,9 @@
 name: CI
 on:
-  - push
-  - pull_request
+  push:
+    branches: [main, master]
+    tags: ["*"]
+  pull_request:
 jobs:
   test:
     name: Julia ${{ matrix.version }} - ${{ matrix.os }} - ${{ matrix.arch }} - ${{ github.event_name }}
@@ -11,16 +13,12 @@ jobs:
       matrix:
         version:
           - '1.5'
-          - 'nightly'
         os:
           - ubuntu-latest
-          - macOS-latest
-          - windows-latest
         arch:
           - x64
-        exclude:
-          - os: macOS-latest
-            arch: x86
+          - x86
+          
     steps:
       - uses: actions/checkout@v2
       - uses: julia-actions/setup-julia@v1
@@ -40,28 +38,16 @@ jobs:
       - uses: julia-actions/julia-buildpkg@v1
       - uses: julia-actions/julia-runtest@v1
       - uses: julia-actions/julia-processcoverage@v1
-      - uses: codecov/codecov-action@v1
+      - uses: codecov/codecov-action@v2
         with:
-          file: lcov.info
+          files: lcov.info
   docs:
     name: Documentation
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-      - uses: julia-actions/setup-julia@v1
-        with:
-          version: '1'
-      - run: |
-          julia --project=docs -e '
-            using Pkg
-            Pkg.develop(PackageSpec(path=pwd()))
-            Pkg.instantiate()'
-      - run: |
-          julia --project=docs -e '
-            using Documenter: doctest
-            using NonlinearSchrodinger
-            doctest(NonlinearSchrodinger)'
-      - run: julia --project=docs docs/make.jl
+      - uses: julia-actions/julia-buildpkg@latest
+      - uses: julia-actions/julia-docdeploy@latest
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           DOCUMENTER_KEY: ${{ secrets.DOCUMENTER_KEY }}
